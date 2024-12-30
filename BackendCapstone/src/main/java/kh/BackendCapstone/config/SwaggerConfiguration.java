@@ -21,8 +21,8 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableSwagger2
-public class SwaggerConfiguration {
-	
+public class SwaggerConfiguration { //fssdㅇㅈㅇㅈㅇㅈㅇㅇㅈㅇㅈㅇㅈ
+
 	@Bean
 	public Docket api() {
 		log.info("스웨거 함수 호출!!!!!");
