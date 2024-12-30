@@ -22,7 +22,7 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfiguration { //fssdㅇㅈㅇㅈㅇㅈㅇ
-	
+
 	@Bean
 	public Docket api() {
 		log.info("스웨거 함수 호출!!!!!");
