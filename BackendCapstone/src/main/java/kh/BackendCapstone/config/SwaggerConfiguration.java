@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableSwagger2
-public class SwaggerConfiguration { //fssd
+public class SwaggerConfiguration { //fssdㅇㅈㅇㅈㅇㅈㅇ
 	
 	@Bean
 	public Docket api() {
