@@ -1,11 +1,14 @@
 //  import logo from './logo.svg';
 import './App.css';
-import TopNavBar from './component/TopNavBar';
+import Layout from './styles/Layout';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
     <>
-    <TopNavBar/>
+      <Router>
+        <Layout/>
+      </Router>
     </>
   );
 }
