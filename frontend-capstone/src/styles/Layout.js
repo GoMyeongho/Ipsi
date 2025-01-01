@@ -20,7 +20,7 @@ const Layout = () => {
         <Header>
           <TopNavBar/>
         </Header>
-        <Outlet/>
+        <Outlet/> {/* 자식 컴포넌트를 렌더링할 위치 */}
       </Background>
    </> 
   )
