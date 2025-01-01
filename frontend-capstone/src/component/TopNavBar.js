@@ -11,7 +11,9 @@ const Background = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 추가로 구분 */
+  
   /* p 태그 스타일링 */
   p {
     cursor: pointer;
