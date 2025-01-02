@@ -33,16 +33,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 	@Override
 	//클라이언트가 서버로 연결을 시도할 때 호출
 	protected void handleTextMessage(WebSocketSession session, TextMessage msg) throws Exception {
-//        String payload = msg.getPayload(); // 클라이언트가 전송한 메세지
-//        log.warn("{}",payload);
-//        //JSON 문자열을 ChatMsgDto 객체로 변환
-//        ChatMsgDto chatMsg = objectMapper.readValue(payload, ChatMsgDto.class);
-//        ChatRoomResDto chatRoom = chatService.findRoomById(chatMsg.getRoomId());
-//
-//        log.info("채팅룸의 getRegDate() : {}",  chatRoom.getRegDate());
-//        sessionRoomIdMap.put(session, chatMsg.getRoomId()); // 세션과 채팅방 ID 매핑
-//        log.info("채팅룸 세션 확인해야함!!!!@2222 : {}", sessionRoomIdMap);
-//        chatRoom.handlerActions(session, chatMsg, chatService);
 		try {
 			String payload = msg.getPayload();
 			log.warn("{}", payload);
