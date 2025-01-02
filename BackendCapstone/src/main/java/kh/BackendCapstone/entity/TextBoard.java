@@ -23,7 +23,7 @@ public class TextBoard {
 	@Column(nullable = false, name = "text_title")
 	private String title;
 	@Lob
-	@Column(nullable = false, length = 1024, name = "text_title")
+	@Column(nullable = false, length = 1024, name = "text_content")
 	private String content;
 	
 	@Enumerated(EnumType.STRING)
@@ -41,6 +41,6 @@ public class TextBoard {
 	@JoinColumn(name="member_id")
 	private Member member;
 
-	@OneToMany(mappedBy = "text_board", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "textBoard", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> comments = new ArrayList<>();
 }

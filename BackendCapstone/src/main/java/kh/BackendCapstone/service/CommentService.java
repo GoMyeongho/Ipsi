@@ -49,7 +49,7 @@ public class CommentService {
 		try {
 			TextBoard textBoard = textBoardRepository.findById(textId)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			List<Comment> commentList = commentRepository.findByBoard(textBoard);
+			List<Comment> commentList = commentRepository.findByTextBoard(textBoard);
 			List<CommentResDto> commentResDtoList = new ArrayList<>();
 			for (Comment comment : commentList) commentResDtoList.add(CommentToCommentResDto(comment));
 			return commentResDtoList;
