@@ -18,16 +18,17 @@ public class Comment {
 	
 	@ManyToOne
 	@JoinColumn(name = "text_id")
-	private TextBoard textId;
+	private TextBoard textBoard;
 	
 	@ManyToOne
 	@JoinColumn(name = "member_id")
-	private Member memberId;
+	private Member member;
 	
 	@Column(length = 1000, name = "comment_content")
 	private String content;
 	@Column(name = "comment_reg_date")
 	private LocalDateTime regDate;
+	
 	
 	@PrePersist
 	protected void onCreate() {
