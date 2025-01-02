@@ -49,7 +49,7 @@ public class TextBoardService {
 		try {
 			TextBoard textBoard = textBoardRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			return boardToBoardResDto(textBoard, true);
+			return boardToBoardResDto(textBoard);
 		} catch (Exception e) {
 			log.error("게시글 조회중 오류 : {}",e.getMessage());
 			return null;
@@ -60,7 +60,7 @@ public class TextBoardService {
 		try {
 			List<TextBoard> textBoardList = textBoardRepository.findAll();
 			List<TextBoardResDto> textBoardResDtoList = new ArrayList<>();
-			for(TextBoard textBoard : textBoardList) textBoardResDtoList.add(boardToBoardResDto(textBoard, false));
+			for(TextBoard textBoard : textBoardList) textBoardResDtoList.add(boardToBoardResDto(textBoard));
 			return textBoardResDtoList;
 		} catch (Exception e) {
 			log.error("전체 글 조회중 오류 : {}",e.getMessage());
@@ -73,7 +73,7 @@ public class TextBoardService {
 			List<TextBoard> textBoardList = textBoardRepository.findByTitleContaining(keyword);
 			List<TextBoardResDto> textBoardResDtoList = new ArrayList<>();
 			for(TextBoard textBoard : textBoardList) {
-				textBoardResDtoList.add(boardToBoardResDto(textBoard, false));
+				textBoardResDtoList.add(boardToBoardResDto(textBoard));
 			}
 			return textBoardResDtoList;
 		} catch (Exception e) {
@@ -94,7 +94,7 @@ public class TextBoardService {
 			Pageable pageable = PageRequest.of(page, size);
 			List<TextBoard> textBoardList = textBoardRepository.findAll(pageable).getContent();
 			List<TextBoardResDto> textBoardResDtoList = new ArrayList<>();
-			for(TextBoard textBoard : textBoardList) textBoardResDtoList.add(boardToBoardResDto(textBoard, false));
+			for(TextBoard textBoard : textBoardList) textBoardResDtoList.add(boardToBoardResDto(textBoard));
 			return textBoardResDtoList;
 		} catch (Exception e) {
 			log.error("페이지를 불러오는 중에 오류 : {}",e.getMessage());
@@ -154,60 +154,21 @@ public class TextBoardService {
 			Pageable pageable = PageRequest.of(page, size);
 			List<TextBoard> boardList = textBoardRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable).getContent();
 			List<TextBoardResDto> textBoardResDtoList = new ArrayList<>();
-			for (TextBoard board : boardList) textBoardResDtoList.add(boardToBoardResDto(board, false));
+			for (TextBoard board : boardList) textBoardResDtoList.add(boardToBoardResDto(board));
 			return textBoardResDtoList;
 		} catch (Exception e) {
 			log.error("제목과 내용으로 게시글 조회중 오류 : {}", e.getMessage());
 			return null;
 		}
 	}
-	
-/*	// 댓글 목록 조회
-	public List<CommentResDto> findCommentByBoardId(Long textId) {
-		try {
-			TextBoard textBoard = textBoardRepository.findById(textId)
-				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			List<Comment> commentList = textBoard.getComments();
-			List<CommentResDto> commentResDtoList = new ArrayList<>();
-			for(Comment comment : commentList) {
-				CommentResDto commentResDto = new CommentResDto();
-				commentResDto.setBoardId(comment.getTextBoard().getTextId());
-				commentResDto.setCommentId(comment.getCommentId());
-				commentResDto.setContent(comment.getContent());
-				commentResDto.setRegDate(comment.getRegDate());
-				commentResDto.setEmail(comment.getMember().getEmail());
-				commentResDtoList.add(commentResDto);
-			}
-			return commentResDtoList;
-		} catch (Exception e) {
-			log.error("게시글에 대한 댓글 조회 실패 : {}", e.getMessage());
-			return null;
-		}
-	}*/
-	
-	
 	// board 객체를 BoardResDto로 바꿔주는 메서드
-	private TextBoardResDto boardToBoardResDto(TextBoard textBoard, boolean isComment) {
+	private TextBoardResDto boardToBoardResDto(TextBoard textBoard) {
 		TextBoardResDto textBoardResDto = new TextBoardResDto();
 		textBoardResDto.setBoardId(textBoard.getTextId());
 		textBoardResDto.setTitle(textBoard.getTitle());
 		textBoardResDto.setContent(textBoard.getContent());
 		textBoardResDto.setRegDate(textBoard.getRegDate());
 		textBoardResDto.setEmail(textBoard.getMember().getEmail());
-		if(isComment) {
-			List<CommentResDto> commentResDtoList = new ArrayList<>();
-			for(Comment comment : textBoard.getComments()){
-				CommentResDto commentResDto = new CommentResDto();
-				commentResDto.setBoardId(comment.getTextId());
-//				commentResDto.setBoardId(comment.getTextBoard().getTextId());
-				commentResDto.setCommentId(comment.getCommentId());
-				commentResDto.setContent(comment.getContent());
-				commentResDto.setRegDate(comment.getRegDate());
-				commentResDto.setEmail(comment.getMember().getEmail());
-				commentResDtoList.add(commentResDto);
-			}
-			textBoardResDto.setComments(commentResDtoList);
-		}
 		return textBoardResDto;
 	}
 }
