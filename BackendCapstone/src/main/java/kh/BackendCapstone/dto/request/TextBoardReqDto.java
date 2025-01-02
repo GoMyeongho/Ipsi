@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardReqDto {
+public class TextBoardReqDto {
 	private String title;
 	private String content;
 	private String imgPath;

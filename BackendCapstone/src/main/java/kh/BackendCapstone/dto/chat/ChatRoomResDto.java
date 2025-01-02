@@ -1,7 +1,7 @@
 package kh.BackendCapstone.dto.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hopeback.service.chat.ChatService;
+import kh.BackendCapstone.service.chat.ChatService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,10 +1,10 @@
 package kh.BackendCapstone.controller.chat;
 
-import com.hopeback.dto.chat.ChatMsgDto;
-import com.hopeback.dto.chat.ChatRoomReqDto;
-import com.hopeback.dto.chat.ChatRoomResDto;
-import com.hopeback.entity.chat.Chat;
-import com.hopeback.service.chat.ChatService;
+import kh.BackendCapstone.dto.chat.ChatMsgDto;
+import kh.BackendCapstone.dto.chat.ChatRoomReqDto;
+import kh.BackendCapstone.dto.chat.ChatRoomResDto;
+import kh.BackendCapstone.entity.chat.Chat;
+import kh.BackendCapstone.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

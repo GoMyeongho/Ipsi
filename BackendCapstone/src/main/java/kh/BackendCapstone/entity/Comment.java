@@ -18,11 +18,11 @@ public class Comment {
 	
 	@ManyToOne
 	@JoinColumn(name = "text_id")
-	private TextBoard textBoard;
+	private TextBoard textId;
 	
 	@ManyToOne
 	@JoinColumn(name = "member_id")
-	private Member member;
+	private Member memberId;
 	
 	@Column(length = 1000, name = "comment_content")
 	private String content;
