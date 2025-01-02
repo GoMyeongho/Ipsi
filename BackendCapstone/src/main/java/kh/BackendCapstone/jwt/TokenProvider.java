@@ -1,6 +1,6 @@
 package kh.BackendCapstone.jwt;
 
-import com.kh.springJpa241217.dto.TokenDto;
+import kh.BackendCapstone.dto.TokenDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

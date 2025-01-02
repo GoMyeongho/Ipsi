@@ -1,7 +1,7 @@
 package kh.BackendCapstone.dto.request;
 
-import com.kh.springJpa241217.constant.Authority;
-import com.kh.springJpa241217.entity.Member;
+import kh.BackendCapstone.constant.Authority;
+import kh.BackendCapstone.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,6 @@ public class MemberReqDto {
 			.email(email)
 			.pwd(passwordEncoder.encode(pwd))
 			.name(name)
-			.imgPath(imgPath)
 			.authority(Authority.ROLE_USER)
 			.build();
 	}

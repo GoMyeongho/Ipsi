@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter @Setter @NoArgsConstructor
-public class BoardResDto {
+public class TextBoardResDto {
 	private Long boardId;
 	private String title;
 	private String content;
