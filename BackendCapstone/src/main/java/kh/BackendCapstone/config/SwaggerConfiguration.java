@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableSwagger2
-public class SwaggerConfiguration { //fssdㅇㅈㅇㅈㅇㅈㅇㅇㅈㅇㅈㅇㅈ
+public class SwaggerConfiguration {
 
 	@Bean
 	public Docket api() {
@@ -29,7 +29,7 @@ public class SwaggerConfiguration { //fssdㅇㅈㅇㅈㅇㅈㅇㅇㅈㅇㅈㅇ�
 		return new Docket(DocumentationType.SWAGGER_2)
 			.apiInfo(apiInfo())
 			.select()
-			.apis(RequestHandlerSelectors.basePackage("com.kh.springJpa241217"))
+			.apis(RequestHandlerSelectors.basePackage("kh.BackendCapstone"))
 			.paths(PathSelectors.any())
 			.build()
 			.securitySchemes(Arrays.asList(apiKey()))
@@ -39,8 +39,8 @@ public class SwaggerConfiguration { //fssdㅇㅈㅇㅈㅇㅈㅇㅇㅈㅇㅈㅇ�
 	private ApiInfo apiInfo() {
 		log.info("apiInfo 호출!!!!!");
 		return new ApiInfoBuilder()
-			.title("Spring Boot Swagger")
-			.description("api 적용을 위한 스웨거 테스트 입니다.")
+			.title("IPSI 스웨거")
+			.description("IPSI의 api 적용을 위한 스웨거 테스트 입니다.")
 			.version("1.0.0")
 			.build();
 	}
