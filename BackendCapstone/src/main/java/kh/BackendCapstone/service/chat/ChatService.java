@@ -1,13 +1,13 @@
 package kh.BackendCapstone.service.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hopeback.dto.chat.ChatMsgDto;
-import com.hopeback.dto.chat.ChatRoomReqDto;
-import com.hopeback.dto.chat.ChatRoomResDto;
-import com.hopeback.entity.chat.Chat;
-import com.hopeback.entity.chat.ChatRoom;
-import com.hopeback.repository.chat.ChatRepository;
-import com.hopeback.repository.chat.ChatRoomRepository;
+import kh.BackendCapstone.dto.chat.ChatMsgDto;
+import kh.BackendCapstone.dto.chat.ChatRoomReqDto;
+import kh.BackendCapstone.dto.chat.ChatRoomResDto;
+import kh.BackendCapstone.entity.chat.Chat;
+import kh.BackendCapstone.entity.chat.ChatRoom;
+import kh.BackendCapstone.repository.chat.ChatRepository;
+import kh.BackendCapstone.repository.chat.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,7 +68,7 @@ public class ChatService {
         }
     }
 
-    //채팅방전체조회
+    // 채팅방전체조회
     public List<ChatRoomResDto> findAllChatRoom() {
         List<ChatRoom> chatRoom = chatRoomRepository.findAllByOrderByCreatedAtDesc();
         List<ChatRoomResDto> chatRoomResDtos = new ArrayList<>();
@@ -86,13 +85,13 @@ public class ChatService {
         return chatRoomResDtoList;
     }
 
-    //채팅방 가져오기
+    // 채팅방 가져오기
     public ChatRoomResDto findRoomById(String roomId) { return chatRooms.get(roomId);}
 
-    //이전 채팅 가져오기
+    // 이전 채팅 가져오기
     public List<Chat> getRecentMsg(String roomId) { return chatRepository.findRecentMsg(roomId);}
 
-    //방 개설하기
+    // 방 개설하기
     public ChatRoomResDto createRoom(ChatRoomReqDto chatRoomDto) {
         String randomId = UUID.randomUUID().toString();
         log.info("UUID : " + randomId);

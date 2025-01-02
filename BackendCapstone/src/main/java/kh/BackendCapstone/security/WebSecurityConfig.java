@@ -1,6 +1,6 @@
 package kh.BackendCapstone.security;
 
-import com.kh.springJpa241217.jwt.TokenProvider;
+import kh.BackendCapstone.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

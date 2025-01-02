@@ -1,9 +1,9 @@
+/*
 package kh.BackendCapstone.controller;
 
-
-import com.kh.springJpa241217.dto.request.ChatRoomReqDto;
-import com.kh.springJpa241217.dto.response.ChatRoomResDto;
-import com.kh.springJpa241217.service.ChatService;
+import kh.BackendCapstone.dto.request.ChatRoomReqDto;
+import kh.BackendCapstone.dto.response.ChatRoomResDto;
+import kh.BackendCapstone.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -38,3 +38,4 @@ public class ChatController {
 		return ResponseEntity.ok(rst);
 	}
 }
+*/
