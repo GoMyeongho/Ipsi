@@ -23,6 +23,8 @@ public class Member {
 	private String pwd;
 	@Column(length = 50)
 	private String name;
+	@Column(length = 50)
+	private String nickName;
 	@Column(unique = true, length = 13)
 	private String phone;
 	@Column(name="member_reg_date")
