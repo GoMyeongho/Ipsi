@@ -29,6 +29,7 @@ public class Comment {
 	@Column(name = "comment_reg_date")
 	private LocalDateTime regDate;
 	
+	
 	@PrePersist
 	protected void onCreate() {
 		regDate = LocalDateTime.now();

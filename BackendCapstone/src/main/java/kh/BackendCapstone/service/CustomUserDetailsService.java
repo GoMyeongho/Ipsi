@@ -1,7 +1,5 @@
 package kh.BackendCapstone.service;
 
-
-
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getAuthority().toString());
 		
 		return new User(
-			String.valueOf(member.getId()),
+			String.valueOf(member.getMemberId()),
 			member.getPwd(),
 			Collections.singleton(grantedAuthority)
 		);

@@ -1,9 +1,8 @@
 package kh.BackendCapstone.controller;
 
-
-import com.kh.springJpa241217.dto.request.MemberReqDto;
-import com.kh.springJpa241217.dto.response.MemberResDto;
-import com.kh.springJpa241217.service.MemberService;
+import kh.BackendCapstone.dto.request.MemberReqDto;
+import kh.BackendCapstone.dto.response.MemberResDto;
+import kh.BackendCapstone.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

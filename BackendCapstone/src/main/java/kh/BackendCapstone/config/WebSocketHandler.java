@@ -1,58 +1,97 @@
 package kh.BackendCapstone.config;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kh.springJpa241217.dto.ChatMessageDto;
-import com.kh.springJpa241217.service.ChatService;
+import kh.BackendCapstone.dto.chat.ChatMsgDto;
+import kh.BackendCapstone.dto.chat.ChatRoomResDto;
+import kh.BackendCapstone.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@RequiredArgsConstructor // 롬복 어노테이션으로 생서자 만들기
-@Slf4j // 롬복 어노테이션으로 log 메시지 사용
-@Component // 스프링 컨테이너에 빈 등록
+@RequiredArgsConstructor
+@Slf4j
+@Component
+//WebSocketHandler 를 상속받아 WebSocketHandler 를 구현
 public class WebSocketHandler extends TextWebSocketHandler {
-	private final ObjectMapper objectMapper;
-	
-	// 세션과 채팅방을 매핑하는데 사용 (사용자가 어떤 채팅방에 속해 있는지 등록)
-	private final Map<WebSocketSession, String>
-		sessionRoomIdMap = new ConcurrentHashMap<>();
-	private final ChatService chatService;
-	
-	@Override // 메세지 받을때 처리부분
-	protected void handleTextMessage(WebSocketSession session, TextMessage message)
-		throws Exception {
-		String payload = message.getPayload(); // 클라이언트가 전송한 메세지
-		log.info("{}", payload);
-		// JSON 문자열을 ChatMessageDto 변환 작업
-		ChatMessageDto chatMessage = objectMapper.readValue(payload, ChatMessageDto.class);
-		String roomId = chatMessage.getRoomId();
-		if(chatMessage.getType() == ChatMessageDto.MessageType.ENTER) {
-			sessionRoomIdMap.put(session, chatMessage.getRoomId());
-			chatService.addSessionAndHandleEnter(roomId, session, chatMessage);
-		} else if (chatMessage.getType() == ChatMessageDto.MessageType.CLOSE) {
-			chatService.removeSessionAndHandleExit(roomId,session,chatMessage);
-		} else {
-			chatService.sendMessageToAll(roomId, chatMessage);
+	private final ObjectMapper objectMapper; //JSON 문자열로 변환하기 위한 객체
+	private final ChatService chatService; // 채팅방 관련 비즈니스 로직을 처리할 서비스
+	private final Map<WebSocketSession, String> sessionRoomIdMap = new ConcurrentHashMap<>();
+	private final Map<String, Set<String>> roomMembersMap = new ConcurrentHashMap<>();
+	@Override
+	//클라이언트가 서버로 연결을 시도할 때 호출
+	protected void handleTextMessage(WebSocketSession session, TextMessage msg) throws Exception {
+//        String payload = msg.getPayload(); // 클라이언트가 전송한 메세지
+//        log.warn("{}",payload);
+//        //JSON 문자열을 ChatMsgDto 객체로 변환
+//        ChatMsgDto chatMsg = objectMapper.readValue(payload, ChatMsgDto.class);
+//        ChatRoomResDto chatRoom = chatService.findRoomById(chatMsg.getRoomId());
+//
+//        log.info("채팅룸의 getRegDate() : {}",  chatRoom.getRegDate());
+//        sessionRoomIdMap.put(session, chatMsg.getRoomId()); // 세션과 채팅방 ID 매핑
+//        log.info("채팅룸 세션 확인해야함!!!!@2222 : {}", sessionRoomIdMap);
+//        chatRoom.handlerActions(session, chatMsg, chatService);
+		try {
+			String payload = msg.getPayload();
+			log.warn("{}", payload);
+			ChatMsgDto chatMsg = objectMapper.readValue(payload, ChatMsgDto.class);
+			String roomId = chatMsg.getRoomId();
+			ChatRoomResDto chatRoom = chatService.findRoomById(roomId);
+
+			if (chatRoom != null) {
+				log.info("채팅룸의 getRegDate() : {}", chatRoom.getRegDate());
+				sessionRoomIdMap.put(session, roomId);
+				log.info("채팅룸 세션 확인해야함!!!!@2222 : {}", sessionRoomIdMap);
+				roomMembersMap.computeIfAbsent(roomId, k -> new HashSet<>()).add(chatMsg.getSender());
+				chatRoom.handlerActions(session, chatMsg, chatService);
+			} else {
+				log.error("채팅룸을 ID로 찾을 수 없습니다. RoomId: {}", roomId);
+			}
+		} catch (Exception e) {
+			log.error("handleTextMessage에서 에러 발생", e);
 		}
 	}
-	
-	@Override // 웹소켓이 해제가 되었을 때
-	public void afterConnectionClosed(WebSocketSession session, CloseStatus status)
-		throws Exception{
-		log.info("연결 해제 이후 동작 : {}", session);
-		String roomId = sessionRoomIdMap.remove(session);
-		if (roomId != null) {
-			ChatMessageDto chatMessage = new ChatMessageDto();
-			chatMessage.setType(ChatMessageDto.MessageType.CLOSE);
-			chatService.removeSessionAndHandleExit(roomId,session,chatMessage);
+	@Override
+	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+		//세션과 매핑된 채팅방 ID 가져오기
+		try {
+			log.warn("채팅방 종료 : {}", session);
+			String roomId = sessionRoomIdMap.remove(session);
+
+			Set<String> roomMembers = roomMembersMap.get(roomId);
+
+			if (roomMembers != null) {
+				roomMembers.remove(session.getId()); // 세션 아이디로 사용자 제거
+			}
+
+			ChatRoomResDto chatRoom = chatService.findRoomById(roomId);
+			if (chatRoom != null) {
+				chatRoom.handleSessionClosed(session, chatService);
+			} else {
+				log.warn("채팅창을 아이디로 찾을 수 없음: {}", roomId);
+			}
+		}catch (Exception e) {
+			log.error("채팅방 종료 에러", e);
 		}
+	}
+
+	// 실시간으로 채팅방 참여자 목록을 가져오기 위한 메서드
+	@GetMapping("/chat/members/{roomId}")
+	public ResponseEntity<Set<String>> getChatMembers(@PathVariable String roomId) {
+		Set<String> members = roomMembersMap.getOrDefault(roomId, Collections.emptySet());
+		log.info("실시간 채팅방 참여자 룸멤버맵 어떻게 가져오나? : {}", roomMembersMap);
+		return ResponseEntity.ok(members);
 	}
 }

@@ -1,8 +1,9 @@
+/*
 package kh.BackendCapstone.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kh.springJpa241217.dto.ChatMessageDto;
-import com.kh.springJpa241217.dto.response.ChatRoomResDto;
+import kh.BackendCapstone.dto.ChatMessageDto;
+import kh.BackendCapstone.dto.response.ChatRoomResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -101,3 +102,4 @@ public class ChatService {
 		}
 	}
 }
+*/
