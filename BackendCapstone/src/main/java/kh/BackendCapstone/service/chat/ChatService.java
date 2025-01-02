@@ -35,7 +35,7 @@ public class ChatService {
     public List<ChatRoomResDto> findAllRoom() { return new ArrayList<>(chatRooms.values());}
 
 
-    //채팅내역전체조회
+    // 채팅내역전체조회
     public List<ChatMsgDto> findAllChat() {
         List<Chat> chat = chatRepository.findAll();
         List<ChatMsgDto> chatMsgDtos = new ArrayList<>();
@@ -45,7 +45,7 @@ public class ChatService {
         return chatMsgDtos;
     }
 
-    // 채팅방 참여자 목록 가져오기
+/*    // 채팅방 참여자 목록 가져오기
     public List<String> getChatMembers(String roomId) {
         Optional<Chat> chatOptional = chatRepository.findById(roomId);
         if (chatOptional.isPresent()) {
@@ -66,7 +66,7 @@ public class ChatService {
         } else {
             throw new RuntimeException("채팅방을 찾을 수 없습니다.");
         }
-    }
+    }*/
 
     // 채팅방전체조회
     public List<ChatRoomResDto> findAllChatRoom() {
@@ -100,12 +100,10 @@ public class ChatService {
                 .roomId(randomId)
                 .name(chatRoomDto.getName())
                 .regDate(LocalDateTime.now())
-                .category(chatRoomDto.getCategory())
                 .build();
         chatRoomEntity.setRoomId(randomId);
         chatRoomEntity.setRoomName(chatRoomDto.getName());
-        chatRoomEntity.setCreatedAt(LocalDateTime.now());
-        chatRoomEntity.setCategory(chatRoomDto.getCategory());
+        chatRoomEntity.setRegDate(LocalDateTime.now());
         chatRoomRepository.save(chatRoomEntity);
         chatRooms.put(randomId, chatRoom);
         return chatRoom;
@@ -157,12 +155,9 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("해당 채팅방이 존재하지 않습니다."));
         Chat chatMsg = new Chat();
         chatMsg.setChatRoom(chatRoom);
-        chatMsg.setSender(sender);
         chatMsg.setMsg(msg);
-        chatMsg.setProfile(profile);
-        chatMsg.setNickName(nickName);
-        chatMsg.setSentAt(LocalDateTime.now());
-        chatMsg.setActive("active");
+        chatMsg.setRegDate(LocalDateTime.now());
+//        chatMsg.setActive("active");
         chatRepository.save(chatMsg);
     }
 
@@ -171,41 +166,17 @@ public class ChatService {
         ChatRoomResDto chatRoomResDto = new ChatRoomResDto();
         chatRoomResDto.setRoomId(chatRoom.getRoomId());
         chatRoomResDto.setName(chatRoom.getRoomName());
-        chatRoomResDto.setCreatedAt(chatRoom.getCreatedAt());
-        chatRoomResDto.setCategory(chatRoom.getCategory());
+        chatRoomResDto.setRegDate(chatRoom.getRegDate());
         return chatRoomResDto;
     }
 
     //Chat 엔티티 dto로 변환
     private ChatMsgDto convertEntityToChatDto(Chat chat) {
         ChatMsgDto chatMsgDto = new ChatMsgDto();
-        chatMsgDto.setId(chat.getId());
+        chatMsgDto.setId(chat.getChatId());
         chatMsgDto.setRoomId(chat.getChatRoom().getRoomId());
-        chatMsgDto.setProfile(chat.getProfile());
-        chatMsgDto.setNickName(chat.getNickName());
         chatMsgDto.setMsg(chat.getMsg());
-        chatMsgDto.setActive(chat.getActive());
-        chatMsgDto.setSender(chat.getSender());
+//        chatMsgDto.setActive(chat.getActive());
         return chatMsgDto;
     }
-    // ============
-
-    @Transactional(readOnly = true)
-    public List<ChatRoomResDto> getChatListByCategory(String category) {
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByCategory(category);
-        try {
-            if (chatRooms.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            return chatRooms.stream()
-                    .map(this::convertEntityToRoomDto)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("ChatService getChatListByCategory : " + e.getMessage());
-            // throw e;
-            return Collections.emptyList();
-        }
-    }
-
 }
