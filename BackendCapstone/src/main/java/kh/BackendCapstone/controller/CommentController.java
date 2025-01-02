@@ -1,9 +1,8 @@
 package kh.BackendCapstone.controller;
 
-
-import com.kh.springJpa241217.dto.request.CommentReqDto;
-import com.kh.springJpa241217.dto.response.CommentResDto;
-import com.kh.springJpa241217.service.CommentService;
+import kh.BackendCapstone.dto.request.CommentReqDto;
+import kh.BackendCapstone.dto.response.CommentResDto;
+import kh.BackendCapstone.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +26,9 @@ public class CommentController {
 	}
 	// 댓글 조회
 	@GetMapping("/getAll/{boardId}")
-	public ResponseEntity<List<CommentResDto>> getCommentByBoardId(@PathVariable("boardId") Long boardId) {
-		List<CommentResDto> rsp = commentService.findCommentByBoardId(boardId);
-		log.warn("댓글 조회 글번호 : {} 에 대한 개수 : {} 내용 : {}", boardId, rsp.size(), rsp);
+	public ResponseEntity<List<CommentResDto>> getCommentByBoardId(@PathVariable("textId") Long textId) {
+		List<CommentResDto> rsp = commentService.findCommentByBoardId(textId);
+		log.warn("댓글 조회 글번호 : {} 에 대한 개수 : {} 내용 : {}", textId, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
 	}
 	// 댓글 삭제

@@ -1,7 +1,7 @@
 package kh.BackendCapstone.repository.chat;
 
-import com.hopeback.entity.chat.Chat;
-import com.hopeback.entity.chat.ChatRoom;
+import kh.BackendCapstone.entity.chat.Chat;
+import kh.BackendCapstone.entity.chat.ChatRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

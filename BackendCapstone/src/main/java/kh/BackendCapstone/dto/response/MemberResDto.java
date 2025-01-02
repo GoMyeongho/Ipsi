@@ -1,11 +1,9 @@
 package kh.BackendCapstone.dto.response;
 
-
-import com.kh.springJpa241217.entity.Member;
+import kh.BackendCapstone.entity.Member;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
 
 @Getter
 @Setter
@@ -22,7 +20,6 @@ public class MemberResDto {
 		return MemberResDto.builder()
 			.name(member.getName())
 			.email(member.getEmail())
-			.imgPath(member.getImgPath())
 			.regDate(member.getRegDate())
 			.build();
 	}
