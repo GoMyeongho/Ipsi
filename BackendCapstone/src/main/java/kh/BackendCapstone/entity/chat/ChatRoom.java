@@ -25,12 +25,10 @@ public class ChatRoom {
     @Column(name = "created_at")
     private LocalDateTime regDate; // 방 생성 시간
 
-    @OneToMany(mappedBy = "chatRoom")
-    private List<Member> members = new ArrayList<>();
-
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Chat> chats = new ArrayList<>(); // 채팅방 대화 내용 저장
-
-    private String active;
+    
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoomMember> members = new ArrayList<>(); // 채팅방 멤버들
 }
