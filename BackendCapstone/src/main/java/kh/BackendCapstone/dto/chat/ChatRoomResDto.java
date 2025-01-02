@@ -19,14 +19,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @NoArgsConstructor
 public class ChatRoomResDto {
-    private String category;
     private String profile;
     private String nickName;
     private String roomId;
     private String name;
     private LocalDateTime regDate;
     private String active;
-    private LocalDateTime createdAt;
 
     @JsonIgnore // 웹소켓 세션의 직렬화 방지
     private Set<WebSocketSession> sessions; //채팅방에 입장한 세션 정보를 담을 Set
@@ -36,8 +34,7 @@ public class ChatRoomResDto {
     public boolean isSessionEmpty() {  return this.sessions == null || this.sessions.size() == 0;}
 
     @Builder
-    public ChatRoomResDto(String roomId, String name, LocalDateTime regDate, String profile, String nickName, String category) {
-        this.category = category;
+    public ChatRoomResDto(String roomId, String name, LocalDateTime regDate, String profile, String nickName) {
         this.profile = profile;
         this.nickName = nickName;
         this.roomId = roomId;

@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom,String> {
     List<ChatRoom> findAllByOrderByCreatedAtDesc();
-    List<ChatRoom> findAllByCategory(String category);
 }

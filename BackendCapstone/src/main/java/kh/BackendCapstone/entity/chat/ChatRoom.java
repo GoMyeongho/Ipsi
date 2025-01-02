@@ -1,7 +1,7 @@
 package kh.BackendCapstone.entity.chat;
 
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import kh.BackendCapstone.entity.Member;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,18 +19,18 @@ public class ChatRoom {
     @Column(name = "room_id")
     private String roomId;
 
-    @Column(name = "category")
-    private String category; //카테고리(증상, 지역)
-
     @Column(name = "room_name")
-    private String roomName; //방제목
+    private String roomName; // 방제목
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt; //방 생성시간
+    private LocalDateTime regDate; // 방 생성 시간
+
+    @OneToMany(mappedBy = "chatRoom")
+    private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Chat> chats = new ArrayList<>(); //채팅방 대화 내용 저장
+    private List<Chat> chats = new ArrayList<>(); // 채팅방 대화 내용 저장
 
     private String active;
 }
