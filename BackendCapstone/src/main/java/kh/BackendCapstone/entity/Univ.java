@@ -12,7 +12,7 @@ public class Univ {
 	@Id // 해당 필드를 기본키로 지정
 	@Column(name="univ_id")
 	@GeneratedValue(strategy= GenerationType.AUTO) //JPA 가 자동으로 생성 전략을 정함
-	private Long id; // Primary Key
+	private Long univId; // Primary Key
 	
 	@Column(unique = true)
 	private String univName;
