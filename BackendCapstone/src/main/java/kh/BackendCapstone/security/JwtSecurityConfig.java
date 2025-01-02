@@ -1,8 +1,8 @@
 package kh.BackendCapstone.security;
 
 
-import com.kh.springJpa241217.jwt.JwtFilter;
-import com.kh.springJpa241217.jwt.TokenProvider;
+import kh.BackendCapstone.jwt.JwtFilter;
+import kh.BackendCapstone.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

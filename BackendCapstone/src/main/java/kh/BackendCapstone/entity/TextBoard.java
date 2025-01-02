@@ -8,6 +8,8 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 // 게시글에 관한 Entity
 @Getter @Setter @ToString
@@ -38,5 +40,7 @@ public class TextBoard {
 	@ManyToOne
 	@JoinColumn(name="member_id")
 	private Member member;
-	
+
+	@OneToMany(mappedBy = "text_board", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> comments = new ArrayList<>();
 }

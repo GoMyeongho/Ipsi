@@ -1,6 +1,5 @@
 package kh.BackendCapstone.entity;
 
-
 import kh.BackendCapstone.constant.Authority;
 import lombok.*;
 import org.checkerframework.common.value.qual.StringVal;
@@ -8,14 +7,12 @@ import org.checkerframework.common.value.qual.StringVal;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-
-
 @Entity @Table(name="member")
 @Getter @Setter @ToString
 @NoArgsConstructor @AllArgsConstructor
 public class Member {
 	@Id // 해당 필드를 기본키로 지정
-	
+	@Column(name = "member_id")
 	@GeneratedValue(strategy=GenerationType.AUTO) //JPA 가 자동으로 생성 전략을 정함
 	private Long memberId; // Primary Key
 	// nullable=false : null 값이 올 수 없다는 제약 조건

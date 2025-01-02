@@ -1,5 +1,5 @@
+/*
 package kh.BackendCapstone.dto;
-
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,3 +14,4 @@ public class ChatMessageDto {
 	private String sender;      // 보내는 사람
 	private String message;     // 메세지 내용
 }
+*/

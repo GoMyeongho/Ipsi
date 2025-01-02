@@ -1,3 +1,4 @@
+/*
 package kh.BackendCapstone.dto.response;
 
 
@@ -37,3 +38,4 @@ public class ChatRoomResDto {
 		this.sessions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	}
 }
+*/

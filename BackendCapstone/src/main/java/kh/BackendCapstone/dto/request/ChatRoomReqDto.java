@@ -1,3 +1,4 @@
+/*
 package kh.BackendCapstone.dto.request;
 
 import lombok.Getter;
@@ -10,3 +11,4 @@ public class ChatRoomReqDto {
 	private String email;   // 개설자 이메일
 	private String name;    // 방 제목
 }
+*/

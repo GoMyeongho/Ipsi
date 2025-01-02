@@ -1,10 +1,10 @@
 package kh.BackendCapstone.controller;
 
 
-import com.kh.springJpa241217.dto.TokenDto;
-import com.kh.springJpa241217.dto.request.MemberReqDto;
-import com.kh.springJpa241217.dto.response.MemberResDto;
-import com.kh.springJpa241217.service.AuthService;
+import kh.BackendCapstone.dto.TokenDto;
+import kh.BackendCapstone.dto.request.MemberReqDto;
+import kh.BackendCapstone.dto.response.MemberResDto;
+import kh.BackendCapstone.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
