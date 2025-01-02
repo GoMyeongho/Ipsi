@@ -41,10 +41,7 @@ public class Member {
 	private Authority authority;
 	
 	private String refreshToken;
-	
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
-	
+
 	@Builder
 	public Member(String email, String pwd, String name, Authority authority) {
 		this.email = email;
