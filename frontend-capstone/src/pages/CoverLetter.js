@@ -117,14 +117,84 @@ const Line = styled.div`
 
 const Contents = styled.div`
   width: 80%;
-  height: 80%;
-  padding: 20%;
-  border: 2px solid black;
   display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   justify-content: space-between;
 `;
 
+const ContentsBox = styled.div`
+  width: 15%;
+  display: flex;
+
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ContentsTop = styled.div`
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+`;
+
+const UnivLogo = styled.div`
+  width: 100%;
+`;
+
+const UnivName = styled.div`
+  width: 100%;
+`;
+
+const UnivDeptName = styled.div`
+  width: 100%;
+`;
+
+const ContentsBottom = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+`;
+
+const ContentsBottomBox = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+const AuthName = styled.div`
+  width: 100%;
+`;
+
+const ContentsPrice = styled.div`
+  width: 100%;
+`;
+
+const BuyButton = styled.button`
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:hover {
+    background-color: #3700b3;
+  }
+`;
+
 const CoverLetter = () => {
+  const contetnItems = () => {};
+
   return (
     <>
       <Background>
@@ -147,7 +217,32 @@ const CoverLetter = () => {
           </Search>
         </Top>
         <Line />
-        <Contents></Contents>
+        <Contents>
+          <ContentsBox>
+            <ContentsTop>
+              <UnivLogo>
+                <img src="https://firebasestorage.googleapis.com/v0/b/photo-island-eeaa3.firebasestorage.app/o/KH_Comprehensive_Project%2Fsearh.png?alt=media&token=9eed2c07-0961-44c9-a298-c6b984bc680c" alt="" />
+              </UnivLogo>
+              <UnivName>
+              건국대학교
+              </UnivName>
+              <UnivDeptName>
+                문화콘텐츠학과
+              </UnivDeptName>
+            </ContentsTop>
+            <ContentsBottom>
+              <ContentsBottomBox>
+                <AuthName>
+                  작성자
+                </AuthName>
+                <ContentsPrice>
+                  5000원
+                </ContentsPrice>
+              </ContentsBottomBox>
+              <BuyButton>구매하기</BuyButton>
+            </ContentsBottom>
+          </ContentsBox>
+        </Contents>
       </Background>
     </>
   );
