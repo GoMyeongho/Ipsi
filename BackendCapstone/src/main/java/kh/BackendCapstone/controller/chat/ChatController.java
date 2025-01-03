@@ -75,14 +75,4 @@ public class ChatController {
         boolean isTrue = chatService.deleteRoom(roomId);
         return ResponseEntity.ok(isTrue);
     }
-
-    // 카테고리에 따른 채팅방 목록 조회
-    @GetMapping("/chatList/{category}")
-    public ResponseEntity<List<ChatRoomResDto>> getChatListByCategory(@PathVariable String category) {
-        List<ChatRoomResDto> chatRooms = chatService.getChatListByCategory(category);
-        if(chatRooms.isEmpty()) {
-            return ResponseEntity.noContent().build(); // 내용이 없는 경우 204 No Content 반환
-        }
-        return ResponseEntity.ok(chatRooms); // 채팅방 목록과 함께 200 OK 반환
-    }
 }
