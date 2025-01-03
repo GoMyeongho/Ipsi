@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import { useState, useEffect } from "react";
+import AxiosApi from "../api/AxiosApi";
 
 const Background = styled.div`
   width: 100%;
@@ -80,7 +82,6 @@ const KeywordSearch = styled.input`
   width: 100%;
   height: 100%;
   border: none;
-
   text-align: center; /* 텍스트를 가운데 정렬 */
 `;
 
@@ -117,39 +118,168 @@ const Line = styled.div`
 
 const Contents = styled.div`
   width: 80%;
-  height: 80%;
-  padding: 20%;
-  border: 2px solid black;
   display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   justify-content: space-between;
 `;
 
-const CoverLetter = () => {
-  return (
-    <>
-      <Background>
-        <Top>
-          <Title>자기소개서</Title>
-          <Search>
-            <DropdownContainer>
-              <Dropdown>
-                <option value="">대학명</option>
-              </Dropdown>
+const ContentsBox = styled.div`
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 
-              <Dropdown>
-                <option value="">학과명</option>
-              </Dropdown>
-            </DropdownContainer>
-            <KeywordSearchContainer>
-              <KeywordSearch placeholder="키워드검색" />
-              <KeywordSearchButton />
-            </KeywordSearchContainer>
-          </Search>
-        </Top>
-        <Line />
-        <Contents></Contents>
-      </Background>
-    </>
+const ContentsTop = styled.div`
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+`;
+
+const UnivLogo = styled.div`
+  width: 100%;
+  margin-top: 5%;
+  img {
+    width: 50%;  // 원하는 크기로 비율을 설정하거나 px 값으로 설정할 수 있습니다
+    height: auto; // 자동으로 비율에 맞게 높이를 조정
+  }
+`;
+
+const UnivName = styled.div`
+  width: 100%;
+  margin-bottom: 2%;
+`;
+
+const UnivDeptName = styled.div`
+  width: 100%;
+  margin-bottom: 5%;
+`;
+
+const ContentsBottom = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+`;
+
+const ContentsBottomBox = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 3%;
+`;
+
+const AuthName = styled.div`
+  width: 100%;
+ 
+`;
+
+const ContentsPrice = styled.div`
+  width: 100%;
+`;
+
+const BuyButton = styled.button`
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:hover {
+    background-color: #3700b3;
+  }
+`;
+
+const CoverLetter = () => {
+  const [contentItems, setContentItems] = useState([]); // 데이터 상태 저장
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
+  const [error, setError] = useState(null); // 에러 상태 관리
+  
+
+  useEffect(() => {
+    // 백엔드에서 데이터 가져오기
+    const fetchData = async () => {
+      try {
+        setLoading(true); // 로딩 시작
+        const response = await AxiosApi.getContents(); // API 호출
+        console.log(response);
+        setContentItems(response.data); // 데이터 저장
+      } catch (err) {
+        setError(err.message); // 에러 저장
+      } finally {
+        setLoading(false); // 로딩 종료
+      }
+    };
+    fetchData();
+  }, []); // 첫 렌더링 시 한 번만 호출
+
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>에러가 발생했습니다: {error}</div>;
+  }
+
+  return (
+    <Background>
+      <Top>
+        <Title>자기소개서</Title>
+        <Search>
+          <DropdownContainer>
+            <Dropdown>
+              <option value="">대학명</option>
+            </Dropdown>
+            <Dropdown>
+              <option value="">학과명</option>
+            </Dropdown>
+          </DropdownContainer>
+          <KeywordSearchContainer>
+            <KeywordSearch placeholder="키워드검색" />
+            <KeywordSearchButton />
+          </KeywordSearchContainer>
+        </Search>
+      </Top>
+      <Line />
+      <Contents>
+        {loading ? ( // 데이터가 로딩 중일 때
+          <div>로딩 중...</div>
+        ) : // 데이터 로딩 완료 후
+        contentItems && contentItems.length > 0 ? (
+          contentItems.map((item, index) => (
+            <ContentsBox key={index}>
+              <ContentsTop>
+                <UnivLogo>
+                  <img src={item.univImg} alt={`${item.univName} 로고`} />
+                </UnivLogo>
+                <UnivName>{item.univName}</UnivName>
+                <UnivDeptName>{item.univDept}</UnivDeptName>
+              </ContentsTop>
+              <ContentsBottom>
+                <ContentsBottomBox>
+                  <AuthName>{item.name}</AuthName>
+                  <ContentsPrice>{item.price}원</ContentsPrice>
+                </ContentsBottomBox>
+                <BuyButton>구매하기</BuyButton>
+              </ContentsBottom>
+            </ContentsBox>
+          ))
+        ) : (
+          <div>데이터가 없습니다.{contentItems}</div>
+        )}
+      </Contents>
+    </Background>
   );
 };
 
