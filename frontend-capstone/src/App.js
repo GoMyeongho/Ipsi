@@ -11,7 +11,7 @@ function App() {
       <Router>
         <Routes>
           <Route path='/' element={<Layout/>}>
-            <Route path='/coverletter' element={<CoverLetter/>}/>
+            <Route path='/coverLetter' element={<CoverLetter/>}/>
 
           </Route>
         </Routes>

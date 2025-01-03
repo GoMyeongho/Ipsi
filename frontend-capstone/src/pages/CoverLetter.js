@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import { useState, useEffect } from "react";
+import AxiosApi from "../api/AxiosApi";
 
 const Background = styled.div`
   width: 100%;
@@ -80,7 +82,6 @@ const KeywordSearch = styled.input`
   width: 100%;
   height: 100%;
   border: none;
-
   text-align: center; /* 텍스트를 가운데 정렬 */
 `;
 
@@ -126,7 +127,6 @@ const Contents = styled.div`
 const ContentsBox = styled.div`
   width: 15%;
   display: flex;
-
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -143,14 +143,21 @@ const ContentsTop = styled.div`
 
 const UnivLogo = styled.div`
   width: 100%;
+  margin-top: 5%;
+  img {
+    width: 50%;  // 원하는 크기로 비율을 설정하거나 px 값으로 설정할 수 있습니다
+    height: auto; // 자동으로 비율에 맞게 높이를 조정
+  }
 `;
 
 const UnivName = styled.div`
   width: 100%;
+  margin-bottom: 2%;
 `;
 
 const UnivDeptName = styled.div`
   width: 100%;
+  margin-bottom: 5%;
 `;
 
 const ContentsBottom = styled.div`
@@ -168,10 +175,12 @@ const ContentsBottomBox = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  margin: 3%;
 `;
 
 const AuthName = styled.div`
   width: 100%;
+ 
 `;
 
 const ContentsPrice = styled.div`
@@ -193,58 +202,84 @@ const BuyButton = styled.button`
 `;
 
 const CoverLetter = () => {
-  const contetnItems = () => {};
+  const [contentItems, setContentItems] = useState([]); // 데이터 상태 저장
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
+  const [error, setError] = useState(null); // 에러 상태 관리
+  
+
+  useEffect(() => {
+    // 백엔드에서 데이터 가져오기
+    const fetchData = async () => {
+      try {
+        setLoading(true); // 로딩 시작
+        const response = await AxiosApi.getContents(); // API 호출
+        console.log(response);
+        setContentItems(response.data); // 데이터 저장
+      } catch (err) {
+        setError(err.message); // 에러 저장
+      } finally {
+        setLoading(false); // 로딩 종료
+      }
+    };
+    fetchData();
+  }, []); // 첫 렌더링 시 한 번만 호출
+
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>에러가 발생했습니다: {error}</div>;
+  }
 
   return (
-    <>
-      <Background>
-        <Top>
-          <Title>자기소개서</Title>
-          <Search>
-            <DropdownContainer>
-              <Dropdown>
-                <option value="">대학명</option>
-              </Dropdown>
-
-              <Dropdown>
-                <option value="">학과명</option>
-              </Dropdown>
-            </DropdownContainer>
-            <KeywordSearchContainer>
-              <KeywordSearch placeholder="키워드검색" />
-              <KeywordSearchButton />
-            </KeywordSearchContainer>
-          </Search>
-        </Top>
-        <Line />
-        <Contents>
-          <ContentsBox>
-            <ContentsTop>
-              <UnivLogo>
-                <img src="https://firebasestorage.googleapis.com/v0/b/photo-island-eeaa3.firebasestorage.app/o/KH_Comprehensive_Project%2Fsearh.png?alt=media&token=9eed2c07-0961-44c9-a298-c6b984bc680c" alt="" />
-              </UnivLogo>
-              <UnivName>
-              건국대학교
-              </UnivName>
-              <UnivDeptName>
-                문화콘텐츠학과
-              </UnivDeptName>
-            </ContentsTop>
-            <ContentsBottom>
-              <ContentsBottomBox>
-                <AuthName>
-                  작성자
-                </AuthName>
-                <ContentsPrice>
-                  5000원
-                </ContentsPrice>
-              </ContentsBottomBox>
-              <BuyButton>구매하기</BuyButton>
-            </ContentsBottom>
-          </ContentsBox>
-        </Contents>
-      </Background>
-    </>
+    <Background>
+      <Top>
+        <Title>자기소개서</Title>
+        <Search>
+          <DropdownContainer>
+            <Dropdown>
+              <option value="">대학명</option>
+            </Dropdown>
+            <Dropdown>
+              <option value="">학과명</option>
+            </Dropdown>
+          </DropdownContainer>
+          <KeywordSearchContainer>
+            <KeywordSearch placeholder="키워드검색" />
+            <KeywordSearchButton />
+          </KeywordSearchContainer>
+        </Search>
+      </Top>
+      <Line />
+      <Contents>
+        {loading ? ( // 데이터가 로딩 중일 때
+          <div>로딩 중...</div>
+        ) : // 데이터 로딩 완료 후
+        contentItems && contentItems.length > 0 ? (
+          contentItems.map((item, index) => (
+            <ContentsBox key={index}>
+              <ContentsTop>
+                <UnivLogo>
+                  <img src={item.univImg} alt={`${item.univName} 로고`} />
+                </UnivLogo>
+                <UnivName>{item.univName}</UnivName>
+                <UnivDeptName>{item.univDept}</UnivDeptName>
+              </ContentsTop>
+              <ContentsBottom>
+                <ContentsBottomBox>
+                  <AuthName>{item.name}</AuthName>
+                  <ContentsPrice>{item.price}원</ContentsPrice>
+                </ContentsBottomBox>
+                <BuyButton>구매하기</BuyButton>
+              </ContentsBottom>
+            </ContentsBox>
+          ))
+        ) : (
+          <div>데이터가 없습니다.{contentItems}</div>
+        )}
+      </Contents>
+    </Background>
   );
 };
 
