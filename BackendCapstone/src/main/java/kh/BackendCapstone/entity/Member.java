@@ -1,11 +1,14 @@
 package kh.BackendCapstone.entity;
 
 import kh.BackendCapstone.constant.Authority;
+import kh.BackendCapstone.entity.chat.ChatRoomMember;
 import lombok.*;
 import org.checkerframework.common.value.qual.StringVal;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Table(name="member")
 @Getter @Setter @ToString
@@ -23,6 +26,8 @@ public class Member {
 	private String pwd;
 	@Column(length = 50)
 	private String name;
+	@Column(length = 50)
+	private String nickName;
 	@Column(unique = true, length = 13)
 	private String phone;
 	@Column(name="member_reg_date")
@@ -36,7 +41,7 @@ public class Member {
 	private Authority authority;
 	
 	private String refreshToken;
-	
+
 	@Builder
 	public Member(String email, String pwd, String name, Authority authority) {
 		this.email = email;
