@@ -70,7 +70,7 @@ public class ChatService {
 
     // 채팅방전체조회
     public List<ChatRoomResDto> findAllChatRoom() {
-        List<ChatRoom> chatRoom = chatRoomRepository.findAllByOrderByCreatedAtDesc();
+        List<ChatRoom> chatRoom = chatRoomRepository.findAllByOrderByRegDateDesc();
         List<ChatRoomResDto> chatRoomResDtos = new ArrayList<>();
         for(ChatRoom chatRoom1 : chatRoom) {
             chatRoomResDtos.add(convertEntityToRoomDto(chatRoom1));
@@ -129,7 +129,7 @@ public class ChatService {
     // 채팅 내역 삭제
     public boolean deleteChat(Long id) {
         try {
-            Chat chat = chatRepository.findById(id).orElseThrow(
+            Chat chat = chatRepository.findByChatId(id).orElseThrow(
                     () -> new RuntimeException("해당 채팅 내역이 없습니다.")
             );
             chatRepository.delete(chat);
