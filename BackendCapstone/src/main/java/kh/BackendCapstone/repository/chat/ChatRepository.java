@@ -13,9 +13,9 @@ import java.util.Optional;
 public interface ChatRepository extends JpaRepository <Chat, String> {
     @Query(value = "SELECT * FROM chat WHERE room_id = ?1 ORDER BY sent_at ASC LIMIT 50", nativeQuery = true)
     List<Chat> findRecentMsg(String roomId);
-    Page<Chat> findAllByOrderByIdDesc(Pageable pageable);
+    Page<Chat> findAllByOrderByChatId(Pageable pageable);
 
     Optional<List<Chat>> findByChatRoom(ChatRoom chatRoom);
 
-    Optional<Chat> findById(Long chatId);
+    Optional<Chat> findByChatId(Long chatId);
 }

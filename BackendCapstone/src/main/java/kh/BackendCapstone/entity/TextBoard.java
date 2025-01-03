@@ -1,15 +1,16 @@
 package kh.BackendCapstone.entity;
 
+import kh.BackendCapstone.constant.Active;
 import kh.BackendCapstone.constant.TextCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 
 // 게시글에 관한 Entity
 @Getter @Setter @ToString
@@ -29,6 +30,9 @@ public class TextBoard {
 	@Enumerated(EnumType.STRING)
 	private TextCategory textCategory;
 	
+	@Enumerated(EnumType.STRING)
+	private Active active;
+	
 	@Column(name = "text_reg_date")
 	private LocalDateTime regDate;      // 게시글 등록 일자
 	
@@ -41,6 +45,5 @@ public class TextBoard {
 	@JoinColumn(name="member_id")
 	private Member member;
 
-	@OneToMany(mappedBy = "textBoard", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Comment> comments = new ArrayList<>();
+	
 }
