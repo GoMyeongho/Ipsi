@@ -14,8 +14,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket // 의존성 추가 했기 때문에 보여짐
 public class WebSocketConfig implements WebSocketConfigurer {
 	private final WebSocketHandler webSocketHandler;
-	
-	
+
+
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		log.info("소켓 핸들러 생성~~~~~~");

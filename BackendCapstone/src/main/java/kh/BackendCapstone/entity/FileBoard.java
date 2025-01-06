@@ -41,5 +41,10 @@ public class FileBoard {
 	@ManyToOne
 	@JoinColumn(name="member_id")
 	private Member member;
+
+	@ManyToOne
+	@JoinColumn(name="univ_id")
+	private Univ univ;
+
 	
 }

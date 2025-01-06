@@ -22,7 +22,7 @@ const Background = styled.div`
 `;
 
 const Left = styled.div`
-  width: 600px;
+  width: 700px;
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -144,6 +144,7 @@ const TopNavBar = () => {
           <p onClick={materialOpenModal}>입시자료</p>
           <p onClick={() => navigate("/")}>자소서 작성</p>
           <p onClick={() => navigate("/")}>게시판</p>
+          <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
         </Left>
         <Right>
