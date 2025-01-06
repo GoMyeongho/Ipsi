@@ -14,10 +14,10 @@ public class Univ {
 	@GeneratedValue(strategy= GenerationType.AUTO) //JPA 가 자동으로 생성 전략을 정함
 	private Long univId; // Primary Key
 	
-	@Column(name = "univ_name", unique = true)
+	@Column(name = "univ_name")
 	private String univName;
 
-	@Column(name = "univ_dept", unique = true)
+	@Column(name = "univ_dept")
 	private String univDept;
 
 	@Column(name = "univ_img")

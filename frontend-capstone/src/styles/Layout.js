@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import TopNavBar from "../component/TopNavBar"
 import { Outlet } from 'react-router-dom';
+import CoverLetter from "../pages/CoverLetter";
 
 const Background = styled.div`
   width: 100%;
