@@ -2,10 +2,7 @@ package kh.BackendCapstone.dto.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kh.BackendCapstone.service.chat.ChatService;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -17,11 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 @Setter
 @Slf4j
+@ToString
 @NoArgsConstructor
 public class ChatRoomResDto {
+    private String roomId;
     private String profile;
     private String nickName;
-    private String roomId;
     private String name;
     private LocalDateTime regDate;
     private String active;
