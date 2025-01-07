@@ -22,7 +22,7 @@ const Background = styled.div`
 `;
 
 const Left = styled.div`
-  width: 700px;
+  flex-grow: 1;
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -30,8 +30,10 @@ const Left = styled.div`
 
   /* img 태그 스타일링 (LOGO) */
   img {
-    width: 30%;
+    width: 250px;
+    height: 50px;
     cursor: pointer;
+    margin-left: 10px;
   }
 
   /* p 태그 스타일링 (NavBar page 항목)*/
@@ -42,6 +44,8 @@ const Left = styled.div`
   }
 `;
 
+
+
 const Right = styled.div`
   height: 100%;
   display: flex;
@@ -50,9 +54,10 @@ const Right = styled.div`
 
   /* img 태그 스타일링 */
   img {
-    width: 50%;
-    min-width: 50%; /* 최소 너비 설정 */
+    width: 90px;
+    height: 50px; /* 최소 너비 설정 */
     cursor: pointer;
+    margin: 0 10px;
   }
 `;
 
@@ -106,7 +111,7 @@ const LoginModalContent = styled.div`
   
   /* p 태그 스타일링 */
   p {
-    margin-bottom: 10px;  /* 항목 사이에 간격 추가 */
+    margin-bottom: 10px; /* 항목 사이에 간격 추가 */
   }
 `;
 
@@ -138,7 +143,7 @@ const TopNavBar = () => {
       <Background>
         <Left>
           <img
-            src="https://firebasestorage.googleapis.com/v0/b/photo-island-eeaa3.firebasestorage.app/o/KH_Comprehensive_Project%2Fipsi%20Logo.png?alt=media&token=5bf92de0-1097-4148-9546-c1ed3bb887a6"
+            src="https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Flogo%2Flogo.png?alt=media"
             alt="Logo"
           />
           <p onClick={materialOpenModal}>입시자료</p>
