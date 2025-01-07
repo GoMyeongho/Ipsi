@@ -24,10 +24,10 @@ public class Chat {
     private Member member;
 
     @Column(name = "msg")
-    private String msg;
+    private String msg; // 전송 내용
 
     @Column(name = "sent_at")
-    private LocalDateTime regDate;   //
+    private LocalDateTime regDate;   // 전송 시간
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")

@@ -4,8 +4,8 @@ import axiosApi from "../api/AxiosApi";
 moment.locale("ko"); // 한국 시간 적용
 
 const Commons = {
-	KH_DOMAIN: "http://localhost:8111",
-	KH_SOCKET_URL: "ws://localhost:8111/ws/chat",
+	Capstone: "http://localhost:8111",
+	Capstone_URL: "ws://localhost:8111/ws/chat",
 	timeFromNow: (timestamp) => {
 		return moment(timestamp).fromNow();
 	},
@@ -45,7 +45,7 @@ const Commons = {
 		};
 		try {
 			const rsp = await axiosApi.post(
-				`${Commons.KH_DOMAIN}/auth/refresh`,
+				`${Commons.Capstone}/auth/refresh`,
 				refreshToken, config
 			);
 			console.log(rsp.data)
