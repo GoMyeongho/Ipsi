@@ -1,8 +1,7 @@
-// api/firebase.js
-import firebase from "firebase/compat/app";
-import "firebase/compat/storage";  // Firebase Storage를 사용하기 위한 import
+import { initializeApp } from "firebase/app";
+import { getStorage } from "firebase/storage";  // storage 관련 API를 모듈화된 방식으로 import
 
-// Firebase 초기화
+// Firebase 구성 객체
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
 	authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -12,22 +11,11 @@ const firebaseConfig = {
 	appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-if (!firebase.apps.length) {
-	firebase.initializeApp(firebaseConfig);  // Firebase 초기화
-} else {
-	firebase.app();  // 이미 초기화된 앱이 있으면 사용
-}
+// Firebase 앱 초기화
+const app = initializeApp(firebaseConfig);
 
-// 파일 업로드 함수
-export const uploadFileToFirebase = (file, filePath) => {
-	const storageRef = firebase.storage().ref();  // Firebase 스토리지 참조
-	const fileRef = storageRef.child(filePath);  // 업로드할 파일 경로 설정
-	
-	return fileRef.put(file)  // 파일 업로드
-		.then(() => {
-			return fileRef.getDownloadURL();  // 업로드가 끝나면 다운로드 URL 반환
-		})
-		.catch((error) => {
-			throw new Error(error.message);  // 에러 처리
-		});
-};
+// Firebase 스토리지 참조 가져오기
+const storage = getStorage(app);
+
+export { storage };
+export default app;
