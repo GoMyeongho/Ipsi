@@ -1,4 +1,4 @@
-import { storage } from "../api/firebase";  // firebase 설정 import
+import { storage } from "../api/Firebase";  // firebase 설정 import
 
 // Firebase에 파일을 업로드하고 다운로드 URL을 반환하는 함수
 export const uploadFileToFirebase = (file, path, setModalMessage) => {
