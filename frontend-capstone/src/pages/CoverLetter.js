@@ -184,7 +184,7 @@ const BuyButton = styled.button`
 `;
 
 const replaceMiddleChar = (str) => {
-  const len = str.length;
+  const len = str.length; // 문자열의 길이를 구합니다
   if (len === 0) return str; // 빈 문자열일 경우 원본 반환
   const middleIndex = Math.floor(len / 2); // 가운데 글자 인덱스
   return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1); // 가운데 글자를 '*'로 변경
@@ -206,16 +206,20 @@ const CoverLetter = () => {
     const fetchData = async () => {
       try {
         const response = await AxiosApi.getDropDownList();
+        console.log(response);
         if (response.data) {
           const data = response.data;
 
           // 대학별로 학과 리스트를 그룹화
           const departmentsByUniv = data.reduce((acc, item) => {
             const { univName, departments } = item;
+            // 1. 대학 이름이 acc 객체에 없으면 빈 배열을 만들어서 넣어줍니다.
             if (!acc[univName]) {
               acc[univName] = [];
             }
+            // 2. 대학 이름에 해당하는 학과들을 배열로 추가합니다.
             acc[univName] = [...acc[univName], ...departments];
+            // 3. 최종적으로 누적된 객체를 반환합니다.
             return acc;
           }, {});
 
@@ -252,14 +256,15 @@ const CoverLetter = () => {
     setSelectedUniv(selectedUnivName);
 
     // 선택한 대학에 해당하는 학과 리스트 업데이트
-    const selectedDepartments = dropDwonList[selectedUnivName] || [];
+    const selectedDepartments = dropDwonList[selectedUnivName] || []; // || 논리 OR 연산자 : 왼쪽값이 falsy일경우 빈 배열 반환, 드롭다운리스트안에있는 ["대학명"] 키를 확인해 해당하는 값을 반환 
     const uniqueDepartments = [...new Set(selectedDepartments)]; // 중복된 학과 제거
     setDepartments(uniqueDepartments);
-    // 대학을 선택했을 때 학과를 리셋하고 필터링된 데이터를 초기화
-    setSelectedDept(""); // 학과 초기화
-    setFilteredItems(contentItems); // 필터링된 데이터 초기화 (전체 데이터로 복원)
+
+    // 학과를 리셋
+    setSelectedDept("");
   };
 
+  // 학과 선택 핸들러
   const handleDeptChange = (event) => {
     setSelectedDept(event.target.value); // 학과 선택시 상태 업데이트
   };
