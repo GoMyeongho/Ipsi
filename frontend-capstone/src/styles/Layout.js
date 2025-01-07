@@ -12,6 +12,8 @@ const Background = styled.div`
 const Header = styled.div`
   width: 100%;
   height: 100px;
+  position: relative;
+  z-index: 1000;
 `
 
 const Layout = () => {
@@ -23,7 +25,7 @@ const Layout = () => {
         </Header>
         <Outlet/> {/* 자식 컴포넌트를 렌더링할 위치 */}
       </Background>
-   </> 
+   </>
   )
 }
 
