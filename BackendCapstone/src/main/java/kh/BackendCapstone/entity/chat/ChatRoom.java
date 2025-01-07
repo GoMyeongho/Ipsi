@@ -2,8 +2,7 @@ package kh.BackendCapstone.entity.chat;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import kh.BackendCapstone.entity.Member;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,6 +13,9 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "chatRoom")
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatRoom {
     @Id
     @Column(name = "room_id")
