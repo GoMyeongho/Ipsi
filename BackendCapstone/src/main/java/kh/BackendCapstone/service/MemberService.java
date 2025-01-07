@@ -73,6 +73,8 @@ public class MemberService {
 		MemberResDto memberResDto = new MemberResDto();
 		memberResDto.setEmail(member.getEmail());
 		memberResDto.setName(member.getName());
+//		memberResDto.setRegDate(member.getRegDate());
+//		memberResDto.setPhone(m)
 		memberResDto.setRegDate(member.getRegDate());
 		return memberResDto;
 	}

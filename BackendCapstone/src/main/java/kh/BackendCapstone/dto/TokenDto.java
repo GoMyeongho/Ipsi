@@ -15,4 +15,5 @@ public class TokenDto {
 	private Long accessTokenExpiresIn;    // 액세스 토큰 만료 시간
 	private String refreshToken;    // 리프래시 토큰
 	private Long refreshTokenExpiresIn; // 리프래시 토큰 만료 시간
+	private String authority;
 }

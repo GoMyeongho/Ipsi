@@ -14,7 +14,7 @@ public class MemberResDto {
 	private String email;
 	private String name;
 	private LocalDateTime regDate;
-	private String imgPath;
+
 	
 	public static MemberResDto of(Member member) {
 		return MemberResDto.builder()
