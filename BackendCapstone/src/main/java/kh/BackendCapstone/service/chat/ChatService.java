@@ -68,7 +68,7 @@ public class ChatService {
         }
     }*/
 
-    // 채팅방전체조회
+/*    // 채팅방전체조회
     public List<ChatRoomResDto> findAllChatRoom() {
         List<ChatRoom> chatRoom = chatRoomRepository.findAllByOrderByRegDateDesc();
         List<ChatRoomResDto> chatRoomResDtos = new ArrayList<>();
@@ -76,12 +76,15 @@ public class ChatService {
             chatRoomResDtos.add(convertEntityToRoomDto(chatRoom1));
         }
         return chatRoomResDtos;
-    }
-    public List<ChatRoomResDto> findFreeRoom() { // 채팅방 리스트 반환
+    }*/
+    public List<ChatRoomResDto> findRoomList() { // 채팅방 리스트 반환
         List<ChatRoomResDto> chatRoomResDtoList = new ArrayList<>();
-        for (ChatRoomResDto chatRoomDto : chatRooms.values()) {
+        for (ChatRoom chatRoom : chatRoomRepository.findAllByOrderByRegDateDesc()) {
+            ChatRoomResDto chatRoomDto = convertEntityToRoomDto(chatRoom);
             chatRoomResDtoList.add(chatRoomDto);
+            log.warn("챗룸{}", chatRoomDto);
         }
+        log.warn("채팅방 리스트 검색{}", chatRoomResDtoList);
         return chatRoomResDtoList;
     }
 
@@ -105,6 +108,7 @@ public class ChatService {
         chatRoomEntity.setRoomName(chatRoomDto.getName());
         chatRoomEntity.setRegDate(LocalDateTime.now());
         chatRoomRepository.save(chatRoomEntity);
+
         chatRooms.put(randomId, chatRoom);
         return chatRoom;
     }
@@ -161,7 +165,7 @@ public class ChatService {
         chatRepository.save(chatMsg);
     }
 
-    //CatRoom 엔티티를 dto로 변환
+    //ChatRoom 엔티티를 dto로 변환
     private ChatRoomResDto convertEntityToRoomDto(ChatRoom chatRoom) {
         ChatRoomResDto chatRoomResDto = new ChatRoomResDto();
         chatRoomResDto.setRoomId(chatRoom.getRoomId());

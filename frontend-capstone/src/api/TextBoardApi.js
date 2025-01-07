@@ -1,7 +1,7 @@
 import axios from "axios";
 import Commons from "../util/Common";
 
-const baseUrl = Commons.KH_DOMAIN
+const baseUrl = Commons.Capstone
 
 const TextBoardApi = {
 	// 카테고리별 모든 글을 가져오는 api ( 페이지네이션 포함)
