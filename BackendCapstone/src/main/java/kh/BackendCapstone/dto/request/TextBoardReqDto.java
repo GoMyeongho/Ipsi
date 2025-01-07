@@ -1,17 +1,16 @@
 package kh.BackendCapstone.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import kh.BackendCapstone.constant.TextCategory;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class TextBoardReqDto {
 	private String title;
 	private String content;
-	private String imgPath;
+	private String textCategory;
 	private String email;
 }
