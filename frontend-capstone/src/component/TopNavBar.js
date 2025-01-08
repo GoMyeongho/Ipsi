@@ -30,10 +30,10 @@ const Left = styled.div`
 
   /* img 태그 스타일링 (LOGO) */
   img {
-    width: 250px;
-    height: 50px;
+    width: 200px;
+    height: 40px;
     cursor: pointer;
-    margin-left: 10px;
+    margin: 0 20px;
   }
 
   /* p 태그 스타일링 (NavBar page 항목)*/
@@ -56,6 +56,7 @@ const Right = styled.div`
   img {
     width: 90px;
     height: 50px; /* 최소 너비 설정 */
+    object-fit: cover;
     cursor: pointer;
     margin-right: 20px;
   }
@@ -179,7 +180,7 @@ const TopNavBar = () => {
           <LoginModalBackground onClick={loginCloseModal}>
             <LoginModalContent onClick={(e) => e.stopPropagation()}>
               <p onClick={() => handleLoginNavigate("/")}>회원가입</p>
-              <p onClick={() => handleLoginNavigate("/")}>로그인</p>
+              <p onClick={() => handleLoginNavigate('/login')}>로그인</p>
             </LoginModalContent>
           </LoginModalBackground>
         )}
