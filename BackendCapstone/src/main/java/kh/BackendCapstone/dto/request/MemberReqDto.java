@@ -27,7 +27,6 @@ public class MemberReqDto {
 	private String name;
 	private String phone;
 	private String nickname;
-	private LocalDateTime regDate;
 
 
 
