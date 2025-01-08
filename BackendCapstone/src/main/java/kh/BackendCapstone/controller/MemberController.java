@@ -49,4 +49,9 @@ public class MemberController {
 		return ResponseEntity.ok(isSuccess);
 	}
 	
+	@GetMapping("/isRole/{role}")
+	public ResponseEntity<Boolean> isRole(@PathVariable String role, @RequestHeader("Authorization") String token) {
+		boolean isSuccess = memberService.isRole(role, token);
+		return ResponseEntity.ok(isSuccess);
+	}
 }

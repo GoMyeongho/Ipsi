@@ -1,6 +1,7 @@
 package kh.BackendCapstone.entity.chat;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import kh.BackendCapstone.constant.Active;
 import kh.BackendCapstone.entity.Member;
 import lombok.*;
 
@@ -26,6 +27,12 @@ public class ChatRoom {
 
     @Column(name = "created_at")
     private LocalDateTime regDate; // 방 생성 시간
+    
+    @Enumerated(EnumType.STRING)
+    private Active access;
+    
+    @Enumerated(EnumType.STRING)
+    private Active active;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
