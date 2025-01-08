@@ -5,9 +5,9 @@ import imgLogo from "../../../images/kirby2.jpg";
 import Button from "../../../component/ButtonComponent";
 import Input from "../../../component/InputComponent";
 import { Container, Items } from "../../../component/SignupComponent";
-import AxiosApi from "../../../api/AxiosApi";
 import Modal from "../../../util/Modal";
 import Commons from "../../../util/Common";
+import AuthApi from "../../../api/AuthApi";
 
 const Img = styled.img`
   width: 180px;
@@ -47,13 +47,13 @@ const TestLogin = () => {
 	
 	const onClickLogin = async () => {
 		try {
-			const rsp = await AxiosApi.login(inputEmail, inputPw);
+			const rsp = await AuthApi.login(inputEmail, inputPw);
 			if (rsp.data.grantType === "Bearer") {
 				console.log("엑세스 토큰 : " + rsp.data.accessToken);
 				console.log("리플레시 토큰 : " + rsp.data.refreshToken);
 				Commons.setAccessToken(rsp.data.accessToken)
 				Commons.setRefreshToken(rsp.data.refreshToken)
-				navigate("/home");
+				navigate("/");
 			} else {
 				setModalOpen(true);
 				setModalContent("아이디 또는 패스워드 일치 하지 않습니다.");
