@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import {useEffect, useState} from "react";
+import useImageCompressor from "../hook/useImageCompressor";
+import MemberApi from "../api/MemberApi";
 
 const Background = styled.div`
   width: 100%;
@@ -121,12 +123,31 @@ const TopNavBar = () => {
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false); // 입시자료 모달 상태 관리
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // 로그인 모달 상태 관리
   const navigate = useNavigate(); // 페이지 전환 훅
+  
+  useEffect(() => {
+    const isAdmin = async () => {
+      try {
+        const rsp = await MemberApi.isAdmin()
+        console.log(rsp)
+        if (rsp) {
+          // 성공시 보여줄 부분
+        } else {
+          //실패시 보여줄 부분
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    isAdmin();
+  }, []);
+  
 
   const materialOpenModal = () => setIsMaterialModalOpen(true); // 입시자료 모달창 ON
   const materialCloseModal = () => setIsMaterialModalOpen(false); // 입시자료 모달창 OFF
 
   const loginOpenModal = () => setIsLoginModalOpen(true); // 로그인 모달창 ON
   const loginCloseModal = () => setIsLoginModalOpen(false); // 로그인인 모달창 OFF
+  
 
   // 입시자료 클릭 시 모달 닫고 페이지 전환
   const handleMaterialNavigate = (path) => {
@@ -153,6 +174,7 @@ const TopNavBar = () => {
           <p onClick={() => navigate("/")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
+          {}
         </Left>
         <Right>
           <img
