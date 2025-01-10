@@ -26,13 +26,19 @@ const Title = styled.h1`
 `;
 
 const PermissionMain = () => {
-	const { permissionCategory, permissionList, setPermissionList } = useContext(PermissionContext);
+	const {setPage, permissionCategory, permissionList, setPermissionList } = useContext(PermissionContext);
 	
 	const sortList = [
-		{ name: "요청자", id: "member", align: "left", isSort: false, link: (item) => `/subPage/${item.name}` },
-		{ name: "대학 정보", id: "univ", align: "right", isSort: true, link: (item) => `/subPage/${item.name}` },
-		{ name: "요청 일자", id: "regDate", align: "right", isSort: true, link: (item) => `/subPage/${item.name}` },
+		{ name: "요청자", id: "nickName", align: "left", isSort: false, link: (item) => `/admin/member/${item.memberId}` },
+		{ name: "대학교", id: "univName", align: "right", isSort: true, link: (item) => `/admin/auth/${item.permissionId}` },
+		{ name: "학과", id: "univDept", align: "right", isSort: true, link: (item) => `/admin/auth/${item.permissionId}` },
+		{ name: "요청 일자", id: "regDate", align: "right", isSort: true, link: (item) => `/admin/auth/${item.permissionId}` },
 	];
+	
+	useEffect(() => {
+		setPage("auth");
+	}, []);
+	
 	
 	useEffect(() => {
 		const permissions = async () => {

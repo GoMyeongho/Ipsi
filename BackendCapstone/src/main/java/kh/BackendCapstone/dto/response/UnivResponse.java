@@ -10,6 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class UnivResponse {
-    private List<UnivResDto> content;
+    private List<FileBoardResDto> content;
     private int totalPages;
 }

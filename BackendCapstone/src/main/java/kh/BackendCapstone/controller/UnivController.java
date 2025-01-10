@@ -1,7 +1,7 @@
 package kh.BackendCapstone.controller;
 
 
-import kh.BackendCapstone.dto.response.UnivResDto;
+import kh.BackendCapstone.dto.response.FileBoardResDto;
 import kh.BackendCapstone.dto.response.UnivResponse;
 import kh.BackendCapstone.service.UnivService;
 import lombok.RequiredArgsConstructor;
@@ -36,25 +36,6 @@ public class UnivController {
         }
     }
 
-    // 대학 정보 조회
-    @GetMapping("/contents")
-    public ResponseEntity<UnivResponse> getContents(
-            @RequestParam int page,
-            @RequestParam int limit,
-            @RequestParam(required = false) String univName,
-            @RequestParam(required = false) String univDept) {
-        try {
-            // 대학 정보와 페이지 수를 한 번에 가져옴
-            List<UnivResDto> univResDtos = univService.getContents(page, limit, univName, univDept);
-            int totalPages = univService.getUnivPageCount(page, limit, univName, univDept);
-
-            // DTO로 응답 반환
-            UnivResponse response = new UnivResponse(univResDtos, totalPages);
-//            log.info("{}",response);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
+    
 
 }

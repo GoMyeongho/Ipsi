@@ -9,16 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UnivRepository extends JpaRepository<Univ, Long> {
-    @Query("SELECT u FROM Univ u WHERE (:univName IS NULL OR :univName = '' OR u.univName LIKE %:univName%) " +
-            "AND (:univDept IS NULL OR :univDept = '' OR u.univDept LIKE %:univDept%)")
-    Page<Univ> findByFilters(@Param("univName") String univName, @Param("univDept") String univDept, Pageable pageable);
-
-
-import java.util.Optional;
-
-public interface UnivRepository extends JpaRepository<Univ, Long> {
-	Optional<Univ> findById(Long univId);
+	Optional<Univ> findByUnivNameAndUnivDept(String univName, String univDept);
+	Optional<Univ> findByUnivId(Long univId);
 }
