@@ -1,5 +1,4 @@
-import { createGlobalStyle } from "styled-components";
-
+import styled, { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
 
   * {
@@ -8,6 +7,15 @@ const GlobalStyle = createGlobalStyle`
       padding: 0;
     }
 
+`;
+
+export const BackGround = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default GlobalStyle;

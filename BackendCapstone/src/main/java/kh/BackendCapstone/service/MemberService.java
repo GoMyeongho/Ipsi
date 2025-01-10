@@ -2,12 +2,15 @@ package kh.BackendCapstone.service;
 
 
 
+import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.dto.request.MemberReqDto;
 import kh.BackendCapstone.dto.response.MemberResDto;
 import kh.BackendCapstone.entity.Member;
+import kh.BackendCapstone.jwt.TokenProvider;
 import kh.BackendCapstone.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor // 생성자를 통한 의존성 주입을 받기 위해서 모든
 public class MemberService {
 	private MemberRepository memberRepository;
+	private TokenProvider tokenProvider;
 	
 	// 전체 회원 조회
 	public List<MemberResDto> allMember() {
@@ -67,12 +71,22 @@ public class MemberService {
 		}
 	}
 	
+	public boolean isRole(String role, String token) {
+		token = token.replace("Bearer ", "");
+		Authentication authentication = tokenProvider.getAuthentication(token);
+		Long id = Long.parseLong(authentication.getName());
+		Member member = memberRepository.findById(id)
+			.orElseThrow(()-> new RuntimeException("존재 하지 않는 이메일입니다."));
+		return member.getAuthority().equals(Authority.fromString(role));
+	}
 	
 	// Member Entity -> 회원 정보 DTO
 	private MemberResDto convertEntityToDto(Member member) {
 		MemberResDto memberResDto = new MemberResDto();
 		memberResDto.setEmail(member.getEmail());
 		memberResDto.setName(member.getName());
+//		memberResDto.setRegDate(member.getRegDate());
+//		memberResDto.setPhone(m)
 		memberResDto.setRegDate(member.getRegDate());
 		return memberResDto;
 	}

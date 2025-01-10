@@ -35,7 +35,7 @@ public class ChatService {
     public List<ChatRoomResDto> findAllRoom() { return new ArrayList<>(chatRooms.values());}
 
 
-    // 채팅내역전체조회
+    // 채팅 내역 전체 조회
     public List<ChatMsgDto> findAllChat() {
         List<Chat> chat = chatRepository.findAll();
         List<ChatMsgDto> chatMsgDtos = new ArrayList<>();
@@ -45,43 +45,14 @@ public class ChatService {
         return chatMsgDtos;
     }
 
-/*    // 채팅방 참여자 목록 가져오기
-    public List<String> getChatMembers(String roomId) {
-        Optional<Chat> chatOptional = chatRepository.findById(roomId);
-        if (chatOptional.isPresent()) {
-            Chat chat = chatOptional.get();
-            return chat.getMembers();
-        } else {
-            throw new RuntimeException("채팅방을 찾을 수 없습니다.");
-        }
-    }
-
-    // 채팅방 참여자 목록 업데이트
-    public void updateChatMembers(String roomId, List<String> members) {
-        Optional<Chat> chatOptional = chatRepository.findById(roomId);
-        if (chatOptional.isPresent()) {
-            Chat chat = chatOptional.get();
-            chat.setMembers(members);
-            chatRepository.save(chat);
-        } else {
-            throw new RuntimeException("채팅방을 찾을 수 없습니다.");
-        }
-    }*/
-
-    // 채팅방전체조회
-    public List<ChatRoomResDto> findAllChatRoom() {
-        List<ChatRoom> chatRoom = chatRoomRepository.findAllByOrderByRegDateDesc();
-        List<ChatRoomResDto> chatRoomResDtos = new ArrayList<>();
-        for(ChatRoom chatRoom1 : chatRoom) {
-            chatRoomResDtos.add(convertEntityToRoomDto(chatRoom1));
-        }
-        return chatRoomResDtos;
-    }
-    public List<ChatRoomResDto> findFreeRoom() { // 채팅방 리스트 반환
+    public List<ChatRoomResDto> findRoomList() { // 채팅방 리스트 반환
         List<ChatRoomResDto> chatRoomResDtoList = new ArrayList<>();
-        for (ChatRoomResDto chatRoomDto : chatRooms.values()) {
+        for (ChatRoom chatRoom : chatRoomRepository.findAllByOrderByRegDateDesc()) {
+            ChatRoomResDto chatRoomDto = convertEntityToRoomDto(chatRoom);
             chatRoomResDtoList.add(chatRoomDto);
+            log.warn("챗룸{}", chatRoomDto);
         }
+        log.warn("채팅방 리스트 검색{}", chatRoomResDtoList);
         return chatRoomResDtoList;
     }
 
@@ -94,7 +65,7 @@ public class ChatService {
     // 방 개설하기
     public ChatRoomResDto createRoom(ChatRoomReqDto chatRoomDto) {
         String randomId = UUID.randomUUID().toString();
-        log.info("UUID : " + randomId);
+        log.info("UUID : {}", randomId);
         ChatRoom chatRoomEntity = new ChatRoom(); //ChatRoom엔티티 객체 생성(채팅방 정보db저장 하려고)
         ChatRoomResDto chatRoom = ChatRoomResDto.builder()
                 .roomId(randomId)
@@ -105,6 +76,7 @@ public class ChatService {
         chatRoomEntity.setRoomName(chatRoomDto.getName());
         chatRoomEntity.setRegDate(LocalDateTime.now());
         chatRoomRepository.save(chatRoomEntity);
+
         chatRooms.put(randomId, chatRoom);
         return chatRoom;
     }
@@ -135,7 +107,7 @@ public class ChatService {
             chatRepository.delete(chat);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("채팅 내역 삭제중 오류 : {}", e.getMessage());
             return false;
         }
     }
@@ -161,7 +133,7 @@ public class ChatService {
         chatRepository.save(chatMsg);
     }
 
-    //CatRoom 엔티티를 dto로 변환
+    //ChatRoom 엔티티를 dto로 변환
     private ChatRoomResDto convertEntityToRoomDto(ChatRoom chatRoom) {
         ChatRoomResDto chatRoomResDto = new ChatRoomResDto();
         chatRoomResDto.setRoomId(chatRoom.getRoomId());
@@ -180,3 +152,37 @@ public class ChatService {
         return chatMsgDto;
     }
 }
+
+
+/*    // 채팅방 참여자 목록 가져오기
+    public List<String> getChatMembers(String roomId) {
+        Optional<Chat> chatOptional = chatRepository.findById(roomId);
+        if (chatOptional.isPresent()) {
+            Chat chat = chatOptional.get();
+            return chat.getMembers();
+        } else {
+            throw new RuntimeException("채팅방을 찾을 수 없습니다.");
+        }
+    }
+
+    // 채팅방 참여자 목록 업데이트
+    public void updateChatMembers(String roomId, List<String> members) {
+        Optional<Chat> chatOptional = chatRepository.findById(roomId);
+        if (chatOptional.isPresent()) {
+            Chat chat = chatOptional.get();
+            chat.setMembers(members);
+            chatRepository.save(chat);
+        } else {
+            throw new RuntimeException("채팅방을 찾을 수 없습니다.");
+        }
+    }*/
+
+/*    // 채팅방전체조회
+    public List<ChatRoomResDto> findAllChatRoom() {
+        List<ChatRoom> chatRoom = chatRoomRepository.findAllByOrderByRegDateDesc();
+        List<ChatRoomResDto> chatRoomResDtos = new ArrayList<>();
+        for(ChatRoom chatRoom1 : chatRoom) {
+            chatRoomResDtos.add(convertEntityToRoomDto(chatRoom1));
+        }
+        return chatRoomResDtos;
+    }*/
