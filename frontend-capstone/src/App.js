@@ -1,4 +1,8 @@
-import './App.css';
+// import './App.css';
+import './style.css';
+import { CheckoutPage } from './paySystem/CheckOut';
+import { FailPage } from './paySystem/Fail';
+import { SuccessPage } from './paySystem/Success';
 import CoverLetter from './pages/CoverLetter';
 import GlobalStyle from './styles/GlobalStyle';
 import Layout from './styles/Layout';
@@ -21,7 +25,7 @@ function App() {
         <Routes>
           <Route path='/login' element={<TestLogin/>}></Route>
           <Route path='/' element={<Layout/>}>
-            <Route path='/coverLetter' element={<CoverLetter/>}/>
+           <Route path='/coverLetter' element={<CoverLetter/>}/>
             <Route path='/test/modal' element={<ModalExample/>}/>
             <Route path='/test/accordion' element={<AccordionExample/>}/>
             {/*<Route path='/chat' element={<ChatList />} />*/}
@@ -31,6 +35,10 @@ function App() {
               <Route path="auth" element={<PermissionMain/>}/>
             </Route>
           </Route>
+          {/* CheckoutPage와 관련된 경로 */} 
+          <Route path="/checkoutPage" element={<CheckoutPage />} />
+          <Route path="/sandbox/success" element={<SuccessPage />} />
+          <Route path="/checkoutPage/fail" element={<FailPage />} />
         </Routes>
       </Router>
     </>
