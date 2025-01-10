@@ -2,6 +2,7 @@ package kh.BackendCapstone.controller;
 
 
 import kh.BackendCapstone.dto.response.UnivResDto;
+import kh.BackendCapstone.dto.response.UnivResponse;
 import kh.BackendCapstone.service.UnivService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,32 +28,33 @@ public class UnivController {
         try {
             List<Map<String, Object>> dropdownList = univService.getDropDownList();
             // 컨트롤러에서 데이터를 추가로 로그에 남기고 싶다면 여기에 추가
-            log.info("Dropdown Response Data: {}", dropdownList);
+//            log.info("Dropdown Response Data: {}", dropdownList);
             return ResponseEntity.ok(dropdownList);
         } catch (Exception e) {
-            log.error("드롭다운 조회 실패: {}", e.getMessage());
+//            log.error("드롭다운 조회 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    // 전체 자소서 조회
+
+    // 대학 정보 조회
     @GetMapping("/contents")
-    public ResponseEntity<List<UnivResDto>> getAllUniversities() {
+    public ResponseEntity<UnivResponse> getContents(
+            @RequestParam int page,
+            @RequestParam int limit,
+            @RequestParam(required = false) String univName,
+            @RequestParam(required = false) String univDept) {
         try {
-            List<UnivResDto> univList = univService.allUniv();
-            return ResponseEntity.ok(univList);
+            // 대학 정보와 페이지 수를 한 번에 가져옴
+            List<UnivResDto> univResDtos = univService.getContents(page, limit, univName, univDept);
+            int totalPages = univService.getUnivPageCount(page, limit, univName, univDept);
+
+            // DTO로 응답 반환
+            UnivResponse response = new UnivResponse(univResDtos, totalPages);
+//            log.info("{}",response);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // 예외 처리
+            return ResponseEntity.status(500).body(null);
         }
     }
 
-//    // 특정 대학 상세 조회
-//    @GetMapping("/universities/{univId}")
-//    public ResponseEntity<List<UnivResDto>> getUniversityDetails(@PathVariable Long univId) {
-//        try {
-//            List<UnivResDto> univDetails = univService.getUnivDetails(univId);
-//            return ResponseEntity.ok(univDetails);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body(null); // 예외 처리
-//        }
-//    }
 }

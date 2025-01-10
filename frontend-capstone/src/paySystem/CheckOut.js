@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
+import { useLocation } from "react-router-dom";
 
 const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
@@ -8,11 +9,12 @@ const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 export function CheckoutPage() {
   const [ready, setReady] = useState(false);
   const [widgets, setWidgets] = useState(null);
+  const location = useLocation();
+  const productItem = location.state?.productItem;
   const [amount, setAmount] = useState({
     currency: "KRW",
-    value: 1,
+    value: productItem?.price || 0,
   });
-
 
   useEffect(() => {
     async function fetchPaymentWidgets() {
@@ -64,10 +66,14 @@ export function CheckoutPage() {
     renderPaymentWidgets();
   }, [widgets]);
 
-
   return (
     <div className="wrapper w-100">
       <div className="max-w-540 w-100">
+        <h2>
+          {productItem?.univName} - {productItem?.univDept}
+        </h2>
+        <h3>상품명: {productItem?.fileTitle}</h3>
+        <h3>가격: {productItem?.price}원</h3>
         <div id="payment-method" className="w-100" />
         <div id="agreement" className="w-100" />
         <div className="btn-wrapper w-100">
@@ -83,11 +89,17 @@ export function CheckoutPage() {
                  */
                 await widgets?.requestPayment({
                   orderId: generateRandomString(),
-                  orderName: "토스 티셔츠 외 2건",
-                  customerName: "김토스",
+                  orderName: productItem?.fileTitle,
+                  customerName: productItem?.memberName,
                   customerEmail: "customer123@gmail.com",
-                  successUrl: window.location.origin + "/sandbox/success" + window.location.search,
-                  failUrl: window.location.origin + "/sandbox/fail" + window.location.search
+                  successUrl:
+                    window.location.origin +
+                    "/sandbox/success" +
+                    window.location.search,
+                  failUrl:
+                    window.location.origin +
+                    "/sandbox/fail" +
+                    window.location.search,
                 });
               } catch (error) {
                 // TODO: 에러 처리
