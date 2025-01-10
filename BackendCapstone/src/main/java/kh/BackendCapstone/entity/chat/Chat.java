@@ -34,5 +34,6 @@ public class Chat {
     @JsonIgnore
     private ChatRoom chatRoom;
 
+
 //    private String active;
 }

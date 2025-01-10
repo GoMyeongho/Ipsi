@@ -35,6 +35,9 @@ dependencies {
 	implementation 'com.google.firebase:firebase-admin:9.4.1' // firebase dependency
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.2' // 연결을 위한 추가적인 dependency
 	implementation 'org.apache.httpcomponents.core5:httpcore5:5.2' // 연결을 위한 추가적인 dependency
+	implementation 'com.fasterxml.jackson.core:jackson-databind' // Java 객체와 JSON 간의 변환(직렬화/역직렬화)을 지원하는 라이브러리.
+	implementation 'org.apache.httpcomponents:httpclient' // HTTP 요청을 생성하고 응답을 처리하는 클라이언트 라이브러리.
+	implementation 'org.springframework.boot:spring-boot-starter-validation' // Spring(에서) 입력 데이터의 유효성을 검증하기 위한 라이브러리.
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
