@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {Box, Link, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel} from "@mui/material";
 import styled from "styled-components";
 import {visuallyHidden} from "@mui/utils";
-import {priceFormatter} from "../formatter/priceFormatter";
+import {priceFormatter} from "../function/priceFormatter";
 
 const Container = styled.div``
 
