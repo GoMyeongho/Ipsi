@@ -8,9 +8,14 @@
     import kh.BackendCapstone.repository.UnivRepository;
     import lombok.RequiredArgsConstructor;
     import lombok.extern.slf4j.Slf4j;
+    import org.springframework.data.domain.Page;
+    import org.springframework.data.domain.PageRequest;
+    import org.springframework.data.domain.Pageable;
+    import org.springframework.data.domain.Sort;
     import org.springframework.stereotype.Service;
 
     import java.util.*;
+    import java.util.stream.Collectors;
 
     @Service
     @Slf4j
@@ -40,57 +45,92 @@
             }
         }
 
-        public List<UnivResDto> allUniv() {
+        // 페이지네이션 및 필터링 처리
+//        public List<UnivResDto> getContents(int page, int limit, String univName, String univDept) {
+//            Pageable pageable = Pageable.ofSize(limit).withPage(page - 1);
+//
+//            // Univ 데이터 가져오기
+//            Page<Univ> univPage = univRepository.findByFilters(univName, univDept, pageable);
+//
+//            // UnivResDto로 변환
+//            return univPage.stream()
+//                    .map(univ -> {
+//                        // 파일보드 정보 가져오기
+//                        Long fileBoardId = fileBoardRepository.findFileBoardIdByUnivId(univ.getUnivId());
+//                        String fileTitle = fileBoardRepository.findFileTitleById(fileBoardId);
+//
+//                        // 멤버 정보 가져오기
+//                        String memberName = memberRepository.findMemberNameByFileBoardId(fileBoardId);
+//                        String memberEmail = memberRepository.findMemberEmailByFileBoardId(fileBoardId);
+//
+//                        // 가격 정보 가져오기
+//                        int price = priceRepository.findPriceByFileBoardId(fileBoardId);
+//
+//                        List<FileBoard> fileBoards = fileBoardRepository.findByUniv(univ); // Univ 객체를 전달
+//                        for (FileBoard fileBoard : fileBoards) {
+//                            String memberName = fileBoard.getMember() != null ? fileBoard.getMember().getName() : "Unknown";
+//
+//
+//                            // DTO 생성 및 반환
+//                        return new UnivResDto(
+//                                univ.getUnivId(),
+//                                univ.getUnivName(),
+//                                univ.getUnivDept(),
+//                                univ.getUnivImg(),
+//                                file
+//                                price,
+//                                memberName,
+//                                memberEmail,
+//                                fileBoardId,
+//                                fileTitle
+//                        );
+//                    })
+//                    .collect(Collectors.toList());
+//        }
+
+        // 페이지 수 조회
+        public int getUnivPageCount(int page, int limit, String univName, String univDept) {
+            Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("univName").ascending());
+
             try {
-                List<Univ> univs = univRepository.findAll();
+                Page<Univ> univPage = univRepository.findByFilters(univName, univDept, pageable);
+                return univPage.getTotalPages(); // 전체 페이지 수 반환
+            } catch (Exception e) {
+                log.error("페이지 수 조회 실패 : {}", e.getMessage(), e);
+                throw new RuntimeException("페이지 수를 조회하는 중 문제가 발생했습니다.");
+            }
+        }
 
-                List<UnivResDto> univResDtoList = new ArrayList<>();
+        // 페이지네이션 및 필터링 처리
+        public List<UnivResDto> getContents(int page, int limit, String univName, String univDept) {
+            Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("univName").ascending());
 
-                for (Univ univ : univs) {
-                    // 해당 대학과 관련된 파일보드 데이터 가져오기
-                    List<FileBoard> fileBoards = fileBoardRepository.findByUniv(univ); // Univ 객체를 전달
+            try {
+                // 필터링된 대학 데이터를 가져옴
+                Page<Univ> univPage = univRepository.findByFilters(univName, univDept, pageable);
 
-                    for (FileBoard fileBoard : fileBoards) {
-                        String memberName = fileBoard.getMember() != null ? fileBoard.getMember().getName() : "Unknown";
+                List<UnivResDto> univResDtoList = univPage.stream().flatMap(univ -> {
+                    // 해당 대학의 파일보드 리스트 가져오기
+                    List<FileBoard> fileBoards = fileBoardRepository.findByUniv(univ);
 
-                        UnivResDto dto = new UnivResDto(
-                                univ.getUnivName(),
-                                univ.getUnivDept(),
-                                univ.getUnivImg(),
-                                fileBoard.getPrice(),
-                                memberName
-                        );
-                        univResDtoList.add(dto);
-                    }
-                }
+                    return fileBoards.stream().map(fileBoard -> new UnivResDto(
+                            univ.getUnivId(),
+                            univ.getUnivName(),
+                            univ.getUnivDept(),
+                            univ.getUnivImg(),
+                            fileBoard.getPrice(),
+                            fileBoard.getMember() != null ? fileBoard.getMember().getName() : "Unknown",
+                            fileBoard.getMember() != null ? fileBoard.getMember().getEmail() : "Unknown",
+                            fileBoard.getFileId(),
+                            fileBoard.getTitle()
+                    ));
+                }).collect(Collectors.toList());
+                log.warn("{}",univPage);
                 return univResDtoList;
 
             } catch (Exception e) {
                 log.error("전체 조회 실패 : {} - {}", e.getMessage(), e);
-                return null;
+                throw new RuntimeException("데이터 조회 실패: " + e.getMessage());
             }
         }
-
-//        public List<UnivResDto> getUnivDetails(Long univId) {
-//            // 특정 대학 정보 가져오기
-//            Univ univ = univRepository.findById(univId)
-//                    .orElseThrow(() -> new RuntimeException("University not found"));
-//
-//            // 해당 대학의 파일보드 정보 가져오기
-//            List<FileBoard> fileBoards = fileBoardRepository.findByUniv(univ);
-//
-//            // DTO 리스트 생성
-//            List<UnivResDto> result = new ArrayList<>();
-//            for (FileBoard fileBoard : fileBoards) {
-//                UnivResDto dto = new UnivResDto(
-//                        univ.getUnivName(),
-//                        univ.getUnivDept(),
-//                        univ.getUnivImg(),
-//                        fileBoard.getPrice(),
-//                        fileBoard.getMember().getName() // 작성자 이름 가져오기
-//                );
-//                result.add(dto);
-//            }
-//            return result;
-//        }
     }
