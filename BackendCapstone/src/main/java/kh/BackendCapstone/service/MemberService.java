@@ -1,7 +1,5 @@
 package kh.BackendCapstone.service;
 
-
-
 import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.dto.request.MemberReqDto;
 import kh.BackendCapstone.dto.response.MemberResDto;
@@ -11,6 +9,7 @@ import kh.BackendCapstone.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.List;
 public class MemberService {
 	private MemberRepository memberRepository;
 	private TokenProvider tokenProvider;
-	
+
 	// 전체 회원 조회
 	public List<MemberResDto> allMember() {
 		try {
@@ -101,5 +100,4 @@ public class MemberService {
 		memberResDto.setRegDate(member.getRegDate());
 		return memberResDto;
 	}
-	
 }

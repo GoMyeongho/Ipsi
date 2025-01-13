@@ -1,6 +1,6 @@
 import axios from "axios";
 import Commons from "../util/Common";
-
+import AxiosInstance from "./AxiosInstance";
 
 const baseUrl = Commons.Capstone
 
@@ -19,7 +19,6 @@ const MemberApi = {
 			},
 		});
 	},
-	
 }
 
 export default MemberApi

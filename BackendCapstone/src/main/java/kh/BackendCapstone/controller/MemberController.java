@@ -48,7 +48,7 @@ public class MemberController {
 		log.info("삭제 성공 여부 : {}", isSuccess);
 		return ResponseEntity.ok(isSuccess);
 	}
-	
+	// 받는거
 	@GetMapping("/isRole/{role}")
 	public ResponseEntity<Boolean> isRole(@PathVariable String role, @RequestHeader("Authorization") String token) {
 		boolean isSuccess = memberService.isRole(role, token);
