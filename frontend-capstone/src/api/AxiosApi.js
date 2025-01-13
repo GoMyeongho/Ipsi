@@ -47,12 +47,6 @@ const AxiosApi = {
       throw error;
     }
   },
-};
-  getContents: async () => { 
-    const response = await axios.get(Capstone + `/univ/contents`);
-    // console.log(response)
-    return response;
-  },
   
   // 채팅방 목록 가져오기
   chatList: async () => {
@@ -60,19 +54,29 @@ const AxiosApi = {
   },
 
   // 채팅방 생성하기
-  chatCreate: async (email, name) => {
-    console.log(email, name);
+  chatCreate: async (name, personCnt) => {
+    console.log(name);
     const chat = {
-      email: email,
-      name: name
+      name: name,
+      personCnt: personCnt
     };
+    console.log(chat); // 서버로 보낼 데이터를 확인
     return await axios.post(Capstone + "/chat/new", chat);
   },
 
   // 채팅방 정보 가져오기
   chatDetail: async (roomId) => {
     return await axios.get(Capstone + `/chat/room/${roomId}`);
-  }
+  },
+
+  // 해당 채팅방의 이전 채팅 내역 가져오기
+  chatHistory: async (roomId) => {
+    const response = await axios.get(Capstone + `/chat/message/${roomId}`);
+    if (response.data && Array.isArray(response.data.messages)) {
+      return response.data.messages;  // 메시지 목록을 반환
+    }
+    return response.data;  // 객체로 온다면, 필요에 따라 처리
+  },
 }
 
 export default AxiosApi;
