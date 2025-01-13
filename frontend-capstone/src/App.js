@@ -13,8 +13,9 @@ import AdminNav from "./pages/admin/AdminNav";
 import PermissionMain from "./pages/admin/auth/list/PermissionMain";
 import PermissionStore from "./context/admin/PermissionStore";
 import TestLogin from "./pages/auth/login/TestLogin";
+import ChatStore from './context/ChatStore';
 // import ChatList from './pages/chat/ChatList';
-// import ChatRoomCreate from './pages/chat/ChatRoomCreate';
+// import ChatRoomCreate from './component/ChatComponent/ChatRoomCreate';
 // import Chatting from './pages/chat/Chatting';
 
 function App() {
@@ -24,12 +25,12 @@ function App() {
       <Router>
         <Routes>
           <Route path='/login' element={<TestLogin/>}></Route>
-          <Route path='/' element={<Layout/>}>
+          <Route path='/' element={<ChatStore><Layout/></ChatStore>}>
            <Route path='/coverLetter' element={<CoverLetter/>}/>
             <Route path='/test/modal' element={<ModalExample/>}/>
             <Route path='/test/accordion' element={<AccordionExample/>}/>
             {/*<Route path='/chat' element={<ChatList />} />*/}
-            {/*<Route path='/chat-create' element={<ChatRoomCreate />}/>*/}
+            {/* <Route path='/chat-create' element={<ChatRoomCreate />}/> */}
             {/*<Route path='/chatting/:roomId' element={<Chatting />}/>*/}
             <Route path="/admin" element={<PermissionStore><AdminNav/></PermissionStore>}>
               <Route path="auth" element={<PermissionMain/>}/>
