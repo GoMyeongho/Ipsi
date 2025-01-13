@@ -4,6 +4,7 @@ import Commons from "../util/Common";
 const baseUrl = Commons.Capstone
 const token = localStorage.getItem("accessToken");
 
+// 주는거
 const AdminApi = {
 	getPermissionList: (category) => {
 		console.log(`권한 부여 목록 호출 : ${category}`);

@@ -1,6 +1,9 @@
 import styled from "styled-components";
 import TopNavBar from "../component/TopNavBar"
 import { Outlet } from 'react-router-dom';
+import CoverLetter from "../pages/CoverLetter";
+import ChatModal from "../pages/chat/ChatModal";
+import ChatStore from "../context/ChatStore";
 
 const Background = styled.div`
   width: 100%;
@@ -22,6 +25,7 @@ const Layout = () => {
         <Header>
           <TopNavBar/>
         </Header>
+        <ChatModal/>
         <Outlet/> {/* 자식 컴포넌트를 렌더링할 위치 */}
       </Background>
    </>
