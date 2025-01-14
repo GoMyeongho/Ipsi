@@ -34,15 +34,12 @@
 
 			@Column(name = "refresh_token")
 			private String refreshToken;
-			@Column(name = "nick_name")
-			private String nickName;
 
 			@Column(unique = true, length = 13)
 			private String phone;
 			@Column(name = "member_reg_date")
 			private LocalDateTime regDate;
-			@Column(length = 50)
-			private String type;
+
 			@ManyToOne
 			@JoinColumn(name = "univ_id")
 			private Univ univ;
