@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import {useEffect, useState} from "react";
-import useImageCompressor from "../hook/useImageCompressor";
 import MemberApi from "../api/MemberApi";
 
 const Background = styled.div`
@@ -170,7 +169,7 @@ const TopNavBar = () => {
             alt="Logo"
           />
           <p onClick={materialOpenModal}>입시자료</p>
-          <p onClick={() => navigate("/")}>자소서 작성</p>
+          <p onClick={() => navigate("/coverLetterWrite")}>자소서 작성</p>
           <p onClick={() => navigate("/")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
@@ -203,6 +202,7 @@ const TopNavBar = () => {
             <LoginModalContent onClick={(e) => e.stopPropagation()}>
               <p onClick={() => handleLoginNavigate("/")}>회원가입</p>
               <p onClick={() => handleLoginNavigate('/login')}>로그인</p>
+              <p onClick={() => handleLoginNavigate('/myPageNavBar')}>마이페이지</p>
             </LoginModalContent>
           </LoginModalBackground>
         )}
