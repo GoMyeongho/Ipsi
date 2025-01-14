@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import {useEffect, useState} from "react";
-import useImageCompressor from "../hook/useImageCompressor";
 import MemberApi from "../api/MemberApi";
 import ModalLoginPage from "../pages/auth/login/ModalLoginPage";
 import MemberModal from "../pages/member/MemberMoal";
@@ -210,8 +209,8 @@ const TopNavBar = () => {
             alt="Logo"
           />
           <p onClick={materialOpenModal}>입시자료</p>
-          <p onClick={() => navigate("/")}>자소서 작성</p>
-          <p onClick={() => navigate("/post/list")}>게시판</p>
+          <p onClick={() => navigate("/coverLetterWrite")}>자소서 작성</p>
+          <p onClick={() => navigate("/")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
           {}
@@ -238,7 +237,6 @@ const TopNavBar = () => {
         )}
 
         {/* 로그인 모달창 */}
-        
       </Background>
       <ModalLoginPage
         isOpen={isModalOpen}
