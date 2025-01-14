@@ -32,6 +32,16 @@ const Commons = {
 	setRefreshToken: (token) => {
 		localStorage.setItem("refreshToken",token)
 	},
+
+	  // accessToken 삭제하기 (로그아웃 시 사용)
+	  removeAccessToken: () => {
+		localStorage.removeItem("accessToken");
+	  },
+	
+	  // refreshToken 삭제하기 (로그아웃 시 사용)
+	  removeRefreshToken: () => {
+		localStorage.removeItem("refreshToken");
+	  },
 	
 	// 401 에러 처리 함수
 	handleUnauthorized: async () => {
@@ -54,6 +64,39 @@ const Commons = {
 			console.log(e)
 			return false;
 		}
-	}
+	},
+
+	TakenToken : async()=>{
+		const accessToken = Commons.getAccessToken();
+		try{ return await axiosApi.get(Commons.Capstone + `/sale/takenEmail`,{
+		headers: {
+		  "Content-Type": "application/json",
+		  Authorization: "Bearer " + accessToken,
+		}, }
+		)}catch(e){
+		  if (e.response.status === 401) {
+			await Commons.handleUnauthorized();
+			const newToken = Commons.getAccessToken();
+			if (newToken !== accessToken) {
+			  return await axiosApi.get(Commons.Capstone + `/sale/takenEmail`,{
+				headers: {
+				  "Content-Type": "application/json",
+				  Authorization: "Bearer " + newToken,
+				}, 
+			})}
+		}
+	  };
+	  },
+	IsLogin : async()=>{
+		const accessToken = Commons.getAccessToken();
+		return await axiosApi.get(Commons.Capstone + `/sale/isLogin/${accessToken}`,{
+		  headers: {
+			"Content-Type": "application/json",
+			Authorization: "Bearer " + accessToken,
+		  },
+		})
+	  }
 };
+
+
 export default Commons
