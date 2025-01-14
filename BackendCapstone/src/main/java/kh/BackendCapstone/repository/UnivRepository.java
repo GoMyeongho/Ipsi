@@ -13,6 +13,9 @@ import java.util.Optional;
 
 @Repository
 public interface UnivRepository extends JpaRepository<Univ, Long> {
+	// 대학 이름과 학과를 기반으로 조회
+	List<Univ> findAllByUnivNameAndUnivDept(String univName, String univDept);
+
+	// 단일 조회를 원할 때 사용할 수도 있음
 	Optional<Univ> findByUnivNameAndUnivDept(String univName, String univDept);
-	Optional<Univ> findByUnivId(Long univId);
 }

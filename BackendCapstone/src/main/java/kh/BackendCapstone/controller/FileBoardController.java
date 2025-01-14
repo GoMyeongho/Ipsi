@@ -1,12 +1,15 @@
 package kh.BackendCapstone.controller;
 
+import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
 import kh.BackendCapstone.dto.response.UnivResponse;
 import kh.BackendCapstone.service.FileBoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,10 +36,53 @@ public class FileBoardController {
 			
 			// DTO로 응답 반환
 			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
-//            log.info("{}",response);
+            log.info("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ{}",response);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body(null);
+		}
+	}
+
+	@PostMapping("/save")
+	public ResponseEntity<String> saveFileBoard(
+			@RequestParam("title") String title,
+			@RequestParam("mainFile") MultipartFile mainFile,
+			@RequestParam(value = "preview", required = false) MultipartFile preview,
+			@RequestParam(value = "summary", required = false) String summary,
+			@RequestParam("price") int price,
+			@RequestParam("fileCategory") FileCategory fileCategory,
+			@RequestParam(value = "keywords", required = false) String keywordsJson) {
+
+		try {
+
+			// mainFile이 null이 아니고, 파일이 비어 있지 않다면
+			if (mainFile == null || mainFile.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Main file is required.");
+			}
+
+			// preview 파일이 null이거나 비어있다면 콘솔에 출력하고 진행
+			if (preview == null || preview.isEmpty()) {
+				System.out.println("No preview file provided. Proceeding without it.");
+			} else {
+				// preview 파일이 존재하면, getOriginalFilename을 안전하게 호출할 수 있습니다.
+				String previewFileName = preview.getOriginalFilename();
+				System.out.println("Preview file: " + previewFileName);
+			}
+
+			if (summary == null || summary.trim().isEmpty()) {
+				summary = "No summary provided"; // 기본값 설정
+			}
+
+			if (keywordsJson == null || keywordsJson.trim().isEmpty()) {
+				keywordsJson = "{}"; // 빈 JSON 객체로 설정
+			}
+
+			// 서비스 호출
+			fileBoardService.saveFileBoard(title, mainFile, preview, summary, price, fileCategory, keywordsJson);
+			return ResponseEntity.ok("파일 저장 성공");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
 		}
 	}
 }
