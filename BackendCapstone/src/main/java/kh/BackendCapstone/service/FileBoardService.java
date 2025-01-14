@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service @Slf4j
 @RequiredArgsConstructor
@@ -39,7 +39,7 @@ public class FileBoardService {
 	
 	// 페이지네이션 및 필터링 처리
 	public List<FileBoardResDto> getContents(int page, int limit, String univName, String univDept, String category) {
-		Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("univName").ascending());
+		Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("univ.univName").ascending());
 		try {
 			Page<FileBoard> fileBoardPage = selectOption(univName, univDept, pageable, category);
 			List<FileBoardResDto> fileBoardResDtoList = convertEntityToDto(fileBoardPage.getContent());

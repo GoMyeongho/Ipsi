@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {useEffect, useState} from "react";
 import useImageCompressor from "../hook/useImageCompressor";
 import MemberApi from "../api/MemberApi";
+import ModalLoginPage from "../pages/auth/login/ModalLoginPage";
+import MemberModal from "../pages/member/MemberMoal";
+import LoginModal from "../pages/auth/login/LoginModal";
+import SignupModal from "../pages/auth/signup/SingupModal";
 
 const Background = styled.div`
   width: 100%;
@@ -121,9 +125,19 @@ const LoginModalContent = styled.div`
 
 const TopNavBar = () => {
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false); // 입시자료 모달 상태 관리
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // 로그인 모달 상태 관리
+  
   const navigate = useNavigate(); // 페이지 전환 훅
   
+  
+  
+  const [isModalOpen, setModalOpen] = useState(false);
+  
+  
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+  const [isSignupModalOpen, setSignupModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("loggedInUserId")
+  );
   useEffect(() => {
     const isAdmin = async () => {
       try {
@@ -144,22 +158,48 @@ const TopNavBar = () => {
 
   const materialOpenModal = () => setIsMaterialModalOpen(true); // 입시자료 모달창 ON
   const materialCloseModal = () => setIsMaterialModalOpen(false); // 입시자료 모달창 OFF
-
-  const loginOpenModal = () => setIsLoginModalOpen(true); // 로그인 모달창 ON
-  const loginCloseModal = () => setIsLoginModalOpen(false); // 로그인인 모달창 OFF
   
-
   // 입시자료 클릭 시 모달 닫고 페이지 전환
   const handleMaterialNavigate = (path) => {
     setIsMaterialModalOpen(false); // 모달 닫기
     navigate(path); // 페이지 전환
   };
-
-  // 로그인 모달 클릭 시 페이지 전환
-  const handleLoginNavigate = (path) => {
-    setIsLoginModalOpen(false); // 모달 닫기
-    navigate(path); // 페이지 전환
+  const handleImageClick = () => {
+    setModalOpen(true);
   };
+  
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+  
+  
+  const closeLoginModal = () => {
+    setLoginModalOpen(false);
+  };
+  
+  const closeSignupModal = () => {
+    setSignupModalOpen(false);
+  };
+  const handleModalLinkClick = (action) => {
+    if (action === "login") {
+      setModalOpen(false);
+      setLoginModalOpen(true);
+    } else if (action === "signup") {
+      setModalOpen(false);
+      setSignupModalOpen(true);
+    } else if (action === "logout") {
+      setIsLoggedIn(false); // 로그인 상태 false
+      localStorage.clear(); // 로컬스토리지 삭제
+      setModalOpen(false); // 모달 닫기
+      navigate("/");
+      alert("로그아웃 되었습니다.");
+    } else if (action === "member") {
+      navigate("/Member"); // 마이페이지 이동
+      setModalOpen(false); // 모달 닫기
+    }
+  };
+
+  
 
   return (
     <>
@@ -171,7 +211,7 @@ const TopNavBar = () => {
           />
           <p onClick={materialOpenModal}>입시자료</p>
           <p onClick={() => navigate("/")}>자소서 작성</p>
-          <p onClick={() => navigate("/")}>게시판</p>
+          <p onClick={() => navigate("/post/list")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
           {}
@@ -180,7 +220,7 @@ const TopNavBar = () => {
           <img
             src="https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fprofile%2FProfile_Purple.png?alt=media"
             alt="Profile"
-            onClick={loginOpenModal}
+            onClick={handleImageClick}
           />
         </Right>
 
@@ -198,15 +238,36 @@ const TopNavBar = () => {
         )}
 
         {/* 로그인 모달창 */}
-        {isLoginModalOpen && (
-          <LoginModalBackground onClick={loginCloseModal}>
-            <LoginModalContent onClick={(e) => e.stopPropagation()}>
-              <p onClick={() => handleLoginNavigate("/")}>회원가입</p>
-              <p onClick={() => handleLoginNavigate('/login')}>로그인</p>
-            </LoginModalContent>
-          </LoginModalBackground>
-        )}
+        
       </Background>
+      <ModalLoginPage
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        handleModalLinkClick={handleModalLinkClick}
+      />
+      
+      {isLoggedIn ? (
+        <MemberModal
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          handleModalLinkClick={handleModalLinkClick}
+          setIsLoggedIn={setIsLoggedIn}
+        />
+      ) : (
+        <ModalLoginPage
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          handleModalLinkClick={handleModalLinkClick}
+        />
+      )}
+      
+      {isLoginModalOpen && (
+        <LoginModal
+          closeModal={closeLoginModal}
+          setIsLoggedIn={setIsLoggedIn}
+        />
+      )}
+      {isSignupModalOpen && <SignupModal closeModal={closeSignupModal} />}
     </>
   );
 };

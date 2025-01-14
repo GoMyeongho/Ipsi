@@ -7,7 +7,6 @@ import exitIcon from "../../images/exit_gray.png";
 import sendIcon from "../../images/send_color.png";
 import { OverlayContainer, OverlayContent, BtnBox } from "../ChatComponent/OpenChatSearch";
 import { useNavigate, useParams } from "react-router-dom";
-import { Capstone_URL } from "../../util/Common";
 import Commons from "../../util/Common";
 import { type } from "@testing-library/user-event/dist/type";
 import { ChatContext } from "../../context/ChatStore";
@@ -223,7 +222,7 @@ const Chatting = ({ setSelectedPage, fetchChatRooms }) => {
     useEffect(() => {
         // 웹소켓 연결하는 부분, 이전 대화내용 불러오는 함수 호출
         if (!ws.current) {
-            ws.current = new WebSocket(Capstone_URL);
+            ws.current = new WebSocket(Commons.Capstone_URL);
             ws.current.onopen = () => {
                 setSocketConnected(true);
             };

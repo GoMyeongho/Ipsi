@@ -10,6 +10,7 @@ const StyledTable = styled(Table)`
 	width: 100%;
 	margin-top: 10px;
 	margin-bottom: 10px;
+	z-index: 100;
 `
 const StyledTableHead = styled(TableHead)``
 const StyledTableRow = styled(TableRow)``
@@ -64,6 +65,10 @@ const sampleSortList = [
 	{name: "이미지", id: "image", align: "center", isSort: false, type: "image", link: (item) => `/imagePage/${item.image}`},
 	{name: "이름", id: "name", align: "left", isSort: true, link: (item) => `/subPage/${item.name}`},
 	{name: "가격", id: "price", align: "right", isSort: true, type: "price", link: (item) => `/subPage/${item.name}`},
+]
+const sampleSortLists = [
+	{name: "자소서", id: "ps", },
+	{name: "생기부", id: "sr",},
 ]
 
 // list : 정렬시킬 값

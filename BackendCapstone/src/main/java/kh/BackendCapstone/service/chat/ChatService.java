@@ -62,7 +62,11 @@ public class ChatService {
         return chatRooms.get(roomId);}
 
     // 이전 채팅 가져오기
-    public List<Chat> getRecentMsg(String roomId) { return chatRepository.findRecentMsg(roomId);}
+    public List<Chat> getRecentMsg(String roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+            .orElseThrow(() -> new RuntimeException("해당 하는 채팅방이 없습니다."));
+        return chatRepository.findRecentMsg(chatRoom);
+    }
 
     // 방 개설하기
     public ChatRoomResDto createRoom(ChatRoomReqDto chatRoomDto) {
