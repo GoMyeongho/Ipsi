@@ -1,12 +1,13 @@
 		package kh.BackendCapstone.service;
 
+		import kh.BackendCapstone.dto.AccessTokenDto;
 		import kh.BackendCapstone.dto.TokenDto;
 		import kh.BackendCapstone.dto.request.MemberReqDto;
 		import kh.BackendCapstone.dto.response.MemberResDto;
 		import kh.BackendCapstone.entity.Member;
 		import kh.BackendCapstone.entity.RefreshToken;
 		import kh.BackendCapstone.jwt.TokenProvider;
-		import kh.BackendCapstone.jwt.TokenUtil;
+
 		import kh.BackendCapstone.repository.MemberRepository;
 		import kh.BackendCapstone.repository.RefreshTokenRepository;
 		import lombok.RequiredArgsConstructor;
@@ -67,7 +68,9 @@
 				return MemberResDto.of(savedMember);
 			}
 
-	//		로그인
+
+			// member 로그인
+
 			public TokenDto login(MemberReqDto memberReqDto) {
 				try {
 					UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
@@ -76,14 +79,17 @@
 					Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
 					log.info("authentication : {}", authentication);
 
+
 					TokenDto token = tokenProvider.generateTokenDto(authentication);
 
-					// refreshToken DB에 저장
+					//refreshToken DB에 저장
 					Member member = memberRepository.findByEmail(memberReqDto.getEmail())
 							.orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
 
-					log.info("Exists by member : {}", refreshTokenRepository.existsByMember(member));
-					if (refreshTokenRepository.existsByMember(member)) {
+
+					// 이미 db에 해당 계정으로 저장된 refreshToken 정보가 있다면 삭제
+					log.info("Exists by member: {}", refreshTokenRepository.existsByMember(member));
+					if(refreshTokenRepository.existsByMember(member)) {
 						refreshTokenRepository.deleteByMember(member);
 					}
 
@@ -96,23 +102,36 @@
 					refreshTokenRepository.save(refreshToken);
 
 					return token;
+
 				} catch (Exception e) {
 					log.error("로그인 중 에러 발생 : ", e);
 					throw new RuntimeException("로그인 중 에러 발생", e);
 				}
+
+			}
+
+			public AccessTokenDto refreshAccessToken(String refreshToken) {
+				log.info("refreshToken : {}", refreshToken);
+				log.info("일반refreshExist : {}", refreshTokenRepository.existsByRefreshToken(refreshToken));
+
+
+				//DB에 일치하는 refreshToken이 있으면
+				if(refreshTokenRepository.existsByRefreshToken(refreshToken) ) {
+					// refreshToken 검증
+					try {
+						if(tokenProvider.validateToken(refreshToken)) {
+							return tokenProvider.generateAccessTokenDto(tokenProvider.getAuthentication(refreshToken));
+						}
+					}catch (RuntimeException e) {
+						log.error("토큰 유효성 검증 중 예외 발생 : {}", e.getMessage());
+					}
+				}
+				return null;
 			}
 
 
 
 
-			// 회원가입 DTO -> Entity
-			private Member convertDtoToEntity(MemberReqDto memberReqDto) {
-				Member member = new Member();
-				member.setEmail(memberReqDto.getEmail());
-				member.setName(memberReqDto.getName());
-				member.setPwd(memberReqDto.getPwd());
-				return member;
-			}
 
 
 

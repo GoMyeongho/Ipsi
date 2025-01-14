@@ -1,7 +1,5 @@
 package kh.BackendCapstone.service;
 
-
-
 import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.dto.request.MemberReqDto;
 import kh.BackendCapstone.dto.response.MemberResDto;
@@ -11,6 +9,7 @@ import kh.BackendCapstone.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.List;
 public class MemberService {
 	private MemberRepository memberRepository;
 	private TokenProvider tokenProvider;
-	
+
 	// 전체 회원 조회
 	public List<MemberResDto> allMember() {
 		try {
@@ -72,13 +71,24 @@ public class MemberService {
 	}
 	
 	public boolean isRole(String role, String token) {
+		return convertTokenToEntity(token).getAuthority().equals(Authority.fromString(role));
+	}
+	
+	// 토큰에서 Member 객체를 받아오는 메서드( 클래스 외부에서도 불러올 수 있게 public )
+	public Member convertTokenToEntity(String token) {
+		// 토큰 앞에 있는 "Bearer " 제거
 		token = token.replace("Bearer ", "");
+		// token 을 통해 memberId를 담고 있는 객체 Authentication 을 불러옴
 		Authentication authentication = tokenProvider.getAuthentication(token);
+		log.warn("Authentication 의 형태 : {}", authentication);
+		// Name 은 String 으로 되어 있기 때문에 Long으로 바꿔주는 과정이 있어야 타입이 일치
 		Long id = Long.parseLong(authentication.getName());
 		Member member = memberRepository.findById(id)
-			.orElseThrow(()-> new RuntimeException("존재 하지 않는 이메일입니다."));
-		return member.getAuthority().equals(Authority.fromString(role));
+			.orElseThrow(()-> new RuntimeException("존재 하지 않는 memberId 입니다."));
+		log.warn("토큰으로부터 얻은 Member: {}", member);
+		return member;
 	}
+	
 	
 	// Member Entity -> 회원 정보 DTO
 	private MemberResDto convertEntityToDto(Member member) {
@@ -90,5 +100,4 @@ public class MemberService {
 		memberResDto.setRegDate(member.getRegDate());
 		return memberResDto;
 	}
-	
 }

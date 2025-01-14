@@ -51,6 +51,11 @@ dependencies {
 	implementation 'net.nurigo:sdk:4.2.7'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
+	implementation 'javax.validation:validation-api:2.0.1.Final'
 }
 
 tasks.named('test') {

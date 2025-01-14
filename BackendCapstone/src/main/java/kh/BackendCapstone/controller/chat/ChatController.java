@@ -23,19 +23,19 @@ public class ChatController {
     //채팅방 생성
     @PostMapping("/new")
     public ResponseEntity<String> createRoom(@RequestBody ChatRoomReqDto chatRoomReqDto) {
+
+        if (chatRoomReqDto.getName().length() > 20) {
+            return ResponseEntity.badRequest().body("채팅방 이름은 20자 이하로 입력해주세요.");
+        }
+        if (chatRoomReqDto.getPersonCnt() > 30) {
+            return ResponseEntity.badRequest().body("참여 가능 인원은 최대 30명입니다.");
+        }
+
         ChatRoomResDto room = chatService.createRoom(chatRoomReqDto);
         return ResponseEntity.ok(room.getRoomId());
     }
 
-/*    // 모든 채팅방 리스트(비활성화 된 채팅방까지 _ 어드민 활용 가능)
-    @GetMapping("/roomList")
-    public ResponseEntity<List<ChatRoomResDto>> findAllRoom() {
-        List<ChatRoomResDto> chatRooms = chatService.findAllChatRoom();
-        log.info("채팅방 정보 불러오기: {}", chatRooms);
-        return ResponseEntity.ok(chatRooms);
-    }*/
     //채팅방 리스트
-//    @GetMapping("/freeList")
     @GetMapping("/roomList")
     public ResponseEntity<List<ChatRoomResDto>> findByRoomList() {
         return ResponseEntity.ok(chatService.findRoomList());
