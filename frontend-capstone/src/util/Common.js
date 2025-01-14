@@ -9,7 +9,7 @@ const Commons = {
 	timeFromNow: (timestamp) => {
 		return moment(timestamp).fromNow();
 	},
-	formatDate: (dateString) => {
+	formatDateAndTime: (dateString) => {
 		const date = new Date(dateString);
 		const year = date.getFullYear();
 		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
@@ -17,6 +17,13 @@ const Commons = {
 		const hour = ("0" + date.getHours()).slice(-2);
 		const minute = ("0" + date.getMinutes()).slice(-2);
 		return `${year}년 ${month}월 ${day}일 ${hour}시 ${minute}분`;
+	},
+	formatDate: (dateString) => {
+		const date = new Date(dateString);
+		const year = date.getFullYear();
+		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
+		const day = ("0" + date.getDate()).slice(-2);
+		return `${year}-${month}-${day}` ;
 	},
 	
 	getAccessToken: () => {
@@ -32,6 +39,16 @@ const Commons = {
 	setRefreshToken: (token) => {
 		localStorage.setItem("refreshToken",token)
 	},
+
+	  // accessToken 삭제하기 (로그아웃 시 사용)
+	  removeAccessToken: () => {
+		localStorage.removeItem("accessToken");
+	  },
+	
+	  // refreshToken 삭제하기 (로그아웃 시 사용)
+	  removeRefreshToken: () => {
+		localStorage.removeItem("refreshToken");
+	  },
 	
 	// 401 에러 처리 함수
 	handleUnauthorized: async () => {
@@ -54,6 +71,39 @@ const Commons = {
 			console.log(e)
 			return false;
 		}
-	}
+	},
+
+	TakenToken : async()=>{
+		const accessToken = Commons.getAccessToken();
+		try{ return await axiosApi.get(Commons.Capstone + `/sale/takenEmail`,{
+		headers: {
+		  "Content-Type": "application/json",
+		  Authorization: "Bearer " + accessToken,
+		}, }
+		)}catch(e){
+		  if (e.response.status === 401) {
+			await Commons.handleUnauthorized();
+			const newToken = Commons.getAccessToken();
+			if (newToken !== accessToken) {
+			  return await axiosApi.get(Commons.Capstone + `/sale/takenEmail`,{
+				headers: {
+				  "Content-Type": "application/json",
+				  Authorization: "Bearer " + newToken,
+				}, 
+			})}
+		}
+	  };
+	  },
+	IsLogin : async()=>{
+		const accessToken = Commons.getAccessToken();
+		return await axiosApi.get(Commons.Capstone + `/sale/isLogin/${accessToken}`,{
+		  headers: {
+			"Content-Type": "application/json",
+			Authorization: "Bearer " + accessToken,
+		  },
+		})
+	  }
 };
+
+
 export default Commons

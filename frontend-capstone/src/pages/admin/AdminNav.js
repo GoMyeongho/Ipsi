@@ -15,7 +15,7 @@ const AdminNavContainer = styled(Paper)`
     margin: 50px 30px;
     padding: 20px;
     border-radius: 16px;
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); /* Paper 스타일에 그림자 추가 */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Paper 스타일에 그림자 추가 */
     background-color: #ece1ff; /* 연보라색 배경 */
 `;
 

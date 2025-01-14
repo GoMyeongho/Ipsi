@@ -50,17 +50,23 @@ public class ChatService {
         for (ChatRoom chatRoom : chatRoomRepository.findAllByOrderByRegDateDesc()) {
             ChatRoomResDto chatRoomDto = convertEntityToRoomDto(chatRoom);
             chatRoomResDtoList.add(chatRoomDto);
-            log.warn("챗룸{}", chatRoomDto);
+//            log.warn("챗룸{}", chatRoomDto);
         }
-        log.warn("채팅방 리스트 검색{}", chatRoomResDtoList);
+//        log.warn("채팅방 리스트 검색{}", chatRoomResDtoList);
         return chatRoomResDtoList;
     }
 
     // 채팅방 가져오기
-    public ChatRoomResDto findRoomById(String roomId) { return chatRooms.get(roomId);}
+    public ChatRoomResDto findRoomById(String roomId) {
+        log.warn(roomId);
+        return chatRooms.get(roomId);}
 
     // 이전 채팅 가져오기
-    public List<Chat> getRecentMsg(String roomId) { return chatRepository.findRecentMsg(roomId);}
+    public List<Chat> getRecentMsg(String roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+            .orElseThrow(() -> new RuntimeException("해당 하는 채팅방이 없습니다."));
+        return chatRepository.findRecentMsg(chatRoom);
+    }
 
     // 방 개설하기
     public ChatRoomResDto createRoom(ChatRoomReqDto chatRoomDto) {
@@ -75,6 +81,8 @@ public class ChatService {
         chatRoomEntity.setRoomId(randomId);
         chatRoomEntity.setRoomName(chatRoomDto.getName());
         chatRoomEntity.setRegDate(LocalDateTime.now());
+        chatRoomEntity.setRoomType(chatRoomDto.getRoomType());
+        chatRoomEntity.setMaxMembers(chatRoomDto.getPersonCnt());
         chatRoomRepository.save(chatRoomEntity);
 
         chatRooms.put(randomId, chatRoom);

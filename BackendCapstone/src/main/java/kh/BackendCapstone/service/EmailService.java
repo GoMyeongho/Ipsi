@@ -1,25 +1,29 @@
 package kh.BackendCapstone.service;
 
 import kh.BackendCapstone.entity.Member;
+import kh.BackendCapstone.entity.email_auth_token;
+import kh.BackendCapstone.repository.EmailAuthTokenRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class EmailService {
 
     private final JavaMailSender mailSender;
-    private final TokenService tokenService;
+    private final EmailAuthTokenRepository emailAuthTokenRepository;
 
-    public EmailService(JavaMailSender mailSender, TokenService tokenService) {
+    public EmailService(JavaMailSender mailSender, EmailAuthTokenRepository emailAuthTokenRepository) {
         this.mailSender = mailSender;
-        this.tokenService = tokenService;
+        this.emailAuthTokenRepository = emailAuthTokenRepository;
     }
 
     // 이메일 전송 메서드 (토큰 발급 및 전송)
     public boolean sendPasswordResetToken(Member member) {
         try {
-            // 예시로 6자리 인증번호 생성
+            // 6자리 인증번호 생성
             String resetToken = generateSixDigitToken();
 
             // 이메일 내용 설정
@@ -33,8 +37,8 @@ public class EmailService {
             // 이메일 전송
             mailSender.send(message);
 
-            // 토큰 저장 (이메일과 토큰을 저장)
-            tokenService.storeToken(member.getEmail(), resetToken);
+            // 토큰을 DB에 저장 (이메일과 토큰을 저장)
+            storeToken(member.getEmail(), resetToken);
 
             return true;
         } catch (Exception e) {
@@ -47,5 +51,36 @@ public class EmailService {
     private String generateSixDigitToken() {
         int token = (int) (Math.random() * 900000) + 100000;  // 100000 ~ 999999 사이의 숫자 생성
         return String.valueOf(token);
+    }
+
+    // 이메일과 토큰을 DB에 저장
+    private void storeToken(String email, String token) {
+        // 기존에 있던 토큰 삭제
+        emailAuthTokenRepository.deleteByEmail(email);
+
+        // 새로운 토큰 저장
+        email_auth_token authToken = new email_auth_token();
+        authToken.setEmail(email);
+        authToken.setToken(token);
+        authToken.setExpiryTime(System.currentTimeMillis() + 300000); // 5분 유효
+        emailAuthTokenRepository.save(authToken);  // DB에 저장
+    }
+
+    // 입력된 토큰을 검증하는 메서드
+    public boolean verifyEmailToken(String email, String inputToken) {
+        Optional<email_auth_token> authToken = emailAuthTokenRepository.findByEmail(email);
+
+        if (authToken.isEmpty()) {
+            throw new RuntimeException("토큰이 존재하지 않거나 만료되었습니다.");
+        }
+
+        email_auth_token token = authToken.get();
+
+        if (System.currentTimeMillis() > token.getExpiryTime()) {
+            emailAuthTokenRepository.delete(token);  // 만료된 토큰은 삭제
+            throw new RuntimeException("토큰이 만료되었습니다.");
+        }
+
+        return token.getToken().equals(inputToken);
     }
 }

@@ -20,12 +20,15 @@
 			private Long memberId; // Primary Key
 			// nullable=false : null 값이 올 수 없다는 제약 조건
 			// length = 50 : 최대 길이(바이트)
+			@Column(name = "nick_name")
+			private String nickName;
 			@Column(nullable = false, unique = true)
 			private String email;
 			@Column(nullable = false)
 			private String pwd;
 			@Column(length = 50)
 			private String name;
+
 			@Column(length = 50)
 			private String type;
 
@@ -33,25 +36,30 @@
 			private String refreshToken;
 			@Column(name = "nick_name")
 			private String nickName;
+
 			@Column(unique = true, length = 13)
 			private String phone;
 			@Column(name = "member_reg_date")
 			private LocalDateTime regDate;
+			@Column(length = 50)
+			private String type;
 			@ManyToOne
 			@JoinColumn(name = "univ_id")
 			private Univ univ;
 			@Enumerated(EnumType.STRING)
 			private Authority authority;
 
+
+
 			@Builder
-			public Member(String email, String pwd, String name, String phone, LocalDateTime regDate, Authority authority, Univ univ, String nickName) {
+			public Member( String nickName, String email, String pwd, String name, String phone, LocalDateTime regDate, Authority authority, Univ univ) {
+				this.nickName = nickName;
 				this.email = email;
 				this.pwd = pwd;
 				this.name = name;
-				this.nickName = nickName;
-				this.authority = authority; // Enum 타입
 				this.phone = phone;
 				this.regDate = regDate;
+				this.authority = authority; // Enum 타입
 				this.univ = univ;
 			}
 
