@@ -1,4 +1,4 @@
-// import './App.css';
+
 import './style.css';
 import { CheckoutPage } from './paySystem/CheckOut';
 import { FailPage } from './paySystem/Fail';
@@ -14,9 +14,10 @@ import PermissionMain from "./pages/admin/auth/list/PermissionMain";
 import PermissionStore from "./context/admin/PermissionStore";
 import TestLogin from "./pages/auth/login/TestLogin";
 import ChatStore from './context/ChatStore';
-// import ChatList from './pages/chat/ChatList';
-// import ChatRoomCreate from './component/ChatComponent/ChatRoomCreate';
-// import Chatting from './pages/chat/Chatting';
+import TextStore, {PostLayout} from "./context/TextStore";
+import PostListMain from "./pages/text/post/list/PostListMain";
+import PostItemMain from "./pages/text/post/item/PostItemMain";
+
 
 function App() {
   return (
@@ -26,17 +27,23 @@ function App() {
         <Routes>
           <Route path='/login' element={<TestLogin/>}></Route>
           <Route path='/' element={<ChatStore><Layout/></ChatStore>}>
-           <Route path='/coverLetter' element={<CoverLetter/>}/>
+            <Route path='/coverLetter' element={<CoverLetter/>}/>
             <Route path='/test/modal' element={<ModalExample/>}/>
             <Route path='/test/accordion' element={<AccordionExample/>}/>
             {/*<Route path='/chat' element={<ChatList />} />*/}
             {/* <Route path='/chat-create' element={<ChatRoomCreate />}/> */}
             {/*<Route path='/chatting/:roomId' element={<Chatting />}/>*/}
+            {/*text Board 페이지*/}
+            <Route path="/post" element={<TextStore><PostLayout/></TextStore>}>
+              <Route path="list" element={<PostListMain/>}/>
+              <Route path="detail/:id" element={<PostItemMain/>}/>
+            </Route>
+            {/*어드민 페이지*/}
             <Route path="/admin" element={<PermissionStore><AdminNav/></PermissionStore>}>
               <Route path="auth" element={<PermissionMain/>}/>
             </Route>
           </Route>
-          {/* CheckoutPage와 관련된 경로 */} 
+          {/* CheckoutPage와 관련된 경로 */}
           <Route path="/checkoutPage" element={<CheckoutPage />} />
           <Route path="/sandbox/success" element={<SuccessPage />} />
           <Route path="/checkoutPage/fail" element={<FailPage />} />

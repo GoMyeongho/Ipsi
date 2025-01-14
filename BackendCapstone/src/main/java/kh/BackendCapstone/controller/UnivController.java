@@ -1,8 +1,7 @@
 package kh.BackendCapstone.controller;
 
 
-import kh.BackendCapstone.dto.response.FileBoardResDto;
-import kh.BackendCapstone.dto.response.UnivResponse;
+
 import kh.BackendCapstone.service.UnivService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +27,10 @@ public class UnivController {
         try {
             List<Map<String, Object>> dropdownList = univService.getDropDownList();
             // 컨트롤러에서 데이터를 추가로 로그에 남기고 싶다면 여기에 추가
-//            log.info("Dropdown Response Data: {}", dropdownList);
+            log.info("Dropdown Response Data: {}", dropdownList);
             return ResponseEntity.ok(dropdownList);
         } catch (Exception e) {
-//            log.error("드롭다운 조회 실패: {}", e.getMessage());
+            log.error("드롭다운 조회 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
