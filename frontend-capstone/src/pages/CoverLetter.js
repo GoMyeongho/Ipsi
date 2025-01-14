@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import AxiosApi from "../api/AxiosApi";
+import DocumentsApi from "../api/DocumentsApi";
 import { useNavigate } from "react-router-dom";
 
 const Background = styled.div`
@@ -105,6 +105,7 @@ const Contents = styled.div`
   flex-wrap: wrap;
   gap: 20px;
   justify-content: flex-start;
+  cursor: pointer; /* 클릭 가능하게 설정 */
 `;
 
 const ContentsBox = styled.div`
@@ -241,7 +242,6 @@ const CoverLetter = () => {
   const [itemsPerPage, setItemsPerPage] = useState(3); // 페이지당 항목 수
   const [totalPages, setTotalPages] = useState(0); // 전체 페이지 수
 
-
   // 페이지네이션 로직: 현재 페이지에 맞는 항목 가져오기
   const indexOfFirstItem = 0;
   const currentItems = filteredItems.slice(
@@ -279,7 +279,7 @@ const CoverLetter = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await AxiosApi.getDropDownList();
+        const response = await DocumentsApi.getDropDownList();
         // console.log(response);
         if (response.data) {
           const data = response.data;
@@ -307,45 +307,44 @@ const CoverLetter = () => {
     fetchData();
   }, []);
 
- // Contents 데이터 가져오기
-const fetchData = async () => {
-  try {
-    setLoading(true);
+  // Contents 데이터 가져오기
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-    const params = {
-      page: currentPage,
-      limit: itemsPerPage,
-      univName: selectedUniv,
-      univDept: selectedDept,
-    };
-    console.log(params)
-    const response = await AxiosApi.getContents(
-      params.page,
-      params.limit,
-      params.univDept,
-      params.univName
-    );
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        univName: selectedUniv,
+        univDept: selectedDept,
+      };
+      console.log(params);
+      const response = await DocumentsApi.getContents(
+        params.page,
+        params.limit,
+        params.univName,
+        params.univDept
+      );
 
-    const items = response.content || response.items;
+      const items = response.content || response.items;
 
-    console.log(items); // 데이터 확인용
-    setContentItems(items);
-    setFilteredItems(items); // 필터링된 항목 업데이트
-    setTotalPages(
-      response.totalPages || Math.ceil(items.length / itemsPerPage)
-    ); // 전체 페이지 수 계산
-  } catch (err) {
-    setContentsError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      console.log(items); // 데이터 확인용
+      setContentItems(items);
+      setFilteredItems(items); // 필터링된 항목 업데이트
+      setTotalPages(
+        response.totalPages || Math.ceil(items.length / itemsPerPage)
+      ); // 전체 페이지 수 계산
+    } catch (err) {
+      setContentsError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// 페이지가 변경될 때마다 데이터 새로 가져오기
-useEffect(() => {
-  fetchData(); // 페이지 변경 시 데이터 가져오기
-}, [currentPage, itemsPerPage]); // 의존성 배열에 currentPage, itemsPerPage, selectedUniv, selectedDept 추가
-
+  // 페이지가 변경될 때마다 데이터 새로 가져오기
+  useEffect(() => {
+    fetchData(); // 페이지 변경 시 데이터 가져오기
+  }, [currentPage, itemsPerPage]); // 의존성 배열에 currentPage, itemsPerPage, selectedUniv, selectedDept 추가
 
   // 대학 선택 핸들러
   const handleUnivChange = (event) => {
@@ -370,7 +369,7 @@ useEffect(() => {
   const handleSearch = () => {
     fetchData();
     let filtered = contentItems;
-   
+
     // 대학이 선택되었을 경우 필터링
     if (selectedUniv !== "") {
       filtered = filtered.filter((item) => item.univName === selectedUniv);
@@ -419,6 +418,10 @@ useEffect(() => {
     navigate("/checkOutPage", { state: { productItem } });
   };
 
+  const handleTopClick = (selectedData) => {
+    navigate("/coverLetterDetail", { state: { item: selectedData } } );
+  };
+
   return (
     <Background>
       <Top>
@@ -458,7 +461,7 @@ useEffect(() => {
       <Contents>
         {currentItems && currentItems.length > 0 ? (
           currentItems.map((item, index) => (
-            <ContentsBox key={index}>
+            <ContentsBox onClick={() => handleTopClick(item)} key={index}>
               <ContentsTop>
                 <UnivLogo>
                   <img src={item.univImg} alt="" />

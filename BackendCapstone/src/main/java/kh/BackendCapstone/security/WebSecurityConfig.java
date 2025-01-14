@@ -45,7 +45,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {  // WebMvcConfigure
 				.accessDeniedHandler(jwtAccessDeniedHandler)  // 인가 실패 시 처리할 객체 설정
 				.and()
 				.authorizeRequests()  // 요청에 대한 권한 설정
-				.antMatchers("/", "/static/**", "/auth/**", "/ws/**","/oauth2/**","/api/v1/auth/**","/chat/**","/api/bank-verification/**","/flask/**").permitAll()  // 특정 경로는 모두 허용
+				.antMatchers("/", "/static/**", "/auth/**", "/ws/**","/oauth2/**","/api/v1/auth/**","/api/v1/payments/**","/chat/**","/flask/**","/file/**","/univ/**").permitAll()  // 특정 경로는 모두 허용
 				.antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()  // Swagger 관련 경로는 모두 허용
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // OPTIONS 메서드 요청은 모두 허용
 				.antMatchers("/favicon.ico","/manifest.json").permitAll()  // favicon 및 manifest 파일은 모두 허용

@@ -75,7 +75,7 @@ export function SuccessPage() {
               <Link className="btn w-100" to="/">
                 홈페이지
               </Link>
-              <Link className="btn w-100" to="/">
+              <Link className="btn w-100" to="/myPageNavBar">
                 마이페이지
               </Link>
             </div>
