@@ -1,11 +1,3 @@
-
-import "./style.css";
-import { CheckoutPage } from "./paySystem/CheckOut";
-import { FailPage } from "./paySystem/Fail";
-import { SuccessPage } from "./paySystem/Success";
-import CoverLetter from "./pages/CoverLetter";
-import GlobalStyle from "./styles/GlobalStyle";
-import Layout from "./styles/Layout";
 import './style.css';
 import { CheckoutPage } from './paySystem/CheckOut';
 import { FailPage } from './paySystem/Fail';
@@ -25,10 +17,9 @@ import CoverLetterWrite from "./pages/CoverLetterWrite";
 import MyPageNavBar from "./component/MyPageNavBar";
 import CoverLetterRegister from "./pages/myPage/CoverLetterRegister";
 import ChatStore from './context/ChatStore';
-import TextStore, {PostLayout} from "./context/TextStore";
+import TextStore, { PostLayout } from "./context/TextStore";
 import PostListMain from "./pages/text/post/list/PostListMain";
 import PostItemMain from "./pages/text/post/item/PostItemMain";
-
 
 function App() {
   return (
@@ -36,37 +27,40 @@ function App() {
       <GlobalStyle />
       <Router>
         <Routes>
-          <Route path="/login" element={<TestLogin />}></Route>
-          <Route path="/" element={<Layout />}>
-            <Route path="/coverLetter" element={<CoverLetter />} />
-            <Route path="/coverLetterWrite" element={<CoverLetterWrite />} />
-            <Route path="/coverLetterDetail" element={<CoverLetterDetail />} />
-            <Route path="/myPageNavBar" element={<MyPageNavBar/>}>
-              <Route path="coverLetterRegister" element={<CoverLetterRegister/>}/>
+          {/* 로그인 페이지 */}
+          <Route path="/login" element={<TestLogin />} />
+          
+          {/* 메인 레이아웃 적용 */}
+          <Route path="/" element={<ChatStore><Layout /></ChatStore>}>
+            <Route path="coverLetter" element={<CoverLetter />} />
+            <Route path="coverLetterWrite" element={<CoverLetterWrite />} />
+            <Route path="coverLetterDetail" element={<CoverLetterDetail />} />
+            
+            {/* 마이페이지 내비게이션 */}
+            <Route path="myPageNavBar" element={<MyPageNavBar />}>
+              <Route path="coverLetterRegister" element={<CoverLetterRegister />} />
             </Route>
-            <Route path="/test/modal" element={<ModalExample />} />
-            <Route path="/test/accordion" element={<AccordionExample />} />
-          <Route path='/login' element={<TestLogin/>}></Route>
-          <Route path='/' element={<ChatStore><Layout/></ChatStore>}>
-            <Route path='/coverLetter' element={<CoverLetter/>}/>
-            <Route path='/test/modal' element={<ModalExample/>}/>
-            <Route path='/test/accordion' element={<AccordionExample/>}
-            <Route path="/admin" element={<PermissionStore><AdminNav /></PermissionStore>}>
+            
+            {/* 테스트 페이지 */}
+            <Route path="test/modal" element={<ModalExample />} />
+            <Route path="test/accordion" element={<AccordionExample />} />
+            
+            {/* 어드민 페이지 */}
+            <Route path="admin" element={<PermissionStore><AdminNav /></PermissionStore>}>
               <Route path="auth" element={<PermissionMain />} />
-            {/*text Board 페이지*/}
-            <Route path="/post" element={<TextStore><PostLayout/></TextStore>}>
-              <Route path="list" element={<PostListMain/>}/>
-              <Route path="detail/:id" element={<PostItemMain/>}/>
             </Route>
-            {/*어드민 페이지*/}
-            <Route path="/admin" element={<PermissionStore><AdminNav/></PermissionStore>}>
-              <Route path="auth" element={<PermissionMain/>}/>
+            
+            {/* 게시판 (text Board) */}
+            <Route path="post" element={<TextStore><PostLayout /></TextStore>}>
+              <Route path="list" element={<PostListMain />} />
+              <Route path="detail/:id" element={<PostItemMain />} />
             </Route>
+            
+            {/* 결제 관련 페이지 */}
+            <Route path="checkoutPage" element={<CheckoutPage />} />
+            <Route path="sandbox/success" element={<SuccessPage />} />
+            <Route path="checkoutPage/fail" element={<FailPage />} />
           </Route>
-          {/* CheckoutPage와 관련된 경로 */}
-          <Route path="/checkoutPage" element={<CheckoutPage />} />
-          <Route path="/sandbox/success" element={<SuccessPage />} />
-          <Route path="/checkoutPage/fail" element={<FailPage />} />
         </Routes>
       </Router>
     </>
