@@ -10,4 +10,5 @@ public class TextBoardListResDto {
 	private String title;
 	private LocalDateTime regDate;
 	private String nickName;
+	private String summary;
 }

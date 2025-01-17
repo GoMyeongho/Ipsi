@@ -125,15 +125,13 @@ const TopNavBar = () => {
   
   const navigate = useNavigate(); // 페이지 전환 훅
   
-  
-  
   const [isModalOpen, setModalOpen] = useState(false);
-  
-  
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
+
   const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("loggedInUserId")
+    // !!localStorage.getItem("loggedInUserId")
+    !!localStorage.getItem("accessToken") // 토큰 여부로 로그인 상태 결정
   );
   useEffect(() => {
     const isAdmin = async () => {
@@ -162,13 +160,14 @@ const TopNavBar = () => {
     navigate(path); // 페이지 전환
   };
   const handleImageClick = () => {
-    setModalOpen(true);
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token); // 토큰이 있으면 로그인 상태 true
+    setModalOpen(true); // 모달 열기
   };
   
   const closeModal = () => {
     setModalOpen(false);
   };
-  
   
   const closeLoginModal = () => {
     setLoginModalOpen(false);
@@ -177,6 +176,7 @@ const TopNavBar = () => {
   const closeSignupModal = () => {
     setSignupModalOpen(false);
   };
+
   const handleModalLinkClick = (action) => {
     if (action === "login") {
       setModalOpen(false);
@@ -187,6 +187,9 @@ const TopNavBar = () => {
     } else if (action === "logout") {
       setIsLoggedIn(false); // 로그인 상태 false
       localStorage.clear(); // 로컬스토리지 삭제
+
+      localStorage.removeItem("accessToken"); // 토큰 삭제
+
       setModalOpen(false); // 모달 닫기
       navigate("/");
       alert("로그아웃 되었습니다.");
@@ -208,7 +211,7 @@ const TopNavBar = () => {
           />
           <p onClick={materialOpenModal}>입시자료</p>
           <p onClick={() => navigate("/PersonalStatementWrite")}>자소서 작성</p>
-          <p onClick={() => navigate("/")}>게시판</p>
+          <p onClick={() => navigate("/post/list/default")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
           {}

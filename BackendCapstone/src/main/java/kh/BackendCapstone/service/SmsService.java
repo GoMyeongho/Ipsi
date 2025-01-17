@@ -3,18 +3,19 @@ package kh.BackendCapstone.service;
 import kh.BackendCapstone.entity.SmsAuthToken;
 import kh.BackendCapstone.repository.SmsAuthTokenRepository;
 import net.nurigo.sdk.NurigoApp;
-import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.service.DefaultMessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-
 @Service
 @Transactional
 public class SmsService {
+    private static final Logger logger = LoggerFactory.getLogger(SmsService.class);
     private final DefaultMessageService messageService;
     private final SmsAuthTokenRepository smsAuthTokenRepository;
 
@@ -46,20 +47,17 @@ public class SmsService {
                     .orElse(false);
 
             if (isSaved) {
-                System.out.println("인증번호 발송 성공: " + verificationCode);
+                logger.info("인증번호 발송 성공: {}", verificationCode);
                 return true;
             } else {
-                System.err.println("인증번호 저장 실패");
+                logger.error("인증번호 저장 실패");
                 return false;
             }
         } catch (Exception e) {
-            System.err.println("SMS 발송 실패: " + e.getMessage());
+            logger.error("SMS 발송 실패: {}", e.getMessage());
             return false;
         }
     }
-
-
-
 
     // 6자리 인증번호 생성
     private String generateSixDigitCode() {
@@ -91,16 +89,24 @@ public class SmsService {
         Optional<SmsAuthToken> authToken = smsAuthTokenRepository.findByPhone(phone);
 
         if (authToken.isEmpty()) {
-            throw new RuntimeException("인증번호가 존재하지 않거나 만료되었습니다.");
+            logger.warn("인증번호가 존재하지 않거나 만료되었습니다. phone: {}", phone);
+            throw new IllegalArgumentException("인증번호가 존재하지 않거나 만료되었습니다.");
         }
 
         SmsAuthToken token = authToken.get();
 
         if (System.currentTimeMillis() > token.getExpiryTime()) {
             smsAuthTokenRepository.delete(token); // 만료된 토큰 삭제
-            throw new RuntimeException("인증번호가 만료되었습니다.");
+            logger.warn("인증번호가 만료되었습니다. phone: {}", phone);
+            throw new IllegalArgumentException("인증번호가 만료되었습니다.");
         }
 
-        return token.getToken().equals(inputCode);
+        boolean isValid = token.getToken().equals(inputCode);
+        if (!isValid) {
+            logger.warn("잘못된 인증번호 입력. phone: {}, 입력된 코드: {}", phone, inputCode);
+            throw new IllegalArgumentException("인증번호가 올바르지 않습니다.");
+        }
+
+        return isValid;
     }
 }

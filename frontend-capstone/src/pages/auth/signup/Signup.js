@@ -310,7 +310,7 @@ const Signup = () => {
         )}
       </Items>
       <Items variant="item2">
-        {isName && isId && isPw && isConPw && isMail && isPhone ? (
+        { isId && isPw && isConPw && isMail && isPhone ? (
           <Button enabled onClick={onClickSignup}>
             NEXT
           </Button>

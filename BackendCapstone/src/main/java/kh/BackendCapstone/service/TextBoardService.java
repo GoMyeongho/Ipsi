@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,8 +62,8 @@ public class TextBoardService {
 		}
 	}
 	// 카테고리별 게시글 전체 조회
-	public List<TextBoardListResDto> findBoardAllByCategory(String category, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size);
+	public List<TextBoardListResDto> findBoardAllByCategory(String category, int page, int size, String sort) {
+		Pageable pageable = getPageable(page,size,sort);
 		try {
 			List<TextBoard> textBoardList = textBoardRepository.findByActiveAndTextCategory(Active.ACTIVE, TextCategory.fromString(category), pageable).getContent();
 			List<TextBoardListResDto> textBoardResDtoList = boardToBoardListResDto(textBoardList);
@@ -87,9 +88,9 @@ public class TextBoardService {
 	}
 	
 	// 카테고리별 검색(제목)
-	public List<TextBoardListResDto> findBoardByTitle(String category, String keyword, int page, int size) {
+	public List<TextBoardListResDto> findBoardByTitle(String category, String keyword, int page, int size, String sort) {
 		try {
-			Pageable pageable = PageRequest.of(page, size);
+			Pageable pageable = getPageable(page,size,sort);
 			List<TextBoard> textBoardList = textBoardRepository.findByActiveAndTextCategoryAndTitleContaining(Active.ACTIVE,TextCategory.fromString(category),keyword,pageable).getContent();
 			List<TextBoardListResDto> textBoardListResDtoList = boardToBoardListResDto(textBoardList);
 			log.warn("제목 검색으로 인한 결과 {}개 : {}",textBoardListResDtoList.size(), textBoardListResDtoList);
@@ -115,9 +116,9 @@ public class TextBoardService {
 	}
 	
 	// 카테고리별 검색(작성자)
-	public List<TextBoardListResDto> findBoardByNickName(String category, String keyword, int page, int size) {
+	public List<TextBoardListResDto> findBoardByNickName(String category, String keyword, int page, int size, String sort) {
 		try {
-			Pageable pageable = PageRequest.of(page, size);
+			Pageable pageable = getPageable(page,size,sort);
 			List<TextBoard> textBoardList = textBoardRepository.findByActiveAndTextCategoryAndMember_NickNameContaining(Active.ACTIVE,TextCategory.fromString(category),keyword,pageable).getContent();
 			List<TextBoardListResDto> textBoardListResDtoList = boardToBoardListResDto(textBoardList);
 			log.warn("작성자 검색으로 인한 결과 {}개 : {}",textBoardListResDtoList.size(), textBoardListResDtoList);
@@ -142,9 +143,9 @@ public class TextBoardService {
 	}
 	
 	// 카테고리별 검색(제목 + 내용)
-	public List<TextBoardListResDto> findBoardByTitleAndContent(String category, String keyword, int page, int size) {
+	public List<TextBoardListResDto> findBoardByTitleAndContent(String category, String keyword, int page, int size, String sort) {
 		try {
-			Pageable pageable = PageRequest.of(page, size);
+			Pageable pageable = getPageable(page,size,sort);
 			List<TextBoard> textBoardList = textBoardRepository.findByActiveAndTextCategoryAndTitleContainingOrContentContaining(Active.ACTIVE,TextCategory.fromString(category),keyword,keyword,pageable).getContent();
 			List<TextBoardListResDto> textBoardListResDtoList = boardToBoardListResDto(textBoardList);
 			log.warn("제목과 내용 검색으로 인한 결과 {}개 : {}",textBoardListResDtoList.size(), textBoardListResDtoList);
@@ -169,12 +170,12 @@ public class TextBoardService {
 	}
 	
 	// 카테고리별 검색(회원)
-	public List<TextBoardListResDto> findBoardByMember(String category, String email, int page, int size) {
+	public List<TextBoardListResDto> findBoardByMember(String category, String email, int page, int size, String sort) {
 		try {
 			Member member = memberRepository.findByEmail(email)
 				.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
 			
-			Pageable pageable = PageRequest.of(page, size);
+			Pageable pageable = getPageable(page,size,sort);
 			List<TextBoard> textBoardList = textBoardRepository.findByActiveAndTextCategoryAndMember(Active.ACTIVE,TextCategory.fromString(category),member,pageable).getContent();
 			List<TextBoardListResDto> textBoardListResDtoList = boardToBoardListResDto(textBoardList);
 			log.warn("회원 검색으로 인한 결과 {}개 : {}",textBoardListResDtoList.size(), textBoardListResDtoList);
@@ -260,56 +261,24 @@ public class TextBoardService {
 			textBoardListResDto.setTitle(textBoard.getTitle());
 			textBoardListResDto.setNickName(textBoard.getMember().getNickName());
 			textBoardListResDto.setRegDate(textBoard.getRegDate());
+			textBoardListResDto.setSummary(getSummaryWithEllipsis(textBoard.getContent()));
 			textBoardListResDtoList.add(textBoardListResDto);
 		}
 		return textBoardListResDtoList;
 	}
+	public String getSummaryWithEllipsis(String content) {
+		// 최대 20자까지만 잘라서 "..."을 붙임
+		return content.length() > 20 ? content.substring(0, 20) + "..." : content;
+	}
+	
+	private Pageable getPageable(int page, int size, String sort) {
+		return switch (sort) {
+			case "asc" -> PageRequest.of(page, size, Sort.by(Sort.Order.asc("text_reg_date"))); // 오름차순 정렬
+			case "desc" -> PageRequest.of(page, size, Sort.by(Sort.Order.desc("text_reg_date"))); // 내림차순 정렬
+			default -> {
+				log.warn("값이 제대로 들어 오지 않았습니다. sort : {}", sort);
+				yield null;
+			}
+		};
+	}
 }
-
-//	// 게시글 검색
-//	public List<TextBoardResDto> findBoardByTitle(String keyword) {
-//		try {
-//			List<TextBoard> textBoardList = textBoardRepository.findByTitleContaining(keyword);
-//			List<TextBoardResDto> textBoardResDtoList = new ArrayList<>();
-//			for(TextBoard textBoard : textBoardList) {
-//				textBoardResDtoList.add(boardToBoardResDto(textBoard));
-//			}
-//			return textBoardResDtoList;
-//		} catch (Exception e) {
-//			log.error("제목을 통해 검색중 오류 : {}", e.getMessage());
-//			return null;
-//		}
-//	}
-// 게시글 검색
-// 게시글의 페이지 수 조회
-//public int getBoardPageCount(int size) {
-//	PageRequest pageRequest = PageRequest.of(0, size);
-//	return textBoardRepository.findAll(pageRequest).getTotalPages();
-//}
-// 게시글 페이징 : 페이지 단위로 나누기
-// 글의 총 개수. 그로인한 페이지 수를 알아야함
-//public List<TextBoardResDto> pagingBoardList(int page, int size) {
-//	try{
-//		Pageable pageable = PageRequest.of(page, size);
-//		List<TextBoard> textBoardList = textBoardRepository.findAll(pageable).getContent();
-//		List<TextBoardResDto> textBoardResDtoList = new ArrayList<>();
-//		for(TextBoard textBoard : textBoardList) textBoardResDtoList.add(boardToBoardResDto(textBoard));
-//		return textBoardResDtoList;
-//	} catch (Exception e) {
-//		log.error("페이지를 불러오는 중에 오류 : {}",e.getMessage());
-//		return null;
-//	}
-//}
-// public List<TextBoardResDto> findBoardByTitle(String keyword) {
-//		try {
-//			List<TextBoard> textBoardList = textBoardRepository.findByTitleContaining(keyword);
-//			List<TextBoardResDto> textBoardResDtoList = new ArrayList<>();
-//			for(TextBoard textBoard : textBoardList) {
-//				textBoardResDtoList.add(boardToBoardResDto(textBoard));
-//			}
-//			return textBoardResDtoList;
-//		} catch (Exception e) {
-//			log.error("제목을 통해 검색중 오류 : {}", e.getMessage());
-//			return null;
-//		}
-//	}

@@ -4,6 +4,7 @@ import axiosApi from "../api/AxiosApi";
 import axios from "axios";
 moment.locale("ko"); // 한국 시간 적용
 
+
 const Commons = {
   Capstone: "http://localhost:8111",
   Capstone_URL: "ws://localhost:8111/ws/chat",
@@ -27,53 +28,64 @@ const Commons = {
     return `${year}-${month}-${day}`;
   },
 
-  getAccessToken: () => {
-    console.log(localStorage.getItem("accessToken"));
-    return localStorage.getItem("accessToken");
-  },
-  setAccessToken: (token) => {
-    localStorage.setItem("accessToken", token);
-  },
-  getRefreshToken: () => {
-    return localStorage.getItem("refreshToken");
-  },
-  setRefreshToken: (token) => {
-    localStorage.setItem("refreshToken", token);
-  },
 
-  // accessToken 삭제하기 (로그아웃 시 사용)
-  removeAccessToken: () => {
-    localStorage.removeItem("accessToken");
-  },
+	  // accessToken 삭제하기 (로그아웃 시 사용)
+	  removeAccessToken: () => {
+		localStorage.removeItem("accessToken");
+	  },
+	
+	  // refreshToken 삭제하기 (로그아웃 시 사용)
+	  removeRefreshToken: () => {
+		localStorage.removeItem("refreshToken");
+	  },
+	
+	// 401 에러 처리 함수
+	handleUnauthorized: async () => {
+		console.log("handleUnauthorized!!!")
+		const accessToken = Commons.getAccessToken()
+		const refreshToken = Commons.getRefreshToken()
+		const config = {
+			headers: {
+				Authorization: `Bearer ${accessToken}`
+			},
+		};
+		try {
+			const rsp = await axios.post(
+				`${Commons.Capstone}/auth/refresh`,
+				refreshToken, config
+			);
+			console.log(rsp.data)
+			Commons.setAccessToken(rsp.data)
+		} catch (e) {
+			console.log(e)
+			return false;
+		}
+	},
 
-  // refreshToken 삭제하기 (로그아웃 시 사용)
-  removeRefreshToken: () => {
-    localStorage.removeItem("refreshToken");
-  },
+	getTokenByMemberId : async()=>{
+		const accessToken = Commons.getAccessToken();
+		try{ return await axios.get(Commons.Capstone + `/auth/getMemberId `,{
+		headers: {
+		  "Content-Type": "application/json",
+		  Authorization: "Bearer " + accessToken,
+		}, }
+		)}catch(e){
+		  if (e.response.status === 401) {
+			await Commons.handleUnauthorized();
+			const newToken = Commons.getAccessToken();
+			if (newToken !== accessToken) {
+			  return await axios.get(Commons.Capstone + `/auth/getMemberId`,{
+				headers: {
+				  "Content-Type": "application/json",
+				  Authorization: "Bearer " + newToken,
+				}, 
+			})}
+		}
+	  };
+	  }
+	
 
-  // 401 에러 처리 함수
-  handleUnauthorized: async () => {
-    console.log("handleUnauthorized!!!");
-    const accessToken = Commons.getAccessToken();
-    const refreshToken = Commons.getRefreshToken();
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
-    try {
-      const rsp = await axiosApi.post(
-        `${Commons.Capstone}/auth/refresh`,
-        refreshToken,
-        config
-      );
-      console.log(rsp.data);
-      Commons.setAccessToken(rsp.data);
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
-  },
+};
 
   getTokenByMemberId: async () => {
     const accessToken = Commons.getAccessToken();
