@@ -26,7 +26,6 @@ const Layout = () => {
           <TopNavBar/>
         </Header>
         <ChatModal/>
-        <Outlet/> {/* 자식 컴포넌트를 렌더링할 위치 */}
       </Background>
    </>
   )
