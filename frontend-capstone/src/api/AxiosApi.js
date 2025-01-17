@@ -1,4 +1,6 @@
 import axios from "axios";
+import Commons from "../util/Common";
+axios.defaults.withCredentials = true; // 쿠키를 요청에 포함
 const Capstone = "http://localhost:8111";
 
 // return 값을 반환할때 객체를 풀어서 반환하지말고 component 개별적으로 객체를 풀어서 사용할 것
@@ -7,9 +9,13 @@ const AxiosApi = {
 	chatList: async () => {
 		return await axios.get(Capstone + `/chat/roomList`);
 	},
+sendPw: async (email) => {
+  return await axios.post(`${Capstone}/auth/sendPw`, { email: email }); // email을 객체로 감싸서 전달
+},
 	
 	// 채팅방 생성하기
 	chatCreate: async (name, personCnt) => {
+		
 		console.log(name);
 		const chat = {
 			name: name,
@@ -18,11 +24,22 @@ const AxiosApi = {
 		console.log(chat); // 서버로 보낼 데이터를 확인
 		return await axios.post(Capstone + "/chat/new", chat);
 	},
+
+	memberGet: async () => {
+		const res = await Commons.getTokenByMemberId();
+		const id = res.data;
+	
+		return await axios.get(Capstone + `/member/detail/${id}`);
+	  },
 	
 	// 채팅방 정보 가져오기
 	chatDetail: async (roomId) => {
 		return await axios.get(Capstone + `/chat/room/${roomId}`);
 	},
+
+	findEmailByPhone: async (phone) => {
+		return await axios.get(`${Capstone}/member/email/${phone}`);
+	  },
 	
 	// 해당 채팅방의 이전 채팅 내역 가져오기
 	chatHistory: async (roomId) => {
@@ -32,6 +49,8 @@ const AxiosApi = {
 		}
 		return response.data;  // 객체로 온다면, 필요에 따라 처리
 	},
+
+
 	// 로그인
 	login: async (email, pwd) => {
 		console.log("로그인 진입 : " + email);
@@ -41,9 +60,11 @@ const AxiosApi = {
 		};
 		return await axios.post(Capstone + "/auth/login", data);
 	},
+	
+
 	// 아이디 중복 체크
-	idCheck: async (email) => {
-		return await axios.get(`${Capstone}/auth/exist/${email}`);
+	emailCheck: async (inputEmail) => {
+		return await axios.get(`${Capstone}/auth/exist/${inputEmail}`);
 	},
 	// 닉네임 중복 체크
 	nickNameCheck: async (nickName) => {
@@ -55,7 +76,7 @@ const AxiosApi = {
 		return await axios.get(`${Capstone}/auth/phone/${phone}`);
 	},
 	
-	
+
 	// 회원가입
 	signup: async (nickname, email, pwd, name, phone, regDate) => {
 		const signupData = {
@@ -92,11 +113,16 @@ const AxiosApi = {
 			throw error;
 		}
 	},
-	findIdByEmail: async (email) => {
-		return await axios.post(`${Capstone}/auth/findIdByEmail`, {
-			email,
-		});
-	},
+	// findPhoneByEmail: async (phone) => {
+	// 	return await axios.post(`${Capstone}/member/findEmailByPhone`, {
+	// 		phone,
+	// 	});
+	// },
+	findPhoneByEmail: async (phone) => {
+		return await axios.get(`${Capstone}/auth/email/${phone}`);
+	  },
+
+	
 	
 	// 휴대폰 인증 코드 보내기
 	
@@ -108,11 +134,11 @@ const AxiosApi = {
 	},
 	
 	// 휴대폰 인증 코드 확인
-	verifyToken: async (email, token) => {
+	verifyEmialToken: async (inputEmail, inputCode) => {
 		try {
-			const response = await axios.post(`${Capstone}/auth/verifyToken`, {
-				email: email,
-				token: token,
+			const response = await axios.post(`${Capstone}/auth/verify-email-token`, {
+				email: inputEmail,
+				inputToken: inputCode,
 			});
 			return response.data; // "토큰이 유효합니다." 또는 "유효하지 않거나 만료된 토큰입니다."
 		} catch (error) {
@@ -121,10 +147,9 @@ const AxiosApi = {
 		}
 	},
 	
-	checkIdMail: async (userId, userMail) => {
+	checkIdMail: async (email) => {	
 		const checkData = {
-			userId: userId,
-			userMail: userMail,
+			email: email,
 		};
 		try {
 			return await axios.post(
@@ -135,7 +160,29 @@ const AxiosApi = {
 			console.error("checkIdMail error:", error);
 			throw error;
 		}
+	},
+
+	
+	changePassword: async (newPassword) => {
+		
+
+		try {
+			const response = await axios.post(`${Capstone}/auth/change-password`, {
+				pwd: newPassword  // 본문(body)에 `pwd` 필드로 데이터 전송
+			});
+			return response // 비밀번호 변경 성공 메시지
+		} catch (error) {
+			if (error.response) {
+				// 서버에서 반환한 오류 메시지
+				throw new Error(error.response.data);
+			} else {
+				throw new Error('서버에 연결할 수 없습니다.');
+			}
+		}
 	}
+	
+	
 }
+
 
 export default AxiosApi;

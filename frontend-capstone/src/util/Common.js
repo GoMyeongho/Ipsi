@@ -1,7 +1,7 @@
 import moment from "moment"; // 시간을 경과 시간 형태로 표시
 import "moment/locale/ko";
-import axiosApi from "../api/AxiosApi";
-moment.locale("ko"); // 한국 시간 적용
+import axios from "axios";
+
 
 const Commons = {
 	Capstone: "http://localhost:8111",
@@ -61,7 +61,7 @@ const Commons = {
 			},
 		};
 		try {
-			const rsp = await axiosApi.post(
+			const rsp = await axios.post(
 				`${Commons.Capstone}/auth/refresh`,
 				refreshToken, config
 			);
@@ -73,9 +73,9 @@ const Commons = {
 		}
 	},
 
-	TakenToken : async()=>{
+	getTokenByMemberId : async()=>{
 		const accessToken = Commons.getAccessToken();
-		try{ return await axiosApi.get(Commons.Capstone + `/sale/takenEmail`,{
+		try{ return await axios.get(Commons.Capstone + `/auth/getMemberId `,{
 		headers: {
 		  "Content-Type": "application/json",
 		  Authorization: "Bearer " + accessToken,
@@ -85,7 +85,7 @@ const Commons = {
 			await Commons.handleUnauthorized();
 			const newToken = Commons.getAccessToken();
 			if (newToken !== accessToken) {
-			  return await axiosApi.get(Commons.Capstone + `/sale/takenEmail`,{
+			  return await axios.get(Commons.Capstone + `/auth/getMemberId`,{
 				headers: {
 				  "Content-Type": "application/json",
 				  Authorization: "Bearer " + newToken,
@@ -93,16 +93,9 @@ const Commons = {
 			})}
 		}
 	  };
-	  },
-	IsLogin : async()=>{
-		const accessToken = Commons.getAccessToken();
-		return await axiosApi.get(Commons.Capstone + `/sale/isLogin/${accessToken}`,{
-		  headers: {
-			"Content-Type": "application/json",
-			Authorization: "Bearer " + accessToken,
-		  },
-		})
 	  }
+	
+
 };
 
 

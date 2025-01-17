@@ -235,7 +235,7 @@ const SignupModal = ({ closeModal }) => {
       <ModalContainer>
         <h3>회원가입</h3>
 
-        <InputContainer>
+        {/* <InputContainer>
           <p>닉네임</p>
           <Input
             type="text"
@@ -244,7 +244,7 @@ const SignupModal = ({ closeModal }) => {
             onChange={onChangeNickname}
           />
           {nicknameMessage && <Message isValid={isNickname}>{nicknameMessage}</Message>}
-        </InputContainer>
+        </InputContainer> */}
         <InputContainer>
           <p>이메일</p>
           <Input

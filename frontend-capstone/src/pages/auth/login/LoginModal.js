@@ -3,14 +3,13 @@ import styled from "styled-components";
 import AxiosApi from "../../../api/AxiosApi";
 import SignupModal from "../signup/SingupModal";
 import FindPw from "../findPw/FIndPw";
-import FindIdByEmail from "../findId/FindIdByEmail";
+import FindIdByPhone from "../findId/FindIdByPhone";
 import { useNavigate } from "react-router-dom";
 import Commons from "../../../util/Common";
 
 // 도메인 및 API URL 설정
-const DOMAIN = 'http://localhost:8111'; // 도메인 수정
-const API_DOMAIN = `${DOMAIN}/api/v1`;
-const SNS_SIGN_IN_URL = (type) => `${API_DOMAIN}/auth/oauth2/${type}`;
+
+
 
 // 모달 배경
 const ModalOverlay = styled.div`
@@ -152,6 +151,14 @@ const SignupTextButton = styled.button`
 `;
 
 const LoginModal = ({ closeModal, setIsLoggedIn }) => {
+
+  const onSnsSignInButtonClickHandler =(type) =>{
+    window.location.href = SNS_SIGN_IN_URL(type);
+  };
+  const DOMAIN = 'http://localhost:8111'; // 도메인 수정
+  const API_DOMAIN = `${DOMAIN}/api/v1`;
+  const SNS_SIGN_IN_URL = (type) => `${API_DOMAIN}/auth/oauth2/${type}`;
+
   const [inputEmail, setInputEmail] = useState("");
   const [inputPw, setInputPw] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -217,9 +224,7 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
     setIsFindPwModalOpen(false);
   };
 
-  const handleSNSLogin = (type) => {
-    window.location.href = SNS_SIGN_IN_URL(type);
-  };
+
 
   return (
     <>
@@ -246,8 +251,8 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
 
           {/* 네이버 및 카카오톡 로그인 버튼 */}
           <SocialButtonsContainer>
-            <NaverButton onClick={() => handleSNSLogin('naver')}></NaverButton>
-            <KakaoButton onClick={() => handleSNSLogin('kakao')}></KakaoButton>
+            <NaverButton onClick={() => onSnsSignInButtonClickHandler('naver')}></NaverButton>
+            <KakaoButton onClick={() => onSnsSignInButtonClickHandler('kakao')}></KakaoButton>
           </SocialButtonsContainer>
 
           {/* 아이디찾기 / 비밀번호 찾기 */}
@@ -263,7 +268,7 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
       </ModalContent>
 
       {isSignupModalOpen && <SignupModal closeModal={closeSignupModal} />}
-      {isFindIdModalOpen && <FindIdByEmail closeModal={closeFindIdModal} />}
+      {isFindIdModalOpen && <FindIdByPhone closeModal={closeFindIdModal} />}
       {isFindPwModalOpen && <FindPw closeModal={closeFindPwModal} />}
     </>
   );
