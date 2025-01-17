@@ -36,7 +36,7 @@ public class FileBoardController {
 			
 			// DTO로 응답 반환
 			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
-            log.info("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ{}",response);
+			log.info("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ{}",response);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body(null);
