@@ -38,6 +38,58 @@ public class UnivService {
 			
 		}
 	}
+
+
+	// 모든 대학 목록 조회
+	public List<Map<String, Object>> getUnivList() {
+		try {
+			// 대학 목록 조회
+			List<Univ> univList = univRepository.findAll();
+			List<Map<String, Object>> univListResponse = new ArrayList<>();
+
+			for (Univ univ : univList) {
+				Map<String, Object> univMap = new HashMap<>();
+				univMap.put("univName", univ.getUnivName());
+				univListResponse.add(univMap);
+			}
+			return univListResponse;
+		} catch (Exception e) {
+			log.error("대학 목록 조회 실패: {}", e.getMessage(), e);
+			throw new RuntimeException("대학 목록을 조회하는 중 문제가 발생했습니다.");
+		}
+	}
+
+	// 특정 대학에 대한 학과 목록 조회
+	public List<Map<String, Object>> getDeptList(String univName) {
+		try {
+			// 해당 대학 조회 (여러 개일 수 있음)
+			List<Univ> univList = univRepository.findByUnivName(univName);
+
+			if (univList.isEmpty()) {
+				throw new RuntimeException("대학 정보를 찾을 수 없습니다: " + univName);
+			}
+
+			// 모든 대학에 대해 학과 목록 생성
+			List<Map<String, Object>> deptListResponse = new ArrayList<>();
+
+			// 각 대학에 대해 학과 목록 생성
+			for (Univ univ : univList) {
+				String[] departments = univ.getUnivDept().split(","); // 쉼표로 구분된 학과 문자열 분리
+
+				for (String dept : departments) {
+					Map<String, Object> deptMap = new HashMap<>();
+					deptMap.put("deptName", dept.trim()); // 공백 제거 후 학과 이름 추가
+					deptListResponse.add(deptMap);
+				}
+			}
+
+			return deptListResponse;
+
+		} catch (Exception e) {
+			log.error("학과 목록 조회 실패: 대학명 = {}, 에러 = {}", univName, e.getMessage(), e);
+			throw new RuntimeException("학과 목록을 조회하는 중 문제가 발생했습니다.", e);
+		}
+	}
 	
 	public boolean saveUniv(Univ univ) {
 		try{

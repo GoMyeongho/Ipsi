@@ -3,6 +3,7 @@ package kh.BackendCapstone.controller;
 import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
 import kh.BackendCapstone.dto.response.UnivResponse;
+import kh.BackendCapstone.jwt.TokenProvider;
 import kh.BackendCapstone.service.FileBoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +22,11 @@ import java.util.List;
 public class FileBoardController {
 	
 	private final FileBoardService fileBoardService;
+	private final TokenProvider tokenProvider;
 	
 	// 대학 정보 조회
-	@GetMapping("/list")
-	public ResponseEntity<UnivResponse> getResumeList(
+	@GetMapping("/psList")
+	public ResponseEntity<UnivResponse> getPersonalStatementList(
 		@RequestParam int page,
 		@RequestParam int limit,
 		@RequestParam(required = false) String univName,
@@ -36,7 +38,28 @@ public class FileBoardController {
 			
 			// DTO로 응답 반환
 			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
-            log.info("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ{}",response);
+			log.warn("wdqdqwd{}",response);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(null);
+		}
+	}
+
+	// 대학 정보 조회
+	@GetMapping("/srList")
+	public ResponseEntity<UnivResponse> getStudentRecordList(
+			@RequestParam int page,
+			@RequestParam int limit,
+			@RequestParam(required = false) String univName,
+			@RequestParam(required = false) String univDept) {
+		try {
+			// 대학 정보와 페이지 수를 한 번에 가져옴
+			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "sr");
+			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "sr");
+
+			// DTO로 응답 반환
+			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
+			log.warn("wdqdqwd{}",response);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body(null);
@@ -49,12 +72,14 @@ public class FileBoardController {
 			@RequestParam("mainFile") MultipartFile mainFile,
 			@RequestParam(value = "preview", required = false) MultipartFile preview,
 			@RequestParam(value = "summary", required = false) String summary,
+			@RequestParam("univName") String univName,
+			@RequestParam("univDept") String univDept,
 			@RequestParam("price") int price,
 			@RequestParam("fileCategory") FileCategory fileCategory,
-			@RequestParam(value = "keywords", required = false) String keywordsJson) {
+			@RequestParam(value = "keywords", required = false) List<String> keywords,
+			@RequestParam("memberId") Long memberId) { // 추가된 부분
 
 		try {
-
 			// mainFile이 null이 아니고, 파일이 비어 있지 않다면
 			if (mainFile == null || mainFile.isEmpty()) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Main file is required.");
@@ -73,16 +98,21 @@ public class FileBoardController {
 				summary = "No summary provided"; // 기본값 설정
 			}
 
-			if (keywordsJson == null || keywordsJson.trim().isEmpty()) {
-				keywordsJson = "{}"; // 빈 JSON 객체로 설정
+			if (keywords == null || keywords.isEmpty()) {
+				keywords = List.of(); // 기본값 설정 (빈 리스트)
 			}
 
+			// memberId 출력 (디버깅 용도)
+			System.out.println("Received memberId: " + memberId);
+
 			// 서비스 호출
-			fileBoardService.saveFileBoard(title, mainFile, preview, summary, price, fileCategory, keywordsJson);
+			fileBoardService.saveFileBoard(
+					title, mainFile, preview, summary, univName, univDept, price, fileCategory, keywords, memberId); // memberId 추가
 			return ResponseEntity.ok("파일 저장 성공");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
 		}
 	}
+
 }
