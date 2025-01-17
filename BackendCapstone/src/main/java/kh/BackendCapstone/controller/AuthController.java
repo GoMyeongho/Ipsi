@@ -185,15 +185,7 @@
 			log.info("tokenDto : {}", tokenDto);
 			return ResponseEntity.ok(tokenDto);
 		}
-
-		@GetMapping("/getMemberId")
-		public ResponseEntity<Long> getMemberId() {
-			Long memberId = SecurityUtil.getCurrentMemberId();  // 현재 인증된 사용자의 memberId를 가져옴
-			if (memberId == null) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();  // 인증되지 않은 경우
-			}
-			return ResponseEntity.ok(memberId);
-		}
+		
 		@PostMapping("/change-password")
 		public ResponseEntity<Boolean> changePassword(@RequestBody MemberReqDto memberReqDto) {
 			try {

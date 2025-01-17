@@ -23,6 +23,8 @@ public class Member {
     private Long memberId; // Primary Key
     // nullable=false : null 값이 올 수 없다는 제약 조건
     // length = 50 : 최대 길이(바이트)
+    @Column(unique = true)
+    private String userId; // 고유 사용자 ID (소셜 또는 직접 가입)
     @Column(name = "nick_name")
     private String nickName;
     @Column(nullable = false, unique = true)

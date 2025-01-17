@@ -10,7 +10,6 @@ import AccordionExample from "./example/AccordionExample";
 import AdminNav from "./pages/admin/AdminNav";
 import PermissionMain from "./pages/admin/auth/list/PermissionMain";
 import PermissionStore from "./context/admin/PermissionStore";
-import CoverLetterWrite from "./pages/CoverLetterWrite";
 import MyPageNavBar from "./component/MyPageNavBar";
 import ChatStore from './context/ChatStore';
 import TextStore, { PostLayout } from "./context/TextStore";
@@ -38,8 +37,6 @@ function App() {
       {/* Router를 최상위에서만 사용 */}
       <Router>
         <Routes>
-          {/* 로그인 페이지 */}
-          <Route path="/login" element={<TestLogin />} />
 
           {/* 메인 레이아웃 적용 */}
           <Route path="/" element={<ChatStore><Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /></ChatStore>}>
