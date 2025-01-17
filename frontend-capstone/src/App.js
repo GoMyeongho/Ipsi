@@ -20,8 +20,14 @@ import ChatStore from './context/ChatStore';
 import TextStore, { PostLayout } from "./context/TextStore";
 import PostListMain from "./pages/text/post/list/PostListMain";
 import PostItemMain from "./pages/text/post/item/PostItemMain";
+import OAuth from './pages/auth/login/OAuth';
+
+import {useState} from "react";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("accessToken")
+  );
   return (
     <>
       <GlobalStyle />
@@ -31,7 +37,7 @@ function App() {
           <Route path="/login" element={<TestLogin />} />
           
           {/* 메인 레이아웃 적용 */}
-          <Route path="/" element={<ChatStore><Layout /></ChatStore>}>
+          <Route path="/" element={<ChatStore><Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /></ChatStore>}>
             <Route path="coverLetter" element={<CoverLetter />} />
             <Route path="coverLetterWrite" element={<CoverLetterWrite />} />
             <Route path="coverLetterDetail" element={<CoverLetterDetail />} />
@@ -55,7 +61,7 @@ function App() {
               <Route path="list" element={<PostListMain />} />
               <Route path="detail/:id" element={<PostItemMain />} />
             </Route>
-            
+            <Route path='auth/oauth-response/:token/:expirationTime' element={<OAuth/>}/>
             {/* 결제 관련 페이지 */}
             <Route path="checkoutPage" element={<CheckoutPage />} />
             <Route path="sandbox/success" element={<SuccessPage />} />
