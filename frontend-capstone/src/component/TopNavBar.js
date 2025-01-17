@@ -213,7 +213,7 @@ const TopNavBar = () => {
           />
           <p onClick={materialOpenModal}>입시자료</p>
           <p onClick={() => navigate("/coverLetterWrite")}>자소서 작성</p>
-          <p onClick={() => navigate("/")}>게시판</p>
+          <p onClick={() => navigate("/post/list/default")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
           {}

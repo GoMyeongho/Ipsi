@@ -3,7 +3,7 @@ import { Button, Typography, LinearProgress, Box } from "@mui/material";
 
 // 파일 업로드 컴포넌트
 const FileUploader = ({
-	                      folderPath,     // 업로드할 폴더 경로
+	                      folderPath="firebase/upload",     // 업로드할 폴더 경로
 	                      uploadApi,      // 파일을 업로드할 API 함수 (예: firebaseUploader)
 	                      onProgress,     // 업로드 진행 상태를 상위 컴포넌트로 전달할 콜백 함수
                       }) => {
@@ -31,15 +31,20 @@ const FileUploader = ({
 		try {
 			// `uploadApi`는 `props`로 전달된 파일 업로드 API 함수
 			// 이 함수는 파일과 폴더 경로, 진행률을 업데이트하는 콜백을 받음
-			const result = await uploadApi(file, folderPath, (progress) => {
+			
+			const formData = new FormData();
+			formData.append("file", file);  // 파일 추가
+			formData.append("folderPath", folderPath);  // 폴더 경로 추가
+			
+			const rsp = await uploadApi(formData, (progress) => {
 				setUploadProgress(progress);  // 업로드 진행률 업데이트
 				if (onProgress) onProgress(progress);  // 상위 컴포넌트로 진행률 전달
 			});
 			
 			// 업로드 성공 여부 확인 후 메시지 설정
-			if (result.success) {
+			if (rsp.data.success) {
 				setUploadStatus("파일 업로드 성공!");  // 성공 메시지
-				console.log("파일 URL:", result.fileUrl);  // 업로드된 파일 URL 출력
+				console.log("파일 URL:", rsp.data.fileUrl);  // 업로드된 파일 URL 출력
 			} else {
 				setUploadStatus("파일 업로드 실패.");  // 실패 메시지
 			}
@@ -80,3 +85,4 @@ const FileUploader = ({
 
 // 컴포넌트 기본 export
 export default FileUploader;
+
