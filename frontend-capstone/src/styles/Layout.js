@@ -15,17 +15,18 @@ const Header = styled.div`
   z-index: 1000;
 `
 
-const Layout = () => {
-  return(
-   <>
-      <Background>
-        <Header>
-          <TopNavBar/>
-        </Header>
-        <ChatModal/>
-      </Background>
-   </>
-  )
-}
+
+
+const Layout = ({ isLoggedIn, setIsLoggedIn }) => {
+  return (
+    <Background>
+      <Header>
+        <TopNavBar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      </Header>
+      <ChatModal />
+    </Background>
+  );
+};
+
 
 export default Layout

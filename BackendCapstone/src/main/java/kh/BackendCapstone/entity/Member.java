@@ -1,4 +1,5 @@
-package kh.BackendCapstone.entity;
+package kh.BackendCapstone.entity;//		package kh.BackendCapstone.entity;
+
 
 import kh.BackendCapstone.constant.Authority;
 
@@ -32,8 +33,7 @@ public class Member {
     private String name;
 
     @Column(length = 50)
-    private String type;
-
+    private String type; // 가입 방식 (예: "kakao", "naver", "direct")
     @Column(name = "revenue", nullable = false)
     private int revenue = 0; // 기본값 0으로 설정
 
@@ -63,5 +63,14 @@ public class Member {
         this.authority = authority; // Enum 타입
         this.univ = univ;
     }
+  public Member(String userId, String email, String type) {
+				this.userId = userId;
+				this.pwd = "password";
+				this.email = email;
+				this.type = type;
+				this.authority = Authority.valueOf("ROLE_USER");
+
+			}
 
 }
+

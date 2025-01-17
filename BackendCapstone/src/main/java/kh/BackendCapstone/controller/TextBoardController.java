@@ -42,8 +42,8 @@ public class TextBoardController {
 		return ResponseEntity.ok(pageCount);
 	}
 	@GetMapping("/find/{category}")
-	public ResponseEntity<List<TextBoardListResDto>> findBoardAll(@PathVariable String category, @RequestParam int page, @RequestParam int size) {
-		List<TextBoardListResDto> rsp = textBoardService.findBoardAllByCategory(category, page, size);
+	public ResponseEntity<List<TextBoardListResDto>> findBoardAll(@PathVariable String category, @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+		List<TextBoardListResDto> rsp = textBoardService.findBoardAllByCategory(category, page, size, sort);
 		log.warn("카테고리 : {} 전체 글 {}개의 내용 조회 : {}",category, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
 	}
@@ -57,8 +57,8 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/title/{category}/{title}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByTitle(@PathVariable String category, @PathVariable String title,
-	                                                              @RequestParam int page, @RequestParam int size) {
-		List<TextBoardListResDto> rsp = textBoardService.findBoardByTitle(category, title, page, size);
+	                                                              @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+		List<TextBoardListResDto> rsp = textBoardService.findBoardByTitle(category, title, page, size, sort);
 		log.warn("카테고리 : {} 글 제목 : {} ,로 검색한 {}개의 내용 조회 : {}", category, title, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
 	}
@@ -72,8 +72,8 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/nickName/{category}/{nickName}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByNickName(@PathVariable String category, @PathVariable String nickName,
-	                                                                  @RequestParam int page, @RequestParam int size) {
-		List<TextBoardListResDto> rsp = textBoardService.findBoardByNickName(category, nickName, page, size);
+	                                                                  @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+		List<TextBoardListResDto> rsp = textBoardService.findBoardByNickName(category, nickName, page, size, sort);
 		log.warn("카테고리 : {} 글 작성자 : {} ,로 검색한 {}개의 내용 조회 : {}", category, nickName, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
 	}
@@ -87,8 +87,8 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/titleOrContent/{category}/{keyword}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByTitleOrContent(@PathVariable String category, @PathVariable String keyword,
-	                                                                       @RequestParam int size, @RequestParam int page) {
-		List<TextBoardListResDto> rsp = textBoardService.findBoardByTitleAndContent(category ,keyword, size, page);
+	                                                                       @RequestParam int size, @RequestParam int page, @RequestParam String sort) {
+		List<TextBoardListResDto> rsp = textBoardService.findBoardByTitleAndContent(category ,keyword, size, page, sort);
 		log.warn("카테고리 : {} 제목과 내용 검색 : {}, 페이지당 {} 인 페이지 {} 의 검색된 개수 : {} 결과 : {}", category, keyword, size, page, rsp.size(),rsp);
 		return ResponseEntity.ok(rsp);
 	}
@@ -102,8 +102,8 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/member/{category}/{email}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByMember(@PathVariable String category, @PathVariable String email,
-	                                                                     @RequestParam int page, @RequestParam int size) {
-		List<TextBoardListResDto> rsp = textBoardService.findBoardByMember(category, email, page, size);
+	                                                                     @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+		List<TextBoardListResDto> rsp = textBoardService.findBoardByMember(category, email, page, size, sort);
 		log.warn("카테고리 : {} 글 회원 : {} ,로 검색한 {}개의 내용 조회 : {}", category, email, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
 	}
