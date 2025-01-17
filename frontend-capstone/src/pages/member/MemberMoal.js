@@ -40,7 +40,7 @@ const ModalTextLink = styled.span`
 `;
 
 const MemberModal = ({ isOpen, closeModal, handleModalLinkClick }) => {
-
+  const navigate = useNavigate();
   if (!isOpen) return null;
 
   // const handleNavigate = () => {
@@ -60,7 +60,7 @@ const MemberModal = ({ isOpen, closeModal, handleModalLinkClick }) => {
     <>
       <ModalOverlay onClick={closeModal} />
       <ModalContent>
-        <ModalTextLink onClick={() => handleModalLinkClick("member")}>
+        <ModalTextLink onClick={() => navigate("/myPageNavBar")}>
           마이페이지
         </ModalTextLink>
         <ModalTextLink onClick={() => handleModalLinkClick("logout")}>

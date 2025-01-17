@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 // JWT 토큰을 생성 및 검증하며, 토큰에서 회원 정보를 추출하는 클래스
 @Slf4j
 @Component
+
 public class TokenProvider {
 	private static final String AUTHORITIES_KEY="auth"; //토큰에 저장되는 권한 정보의 key
 	private static final String BEARER_TYPE = "Bearer"; // 토큰의 타입

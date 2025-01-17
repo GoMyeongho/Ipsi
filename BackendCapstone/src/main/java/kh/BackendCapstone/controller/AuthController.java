@@ -5,13 +5,14 @@
 	import kh.BackendCapstone.dto.request.MemberReqDto;
 	import kh.BackendCapstone.dto.response.MemberResDto;
 	import kh.BackendCapstone.entity.Member;
+	import kh.BackendCapstone.security.SecurityUtil;
 	import kh.BackendCapstone.service.AuthService;
 	import kh.BackendCapstone.service.EmailService;
 	import kh.BackendCapstone.service.SmsService;
-	import kh.BackendCapstone.jwt.TokenProvider;
 
 	import lombok.RequiredArgsConstructor;
 	import lombok.extern.slf4j.Slf4j;
+	import org.springframework.http.HttpStatus;
 	import org.springframework.http.ResponseEntity;
 	import org.springframework.web.bind.annotation.*;
 
@@ -135,7 +136,6 @@
 			}
 		}
 
-
 		// 리프레시 토큰으로 새 액세스 토큰 발급
 		@PostMapping("/refresh")
 		public ResponseEntity<AccessTokenDto> newToken(@RequestBody String refreshToken) {
@@ -150,7 +150,15 @@
 			log.info("tokenDto : {}", tokenDto);
 			return ResponseEntity.ok(tokenDto);
 		}
-	//
+
+		@GetMapping("/getMemberId")
+		public ResponseEntity<Long> getMemberId() {
+			Long memberId = SecurityUtil.getCurrentMemberId();  // 현재 인증된 사용자의 memberId를 가져옴
+			if (memberId == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();  // 인증되지 않은 경우
+			}
+			return ResponseEntity.ok(memberId);
+		}
 	}
 
 
