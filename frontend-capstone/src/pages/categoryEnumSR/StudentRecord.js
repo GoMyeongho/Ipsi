@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import DocumentsApi from "../api/DocumentsApi";
+import DocumentsApi from "../../api/DocumentsApi";
 import { useNavigate } from "react-router-dom";
 
 const Background = styled.div`
@@ -171,7 +171,7 @@ const ContentsPrice = styled.div`
   width: 100%;
 `;
 
-const BuyButton = styled.button`
+const BuyButton = styled.div`
   background-color: #6200ea;
   color: white;
   border: none;
@@ -225,7 +225,7 @@ const replaceMiddleChar = (str) => {
   return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1); // 가운데 글자를 '*'로 변경
 };
 
-const CoverLetter = () => {
+const StudentRecord = () => {
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
   const [dropDwonList, setDropDownList] = useState([]); // DropDown 데이터 상태
   const [selectedUniv, setSelectedUniv] = useState(""); // 선택한 대학
@@ -239,9 +239,9 @@ const CoverLetter = () => {
 
   // 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
-  const [itemsPerPage, setItemsPerPage] = useState(3); // 페이지당 항목 수
+  const [itemsPerPage, setItemsPerPage] = useState(12); // 페이지당 항목 수
   const [totalPages, setTotalPages] = useState(0); // 전체 페이지 수
-
+  
   // 페이지네이션 로직: 현재 페이지에 맞는 항목 가져오기
   const indexOfFirstItem = 0;
   const currentItems = filteredItems.slice(
@@ -280,7 +280,7 @@ const CoverLetter = () => {
     const fetchData = async () => {
       try {
         const response = await DocumentsApi.getDropDownList();
-        // console.log(response);
+        console.log(response);
         if (response.data) {
           const data = response.data;
 
@@ -318,8 +318,8 @@ const CoverLetter = () => {
         univName: selectedUniv,
         univDept: selectedDept,
       };
-      console.log(params);
-      const response = await DocumentsApi.getContents(
+      // console.log(params);
+      const response = await DocumentsApi.getSRContents(
         params.page,
         params.limit,
         params.univName,
@@ -328,7 +328,7 @@ const CoverLetter = () => {
 
       const items = response.content || response.items;
 
-      console.log(items); // 데이터 확인용
+      // console.log(items); // 데이터 확인용
       setContentItems(items);
       setFilteredItems(items); // 필터링된 항목 업데이트
       setTotalPages(
@@ -344,7 +344,7 @@ const CoverLetter = () => {
   // 페이지가 변경될 때마다 데이터 새로 가져오기
   useEffect(() => {
     fetchData(); // 페이지 변경 시 데이터 가져오기
-  }, [currentPage, itemsPerPage]); // 의존성 배열에 currentPage, itemsPerPage, selectedUniv, selectedDept 추가
+  }, [currentPage]); // 의존성 배열에 currentPage, itemsPerPage, selectedUniv, selectedDept 추가
 
   // 대학 선택 핸들러
   const handleUnivChange = (event) => {
@@ -400,32 +400,24 @@ const CoverLetter = () => {
     return <div>Contents 에러가 발생했습니다: {contentsError}</div>;
   }
 
-  const handlePurchaseClick = (productData) => {
-    console.log("선택된 상품:", productData);
-    // 결제 로직 추가
-    const productItem = {
-      id: productData.id, // 상품 ID
-      fileTitle: productData.fileTitle,
-      univName: productData.univName, // 대학명
-      univDept: productData.univDept, // 학과명
-      memberName: productData.memberName, // 작성자 이름
-      price: productData.price, // 가격
-    };
-
-    // alert(`상품 구매를 진행합니다.\n대학: ${productItem.univName}\n학과: ${productItem.univDept}\n가격: ${productItem.price}원`);
-
-    // CheckOut.js로 이동하며 상품 정보를 전달
-    navigate("/checkOutPage", { state: { productItem } });
-  };
-
   const handleTopClick = (selectedData) => {
-    navigate("/coverLetterDetail", { state: { item: selectedData } } );
+    navigate("/StudentRecordDetail", { state: { item: selectedData } } );
   };
+
+  // 자릿수만 포맷팅하는 함수
+const formatPrice = (price) => {
+  if (typeof price !== 'number') {
+    console.warn("Invalid price value:", price);
+    return price; // 잘못된 가격 값이 들어오면 원본 반환
+  }
+
+  return new Intl.NumberFormat("ko-KR").format(price); // 한국식 천 단위 구분 기호 추가
+};
 
   return (
     <Background>
       <Top>
-        <Title>자기소개서</Title>
+        <Title>생활기록부</Title>
         <Search>
           <DropdownContainer>
             <Dropdown onChange={handleUnivChange} value={selectedUniv}>
@@ -472,9 +464,9 @@ const CoverLetter = () => {
               <ContentsBottom>
                 <ContentsBottomBox>
                   <AuthName>{replaceMiddleChar(item.memberName)}</AuthName>
-                  <ContentsPrice>{item.price}원</ContentsPrice>
+                  <ContentsPrice>{formatPrice(item.price)}원</ContentsPrice>
                 </ContentsBottomBox>
-                <BuyButton BuyButton onClick={() => handlePurchaseClick(item)}>
+                <BuyButton>
                   구매하기
                 </BuyButton>
               </ContentsBottom>
@@ -524,4 +516,4 @@ const CoverLetter = () => {
   );
 };
 
-export default CoverLetter;
+export default StudentRecord;

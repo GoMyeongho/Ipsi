@@ -5,6 +5,7 @@ import kh.BackendCapstone.constant.FileCategory;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,4 +31,5 @@ public class FileBoardResDto {
     private String mainFile;
     private String preview;
     private String summary;
+    private String keywords; // 키워드
 }
