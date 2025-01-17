@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
-import AxiosApi from "../api/AxiosApi";
 import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import DocumentsApi from "../api/DocumentsApi";
 
 export function SuccessPage() {
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -23,9 +23,21 @@ export function SuccessPage() {
       };
 
       // API 호출
-      const response = await AxiosApi.confirmPayment(paymentData);
+      const response = await DocumentsApi.confirmPayment(paymentData);
       if (response.status === 200) {
         setIsConfirmed(true);
+
+        // 결제 완료 처리 API 호출 (orderId를 백엔드로 전달)
+        try {
+          const completeResponse = await DocumentsApi.completePayment(orderId);
+          if (completeResponse.status === 200) {
+            console.log("결제 완료 처리 성공");
+          } else {
+            console.error("결제 완료 처리 실패:", completeResponse);
+          }
+        } catch (error) {
+          console.error("결제 완료 처리 중 오류 발생:", error);
+        }
       } else {
         console.error("결제 승인 실패:", response);
       }

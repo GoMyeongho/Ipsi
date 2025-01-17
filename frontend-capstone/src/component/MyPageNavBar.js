@@ -120,8 +120,8 @@ const MyPageNavBar = () => {
 
             <SubTitle2>
               나의 구매목록
-              <p onClick={() => navigate("")}>구매한 자기소개서</p>
-              <p onClick={() => navigate("")}>구매한 생활기록부</p>
+              <p onClick={() => navigate("purchasedEnumPS")}>구매한 자기소개서</p>
+              <p onClick={() => navigate("purchasedEnumSR")}>구매한 생활기록부</p>
             </SubTitle2>
 
             <SubTitle3>
