@@ -34,16 +34,16 @@ export const ChatName = styled.p`
   margin: 0 0 10px 0;
   color: #444;
 `;
-const ChatDate = styled.p`
+/* const ChatDate = styled.p`
   font-size: 1em;
   color: #666;
   margin: 0;
   text-align: right;
-`;
+`; */
 
 const ChatList = ({ setSelectedPage }) => {
     const [chatRooms, setChatRooms] = useState([]);
-    const {setRoomId} = useContext(ChatContext)
+    const {setRoomId} = useContext(ChatContext);
 
     // 서버로부터 채팅방 목록을 가져오는 API
     const fetchChatRooms = async() => {
@@ -63,7 +63,7 @@ const ChatList = ({ setSelectedPage }) => {
     // 채팅방 이동
     const enterChatRoom = (roomId) => {
       console.log("Room ID:", roomId);
-      setRoomId(roomId)
+      setRoomId(roomId);
       setSelectedPage("chatting");
     };
 
