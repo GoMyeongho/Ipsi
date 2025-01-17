@@ -11,10 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
+@CrossOrigin(origins = "http://localhost:3000")
 @Slf4j
 @Service
 @AllArgsConstructor // 생성자를 통한 의존성 주입을 받기 위해서 모든
@@ -42,6 +44,12 @@ public class MemberService {
 	public MemberResDto findMember(String email) {
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+		return convertEntityToDto(member);
+	}
+
+	public MemberResDto findEmailByPhone(String phone) {
+		Member  member = memberRepository.findEmailByPhone(phone)
+				.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
 		return convertEntityToDto(member);
 	}
 	
