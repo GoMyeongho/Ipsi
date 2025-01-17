@@ -5,6 +5,7 @@ import kh.BackendCapstone.dto.response.MemberResDto;
 import kh.BackendCapstone.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,10 @@ public class MemberController {
 		log.info("memberResDto : {}", memberResDto);
 		return ResponseEntity.ok(memberResDto);
 	}
-	
+
+
+
+
 	@PostMapping("/updateUser")
 	public ResponseEntity<Boolean> updateMember(@RequestBody MemberReqDto memberReqDto) {
 		boolean isSuccess = memberService.updateMember(memberReqDto);

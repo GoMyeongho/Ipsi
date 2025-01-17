@@ -1,4 +1,4 @@
-		package kh.BackendCapstone.entity;
+package kh.BackendCapstone.entity;//		package kh.BackendCapstone.entity;
 
 		import kh.BackendCapstone.constant.Authority;
 
@@ -20,18 +20,19 @@
 			private Long memberId; // Primary Key
 			// nullable=false : null 값이 올 수 없다는 제약 조건
 			// length = 50 : 최대 길이(바이트)
+			@Column(unique = true)
+			private String userId; // 고유 사용자 ID (소셜 또는 직접 가입)
 			@Column(name = "nick_name")
 			private String nickName;
 			@Column(nullable = false, unique = true)
 			private String email;
-			@Column(nullable = false)
+			@Column
 			private String pwd;
 			@Column(length = 50)
 			private String name;
-
 			@Column(length = 50)
-			private String type;
-
+//	private String type; // 가입 방식 (예: "kakao", "naver", "direct")
+			private String type; // 가입 방식 (예: "kakao", "naver", "direct")
 			@Column(name = "refresh_token")
 			private String refreshToken;
 
@@ -60,4 +61,15 @@
 				this.univ = univ;
 			}
 
-		}
+			public Member(String userId, String email, String type) {
+				this.userId = userId;
+				this.pwd = "password";
+				this.email = email;
+				this.type = type;
+				this.authority = Authority.valueOf("ROLE_USER");
+
+			}
+
+
+			}
+
