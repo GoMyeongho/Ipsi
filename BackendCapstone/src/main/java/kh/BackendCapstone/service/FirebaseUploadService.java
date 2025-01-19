@@ -15,10 +15,17 @@ import org.springframework.util.MultiValueMap;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FirebaseService {
+public class FirebaseUploadService {
 	
 	private final RestTemplate restTemplate;
 	
+	/*
+	fileUpload 사용 방법 : Flask 부분을 다운받고 구글 드라이브의 firebase 파일 안에  ipsi-firebase-adminsdk.json을 app.py가 있는 디렉토리에 놓는다.
+	FirebaseUploadService 에서 handleFileUpload를 사용할 컨트롤러에서 부른다.
+	file은 프론트에서 파일을 받아와서 넣어주면 되고(리엑트에서 example/FileUploaderExample 부분을 보면 됩니다.), folderPath는 파이어 베이스 안에 저장될 경로 기본적으로 firebase/ 폴더안에서 시작
+	spring 과 flask를 킨다.
+	실행한다.
+	*/
 	public String handleFileUpload(MultipartFile file, String folderPath) {
 		// Flask API로 요청 보내기
 		String flaskUrl = "http://localhost:5000/spring/upload/firebase";
@@ -29,7 +36,7 @@ public class FirebaseService {
 		// Multipart 파일과 폴더 경로를 전송하는 방식으로 변경
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 		body.add("file", file.getResource());
-		body.add("folderPath", folderPath);
+		body.add("folderPath", "firebase/" + folderPath);
 		
 		// HttpEntity로 요청 본문 만들기
 		HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);

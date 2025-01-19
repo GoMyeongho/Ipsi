@@ -1,6 +1,6 @@
 package kh.BackendCapstone.controller;
 
-import kh.BackendCapstone.service.FirebaseService;
+import kh.BackendCapstone.service.FirebaseUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/firebase")
 @Slf4j
-public class FirebaseController {
-	private final FirebaseService firebaseService;
+public class FirebaseUploadController {
+	private final FirebaseUploadService firebaseUploadService;
 	
 	@PostMapping("/upload/test")
-	public String uploadTest(@RequestParam("file") MultipartFile file) {
-		return firebaseService.handleFileUpload(file, "test");
+	public String uploadTest(@RequestParam("file") MultipartFile file, @RequestParam("folderPath") String folderPath) {
+		return firebaseUploadService.handleFileUpload(file, folderPath);
 	}
 }
