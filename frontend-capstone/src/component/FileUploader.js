@@ -3,18 +3,11 @@ import { Button, Typography, LinearProgress, Box } from "@mui/material";
 
 // 파일 업로드 컴포넌트
 const FileUploader = ({
-	                      folderPath="firebase/upload",     // 업로드할 폴더 경로
-	                      uploadApi,      // 파일을 업로드할 API 함수 (예: firebaseUploader)
-	                      onProgress,     // 업로드 진행 상태를 상위 컴포넌트로 전달할 콜백 함수
+	                      folderPath="upload",     // 업로드할 폴더 경로, 기본값 : firebase/upload/
+	                      uploadApi,      // 파일을 업로드할 API 함수
                       }) => {
 	// 파일 상태 (선택한 파일을 저장)
 	const [file, setFile] = useState(null);
-	
-	// 업로드 진행률 상태 (0 ~ 100)
-	const [uploadProgress, setUploadProgress] = useState(0);
-	
-	// 업로드 상태 메시지 (성공, 실패 또는 오류 메시지)
-	const [uploadStatus, setUploadStatus] = useState("");
 	
 	// 파일 선택 핸들러: 파일이 선택되면 파일 상태 업데이트
 	const handleFileChange = (e) => {
@@ -36,10 +29,7 @@ const FileUploader = ({
 			formData.append("file", file);  // 파일 추가
 			formData.append("folderPath", folderPath);  // 폴더 경로 추가
 			
-			const rsp = await uploadApi(formData, (progress) => {
-				setUploadProgress(progress);  // 업로드 진행률 업데이트
-				if (onProgress) onProgress(progress);  // 상위 컴포넌트로 진행률 전달
-			});
+			const rsp = await uploadApi(formData)
 			
 			// 업로드 성공 여부 확인 후 메시지 설정
 			if (rsp.data.success) {
@@ -71,14 +61,6 @@ const FileUploader = ({
 			<Button variant="contained" onClick={handleUpload} disabled={!file}>
 				업로드
 			</Button>
-			
-			{/* 업로드 진행률 표시 (0~100%) */}
-			{uploadProgress > 0 && (
-				<LinearProgress variant="determinate" value={uploadProgress} />
-			)}
-			
-			{/* 업로드 상태 메시지 표시 (성공, 실패, 오류 등) */}
-			{uploadStatus && <Typography>{uploadStatus}</Typography>}
 		</Box>
 	);
 };

@@ -21,17 +21,13 @@ const UploadPage = () => {
 	};
 	
 	// Spring Boot 백엔드로 파일을 업로드하는 API 호출
-	const customUploadApi = async (formData, onProgress) => {
+	const customUploadApi = async (formData) => {
 		try {
 			const token = localStorage.getItem("accessToken");
 			const response = await axios.post("http://localhost:8111/firebase/upload/test", formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 					Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
-				},
-				onUploadProgress: (progressEvent) => {
-					const progress = (progressEvent.loaded / progressEvent.total) * 100;
-					onProgress(progress);  // 업로드 진행률 전달
 				},
 			});
 			console.log(response);
@@ -66,24 +62,6 @@ const UploadPage = () => {
 				onProgress={handleProgress}    // 업로드 진행 상태를 추적하는 함수
 			/>
 			
-			{/* 업로드 진행 상태 표시 */}
-			<Box sx={{ marginTop: 3 }}>
-				<Typography variant="body1">
-					업로드 진행: {uploadProgress}%
-				</Typography>
-				{uploadProgress > 0 && uploadProgress < 100 && (
-					<LinearProgress variant="determinate" value={uploadProgress} />
-				)}
-			</Box>
-			
-			{/* 업로드 상태 메시지 표시 */}
-			<Box sx={{ marginTop: 3 }}>
-				{uploadStatus && (
-					<Typography variant="body1" color={uploadStatus.includes("성공") ? "green" : "red"}>
-						{uploadStatus}
-					</Typography>
-				)}
-			</Box>
 		</Container>
 	);
 };
