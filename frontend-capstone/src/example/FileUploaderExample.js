@@ -24,7 +24,7 @@ const UploadPage = () => {
 	const customUploadApi = async (formData) => {
 		try {
 			const token = localStorage.getItem("accessToken");
-			const response = await axios.post("http://localhost:8111/firebase/upload/test", formData, {
+			const response = await axios.post("http://localhost:8111/firebase/upload", formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 					Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가

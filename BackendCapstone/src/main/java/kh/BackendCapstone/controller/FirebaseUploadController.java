@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FirebaseUploadController {
 	private final FirebaseUploadService firebaseUploadService;
 	
-	@PostMapping("/upload/test")
+	@PostMapping("/upload")
 	public String uploadTest(@RequestParam("file") MultipartFile file, @RequestParam("folderPath") String folderPath) {
 		return firebaseUploadService.handleFileUpload(file, folderPath);
 	}
