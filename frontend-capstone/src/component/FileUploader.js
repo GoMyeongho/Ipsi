@@ -9,6 +9,7 @@ const FileUploader = ({
 	// 파일 상태 (선택한 파일을 저장)
 	const [file, setFile] = useState(null);
 	
+	
 	// 파일 선택 핸들러: 파일이 선택되면 파일 상태 업데이트
 	const handleFileChange = (e) => {
 		const selectedFile = e.target.files[0];  // 파일 객체 가져오기
@@ -33,13 +34,9 @@ const FileUploader = ({
 			
 			// 업로드 성공 여부 확인 후 메시지 설정
 			if (rsp.data.success) {
-				setUploadStatus("파일 업로드 성공!");  // 성공 메시지
 				console.log("파일 URL:", rsp.data.fileUrl);  // 업로드된 파일 URL 출력
-			} else {
-				setUploadStatus("파일 업로드 실패.");  // 실패 메시지
 			}
 		} catch (error) {
-			setUploadStatus("파일 업로드 중 오류 발생.");  // 오류 발생 시 메시지
 			console.error("파일 업로드 중 오류:", error);  // 오류 로그 출력
 		}
 	};
