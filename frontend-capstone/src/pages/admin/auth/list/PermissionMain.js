@@ -29,7 +29,7 @@ const PermissionMain = () => {
 	const {setPage, permissionCategory, permissionList, setPermissionList } = useContext(PermissionContext);
 	
 	const sortList = [
-		{ name: "요청자", id: "nickName", align: "left", isSort: false, link: (item) => `/admin/member/${item.memberId}` },
+		{ name: "요청자", id: "nickname", align: "left", isSort: false, link: (item) => `/admin/member/${item.memberId}` },
 		{ name: "대학교", id: "univName", align: "right", isSort: true, link: (item) => `/admin/auth/${item.permissionId}` },
 		{ name: "학과", id: "univDept", align: "right", isSort: true, link: (item) => `/admin/auth/${item.permissionId}` },
 		{ name: "요청 일자", id: "regDate", align: "right", isSort: true, link: (item) => `/admin/auth/${item.permissionId}` },
@@ -41,17 +41,18 @@ const PermissionMain = () => {
 	
 	
 	useEffect(() => {
-		const permissions = async () => {
+		const fetchPermissions = async () => {
 			try {
 				const rsp = await AdminApi.getPermissionList(permissionCategory);
-				console.log(rsp);
-				setPermissionList(rsp.data);
+				setPermissionList(rsp.data); // 상태를 안전하게 업데이트
 			} catch (error) {
-				console.log("권한 목록 조회중 에러 : " + error);
+				console.error("권한 목록 조회 중 에러:", error);
 			}
 		};
-		permissions();
-	}, [permissionCategory]);
+		
+		fetchPermissions();
+	}, [permissionCategory]); // 의존성 배열을 최소화
+	
 	
 	return (
 		<BackGround>

@@ -128,18 +128,19 @@ const TopNavBar = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
+  const [isAdmin, setAdmin] = useState(false);
 
   const [isLoggedIn, setIsLoggedIn] = useState(
     // !!localStorage.getItem("loggedInUserId")
     !!localStorage.getItem("accessToken") // 토큰 여부로 로그인 상태 결정
   );
   useEffect(() => {
-    const isAdmin = async () => {
+    const adminVerify = async () => {
       try {
         const rsp = await MemberApi.isAdmin()
         console.log(rsp)
         if (rsp) {
-          // 성공시 보여줄 부분
+          setAdmin(rsp.data)
         } else {
           //실패시 보여줄 부분
         }
@@ -147,8 +148,8 @@ const TopNavBar = () => {
         console.log(error)
       }
     }
-    isAdmin();
-  }, []);
+    adminVerify();
+  }, [isAdmin]);
   
 
   const materialOpenModal = () => setIsMaterialModalOpen(true); // 입시자료 모달창 ON
@@ -214,10 +215,9 @@ const TopNavBar = () => {
           <p onClick={() => navigate("/post/list/default")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
-          {}
         </Left>
         <Right>
-          <img
+        <img
             src="https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fprofile%2FProfile_Purple.png?alt=media"
             alt="Profile"
             onClick={handleImageClick}
@@ -251,6 +251,7 @@ const TopNavBar = () => {
           closeModal={closeModal}
           handleModalLinkClick={handleModalLinkClick}
           setIsLoggedIn={setIsLoggedIn}
+          isAdmin={isAdmin}
         />
       ) : (
         <ModalLoginPage
