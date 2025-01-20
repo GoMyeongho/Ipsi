@@ -1,7 +1,6 @@
 import os
 from flask import request, jsonify
 from google.cloud import storage
-import requests
 import mimetypes
 
 # Firebase Admin SDK 인증 파일
@@ -56,7 +55,7 @@ def upload_file():
         folder_path = request.form["folderPath"]
 
         # Firebase Storage 경로 설정
-        firebase_file_path = f"{folder_path}/{file.filename}".replace("\\", "/")
+        firebase_file_path = f"{folder_path}/{file.filename}".replace("\\", "%2F")
 
         # Firebase Storage에 업로드할 Blob 생성
         blob = bucket.blob(firebase_file_path)
@@ -74,7 +73,7 @@ def upload_file():
 
         # 🌐 웹에서 바로 보이는 URL
         display_url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{firebase_file_path.replace('/', '%2F')}?alt=media"
-
+        # 리턴 값 : 다운로드 url, 보여주기 url 나눠서 반환
         return jsonify({
             "message": "File uploaded successfully",
             "download_url": download_url,  # 다운로드 링크

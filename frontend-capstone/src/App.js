@@ -26,6 +26,7 @@ import PurchasedEnumPS from './pages/myPage/PurchasedEnumPS';
 import FileUploaderExample from "./example/FileUploaderExample";
 import OAuth from './pages/auth/login/OAuth';
 import {useState} from "react";
+import PermissionDetailMain from "./pages/admin/auth/item/PermissionDetailMain";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -63,6 +64,7 @@ function App() {
             {/* 어드민 페이지 */}
             <Route path="admin" element={<PermissionStore><AdminNav /></PermissionStore>}>
               <Route path="auth" element={<PermissionMain />} />
+              <Route path="auth/:permissionId" element={<PermissionDetailMain />} />
             </Route>
 
             {/* 게시판 (text Board) */}

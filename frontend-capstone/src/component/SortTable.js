@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {Box, Link, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel} from "@mui/material";
 import styled from "styled-components";
 import {visuallyHidden} from "@mui/utils";
 import {priceFormatter} from "../function/priceFormatter";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div``
 
@@ -10,16 +11,17 @@ const StyledTable = styled(Table)`
 	width: 100%;
 	margin-top: 10px;
 	margin-bottom: 10px;
-	z-index: 100;
 `
 const StyledTableHead = styled(TableHead)``
 const StyledTableRow = styled(TableRow)``
-const StyledTableCell = styled(TableCell)``
+
 const StyledTableBody = styled(TableBody)``
-const StyledLink = styled(Link)`
-	text-decoration: none;
-	color: black;
-`
+
+
+const StyledTableCell = styled(TableCell)`
+  position: relative; /* 링크의 z-index가 영향을 받을 수 있으므로 설정 */
+  overflow: visible; /* 링크 클릭 방해 방지 */
+`;
 const Image = styled.img``
 const Text = styled.p``
 
@@ -72,9 +74,11 @@ const sampleSortLists = [
 ]
 
 // list : 정렬시킬 값
+// SortTable 컴포넌트 내부
 const SortTable = ({ list, sortList }) => {
 	const [order, setOrder] = useState("asc");
 	const [orderBy, setOrderBy] = useState("carName");
+	const navigate = useNavigate();  // useNavigate 훅 사용
 	
 	// 클릭하면 정렬시켜주는 함수
 	const handleRequestSort = (event, property) => {
@@ -94,6 +98,11 @@ const SortTable = ({ list, sortList }) => {
 				return <Text>{item[cell.id]}</Text>;
 		}
 	}
+	
+	// 링크 클릭 시 페이지 이동 처리 함수
+	const handleClick = (link) => {
+		navigate(link);  // 페이지 이동
+	};
 	
 	if (!list || list.length === 0) {
 		return <Paper>데이터가 없습니다.</Paper>; // list가 없거나 비어있으면 메시지 출력
@@ -130,10 +139,11 @@ const SortTable = ({ list, sortList }) => {
 							{sortList.map((cell, index) => (
 								<TableCell key={index} align={cell.align}>
 									{
-										cell.link ?
-											<StyledLink key={index} to={cell.link(item)}>
+										cell.link ? (
+											<div onClick={() => handleClick(cell.link(item))} style={{ cursor: "pointer" }}>
 												{cellTypeApplication(cell, item)}
-											</StyledLink> : cellTypeApplication(cell, item)
+											</div>
+										) : cellTypeApplication(cell, item)
 									}
 								</TableCell>
 							))}
