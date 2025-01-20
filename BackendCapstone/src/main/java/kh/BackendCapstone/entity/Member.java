@@ -1,8 +1,6 @@
-package kh.BackendCapstone.entity;//		package kh.BackendCapstone.entity;
-
+package kh.BackendCapstone.entity;
 
 import kh.BackendCapstone.constant.Authority;
-
 import lombok.*;
 
 import javax.persistence.*;
@@ -50,9 +48,8 @@ public class Member {
     @ManyToOne
     @JoinColumn(name = "univ_id")
     private Univ univ;
-    @Enumerated(EnumType.STRING)
-    private Authority authority;
-
+        @Enumerated(EnumType.STRING)
+        private Authority authority;
 
     @Builder
     public Member(String nickName, String email, String pwd, String name, String phone, LocalDateTime regDate, Authority authority, Univ univ) {

@@ -93,14 +93,14 @@ const ItemColumn = styled.div`
   text-align: center;
 `;
 
-const PurchasedEnumSR = () => {
+const UploadedEnumSR = () => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     // 데이터를 가져오는 함수
     const fetchItems = async () => {
       try {
-        const response = await MyPageApi.PurchasedEnumSRItem("STUDENT_RECORD"); // 카테고리 필터 추가
+        const response = await MyPageApi.UploadedEnumSRItem("STUDENT_RECORD"); // 카테고리 필터 추가
         const data = response.data;
         console.log(data);
         setItems(data);
@@ -128,19 +128,19 @@ const PurchasedEnumSR = () => {
   return (
     <Background>
       <ContainerBox>
-        <Title>구매한 생활기록부</Title>
+        <Title>업로드한 생활기록부</Title>
         <ItemBox>
           <SortingBox>
             <ItemTitle>상품명</ItemTitle>
             <ItemPrice>상품금액</ItemPrice>
-            <ItemDate>구매일자</ItemDate>
+            <ItemDate>업로드일자</ItemDate>
           </SortingBox>
           {/* 데이터를 반복 렌더링 */}
           {items.map((item, index) => (
             <ItemRow key={index}>
               <ItemColumn>{item.univName}{" "}{item.univDept}{" "}({item.fileTitle})</ItemColumn>
               <ItemColumn>{formatPrice(item.price)}</ItemColumn>
-              <ItemColumn>{formatDate(item.purchaseDate)}</ItemColumn>
+              <ItemColumn>{formatDate(item.regDate)}</ItemColumn>
             </ItemRow>
           ))}
         </ItemBox>
@@ -149,4 +149,4 @@ const PurchasedEnumSR = () => {
   );
 };
 
-export default PurchasedEnumSR;
+export default UploadedEnumSR;
