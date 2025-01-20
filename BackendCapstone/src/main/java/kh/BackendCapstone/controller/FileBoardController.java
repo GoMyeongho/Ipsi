@@ -2,6 +2,7 @@ package kh.BackendCapstone.controller;
 
 import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
+import kh.BackendCapstone.dto.response.PayResDto;
 import kh.BackendCapstone.dto.response.UnivResponse;
 import kh.BackendCapstone.jwt.TokenProvider;
 import kh.BackendCapstone.service.FileBoardService;
@@ -22,8 +23,7 @@ import java.util.List;
 public class FileBoardController {
 	
 	private final FileBoardService fileBoardService;
-	private final TokenProvider tokenProvider;
-	
+
 	// 대학 정보 조회
 	@GetMapping("/psList")
 	public ResponseEntity<UnivResponse> getPersonalStatementList(
@@ -38,7 +38,7 @@ public class FileBoardController {
 			
 			// DTO로 응답 반환
 			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
-			log.warn("wdqdqwd{}",response);
+//			log.warn("wdqdqwd{}",response);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body(null);
@@ -59,19 +59,37 @@ public class FileBoardController {
 
 			// DTO로 응답 반환
 			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
-			log.warn("wdqdqwd{}",response);
-			log.info("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ{}",response);
+//			log.warn("wdqdqwd{}",response);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body(null);
 		}
 	}
 
+
+	// 업로드한 자소서 내역 확인
+	@GetMapping("/uploadedEnumPS")
+	public List<FileBoardResDto> getUploadedPSItems(@RequestParam Long memberId,
+											  @RequestParam("fileCategory") FileCategory fileCategory) {
+//		log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
+		return fileBoardService.getUploadedData(memberId, fileCategory);
+	}
+
+	// 업로드한 생기부 내역 확인
+	@GetMapping("/uploadedEnumSR")
+	public List<FileBoardResDto> getUploadedSRItems(      @RequestParam Long memberId,
+													@RequestParam("fileCategory") FileCategory fileCategory) {
+//		log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
+		return fileBoardService.getUploadedData(memberId, fileCategory);
+	}
+
+	// 자료 업로드(저장)
 	@PostMapping("/save")
 	public ResponseEntity<String> saveFileBoard(
 			@RequestParam("title") String title,
 			@RequestParam("mainFile") MultipartFile mainFile,
 			@RequestParam(value = "preview", required = false) MultipartFile preview,
+			@RequestParam("folderPath") String folderPath,  // 파일 경로 받기
 			@RequestParam(value = "summary", required = false) String summary,
 			@RequestParam("univName") String univName,
 			@RequestParam("univDept") String univDept,
@@ -96,7 +114,7 @@ public class FileBoardController {
 			}
 
 			if (summary == null || summary.trim().isEmpty()) {
-				summary = "No summary provided"; // 기본값 설정
+				summary = ""; // 기본값 설정
 			}
 
 			if (keywords == null || keywords.isEmpty()) {
@@ -108,7 +126,7 @@ public class FileBoardController {
 
 			// 서비스 호출
 			fileBoardService.saveFileBoard(
-					title, mainFile, preview, summary, univName, univDept, price, fileCategory, keywords, memberId); // memberId 추가
+					title, mainFile, preview, folderPath, summary, univName, univDept, price, fileCategory, keywords, memberId ); // memberId 추가
 			return ResponseEntity.ok("파일 저장 성공");
 		} catch (Exception e) {
 			e.printStackTrace();

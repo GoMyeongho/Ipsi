@@ -1,10 +1,14 @@
 package kh.BackendCapstone.controller;
 
+import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.request.PayReqDto;
+import kh.BackendCapstone.dto.response.PayResDto;
 import kh.BackendCapstone.service.PayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j // 로깅 기능 추가
 @RequiredArgsConstructor // final 필드와 @NonNull 필드에 대해 생성자를 자동으로 생성
@@ -24,16 +28,27 @@ public class PayController {
         return payService.savePay(fileBoardId, memberId, orderId); // service에 전달
     }
 
-//    // 결제 정보를 조회하는 메서드
-//    @GetMapping("/{payId}")
-//    public PayReqDto getPayById(@PathVariable Long payId) {
-//        return payService.getPayById(payId);
-//    }
-
     // 결제 완료 처리 메서드 (orderId로 결제 완료 처리)
     @PostMapping("/complete/{orderId}")
     public void completePayment(@PathVariable String orderId) {
         log.info(orderId);
         payService.completePayment(orderId); // service에서 결제 완료 처리
     }
+
+    // 구매한 자소서 내역 확인
+    @GetMapping("/purchasedEnumPS")
+    public List<PayResDto> getPurchasedPSItems(      @RequestParam Long memberId,
+                                                   @RequestParam("fileCategory") FileCategory fileCategory) {
+//        log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
+        return payService.getPurchasedData(memberId, fileCategory);
+    }
+
+    // 구매한 생기부 내역 확인
+    @GetMapping("/purchasedEnumSR")
+    public List<PayResDto> getPurchasedISRtems(      @RequestParam Long memberId,
+                                                   @RequestParam("fileCategory") FileCategory fileCategory) {
+//        log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
+        return payService.getPurchasedData(memberId, fileCategory);
+    }
+
 }
