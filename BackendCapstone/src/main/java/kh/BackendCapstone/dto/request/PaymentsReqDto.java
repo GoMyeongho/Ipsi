@@ -22,4 +22,6 @@ public class PaymentsReqDto {
 
     @NotNull
     private Integer amount;
+
+    private String customerEmail; // 이메일 추가
 }

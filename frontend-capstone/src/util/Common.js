@@ -1,6 +1,9 @@
 import moment from "moment"; // 시간을 경과 시간 형태로 표시
 import "moment/locale/ko";
+import axiosApi from "../api/AxiosApi";
 import axios from "axios";
+moment.locale("ko"); // 한국 시간 적용
+
 
 
 const Commons = {
@@ -12,7 +15,7 @@ const Commons = {
 	formatDateAndTime: (dateString) => {
 		const date = new Date(dateString);
 		const year = date.getFullYear();
-		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
+		const month = ("0" + (date.getMonth() + 1)).slice(-2);
 		const day = ("0" + date.getDate()).slice(-2);
 		const hour = ("0" + date.getHours()).slice(-2);
 		const minute = ("0" + date.getMinutes()).slice(-2);
@@ -21,82 +24,84 @@ const Commons = {
 	formatDate: (dateString) => {
 		const date = new Date(dateString);
 		const year = date.getFullYear();
-		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
+		const month = ("0" + (date.getMonth() + 1)).slice(-2);
 		const day = ("0" + date.getDate()).slice(-2);
-		return `${year}-${month}-${day}` ;
+		return `${year}-${month}-${day}`;
 	},
 	
-	getAccessToken: () => {
-		console.log(localStorage.getItem("accessToken"))
-		return localStorage.getItem("accessToken")
+	// Token management functions
+	removeAccessToken: () => {
+		localStorage.removeItem("accessToken");
+	},
+	removeRefreshToken: () => {
+		localStorage.removeItem("refreshToken");
 	},
 	setAccessToken: (token) => {
-		localStorage.setItem("accessToken", token)
+		localStorage.setItem("accessToken", token);
 	},
-	getRefreshToken: () => {
-		return localStorage.getItem("refreshToken")
-	},
-	setRefreshToken: (token) => {
-		localStorage.setItem("refreshToken",token)
-	},
-
-	  // accessToken 삭제하기 (로그아웃 시 사용)
-	  removeAccessToken: () => {
-		localStorage.removeItem("accessToken");
-	  },
 	
-	  // refreshToken 삭제하기 (로그아웃 시 사용)
-	  removeRefreshToken: () => {
-		localStorage.removeItem("refreshToken");
-	  },
-	
-	// 401 에러 처리 함수
+	// 401 Error handling
 	handleUnauthorized: async () => {
-		console.log("handleUnauthorized!!!")
-		const accessToken = Commons.getAccessToken()
-		const refreshToken = Commons.getRefreshToken()
+		const accessToken = Commons.getAccessToken();
+		const refreshToken = Commons.getRefreshToken();
 		const config = {
 			headers: {
-				Authorization: `Bearer ${accessToken}`
+				Authorization: `Bearer ${accessToken}`,
 			},
 		};
 		try {
 			const rsp = await axios.post(
 				`${Commons.Capstone}/auth/refresh`,
-				refreshToken, config
+				refreshToken,
+				config
 			);
-			console.log(rsp.data)
-			Commons.setAccessToken(rsp.data)
+			console.log(rsp.data);
+			Commons.setAccessToken(rsp.data);
 		} catch (e) {
-			console.log(e)
+			console.log(e);
 			return false;
 		}
 	},
-
-	getTokenByMemberId : async()=>{
-		const accessToken = Commons.getAccessToken();
-		try{ return await axios.get(Commons.Capstone + `/auth/getMemberId `,{
-		headers: {
-		  "Content-Type": "application/json",
-		  Authorization: "Bearer " + accessToken,
-		}, }
-		)}catch(e){
-		  if (e.response.status === 401) {
-			await Commons.handleUnauthorized();
-			const newToken = Commons.getAccessToken();
-			if (newToken !== accessToken) {
-			  return await axios.get(Commons.Capstone + `/auth/getMemberId`,{
-				headers: {
-				  "Content-Type": "application/json",
-				  Authorization: "Bearer " + newToken,
-				}, 
-			})}
-		}
-	  };
-	  }
 	
-
+	// Get member ID
+	getTokenByMemberId: async () => {
+		const accessToken = Commons.getAccessToken();
+		try {
+			return await axios.get(Commons.Capstone + `/auth/getMemberId`, {
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: "Bearer " + accessToken,
+				},
+			});
+		} catch (e) {
+			if (e.response.status === 401) {
+				await Commons.handleUnauthorized();
+				const newToken = Commons.getAccessToken();
+				if (newToken !== accessToken) {
+					return await axios.get(Commons.Capstone + `/auth/getMemberId`, {
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: "Bearer " + newToken,
+						},
+					});
+				}
+			}
+		}
+	},
+	
+	// Check login status
+	IsLogin: async () => {
+		const accessToken = Commons.getAccessToken();
+		return await axiosApi.get(
+			Commons.Capstone + `/sale/isLogin/${accessToken}`,
+			{
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: "Bearer " + accessToken,
+				},
+			}
+		);
+	},
 };
 
-
-export default Commons
+export default Commons;

@@ -49,8 +49,6 @@ const Left = styled.div`
   }
 `;
 
-
-
 const Right = styled.div`
   height: 100%;
   display: flex;
@@ -212,8 +210,8 @@ const TopNavBar = () => {
             alt="Logo"
           />
           <p onClick={materialOpenModal}>입시자료</p>
-          <p onClick={() => navigate("/coverLetterWrite")}>자소서 작성</p>
-          <p onClick={() => navigate("/")}>게시판</p>
+          <p onClick={() => navigate("/PersonalStatementWrite")}>자소서 작성</p>
+          <p onClick={() => navigate("/post/list/default")}>게시판</p>
           <p onClick={() => navigate("/")}>FAQ</p>
           <p onClick={() => navigate("/")}>이용후기</p>
           {}
@@ -231,10 +229,10 @@ const TopNavBar = () => {
         {isMaterialModalOpen && (
           <MaterialModalBackground onClick={materialCloseModal}>
             <MatrialModalContent onClick={(e) => e.stopPropagation()}>
-              <p onClick={() => handleMaterialNavigate("/coverLetter")}>
+              <p onClick={() => handleMaterialNavigate("/PersonalStatement")}>
                 자기소개서
               </p>
-              <p onClick={() => handleMaterialNavigate("/")}>생활기록부</p>
+              <p onClick={() => handleMaterialNavigate("/StudentRecord")}>생활기록부</p>
             </MatrialModalContent>
           </MaterialModalBackground>
         )}
