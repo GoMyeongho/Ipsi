@@ -137,8 +137,8 @@ const MyPageNavBar = () => {
 
             <SubTitle5>
               내가 업로드한 파일
-              <p onClick={() => navigate("")}>자기소개서</p>
-              <p onClick={() => navigate("")}>생활기록부</p>
+              <p onClick={() => navigate("UploadedEnumPS")}>자기소개서</p>
+              <p onClick={() => navigate("UploadedEnumSR")}>생활기록부</p>
             </SubTitle5>
           </Left>
           <Right>

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
-import MyPageApi from "../../api/myPageApi";
+import MyPageApi from "../../api/MyPageApi";
 
 const Background = styled.div`
   width: 80%;
@@ -297,10 +297,10 @@ const CoverLetterRegister = () => {
   }, [univName]);
 
   // 데이터 저장 요청
-  const handleSave = async () => {
+  const handleSave = async () => {  
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("mainFile", file);
+    formData.append("mainFile", file); 
     formData.append("summary", introduction);
     formData.append("fileCategory", category);
     formData.append("price", price);
@@ -308,6 +308,8 @@ const CoverLetterRegister = () => {
     formData.append("univDept", univDept);
     formData.append("preview", previewFile);
     formData.append("keywords", JSON.stringify(keywords));
+    formData.append("folderPath", "test/test");
+    console.log([...formData]);
 
     try {
       const response = await MyPageApi.saveCoverLetterRegister(formData);
@@ -338,7 +340,7 @@ const CoverLetterRegister = () => {
     }
     setKeywords(updatedKeywords);
   };
-  
+
   const handleAddKeyword = () => {
     if (keywords.length < 3) {
       setKeywords([...keywords, ""]); // 최대 3개 제한
@@ -346,7 +348,6 @@ const CoverLetterRegister = () => {
       alert("키워드는 최대 3개까지 추가할 수 있습니다.");
     }
   };
-  
 
   const handleRemoveKeyword = (index) => {
     const updatedKeywords = keywords.filter((_, i) => i !== index);
@@ -354,7 +355,7 @@ const CoverLetterRegister = () => {
   };
 
   // 버튼 활성화 조건: 제목, 가격, 분류, 파일이 모두 입력되어야 함
-  const isFormValid = title && price && category && file ;
+  const isFormValid = title && price && category && file;
 
   return (
     <Background>
@@ -441,16 +442,16 @@ const CoverLetterRegister = () => {
           <KeyWordTag>
             키워드(최대3개)
             {keywords.map((keyword, index) => (
-  <div key={index} className="keyword-input">
-    <input
-      type="text"
-      value={keyword}
-      onChange={(e) => handleKeywordChange(index, e.target.value)}
-      placeholder={` ${index + 1}.'#' 포함없이 입력하세요.`}
-    />
-    <button onClick={() => handleRemoveKeyword(index)}>-</button>
-  </div>
-))}
+              <div key={index} className="keyword-input">
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(e) => handleKeywordChange(index, e.target.value)}
+                  placeholder={` ${index + 1}.'#' 포함없이 입력하세요.`}
+                />
+                <button onClick={() => handleRemoveKeyword(index)}>-</button>
+              </div>
+            ))}
             <button className="add-button" onClick={handleAddKeyword}>
               +
             </button>{" "}
