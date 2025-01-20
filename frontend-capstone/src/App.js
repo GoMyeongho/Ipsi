@@ -1,3 +1,5 @@
+import OAuth from './pages/auth/login/OAuth';
+import {useState} from "react";
 import './style.css';
 import { CheckoutPage } from './paySystem/CheckOut';
 import { FailPage } from './paySystem/Fail';
@@ -24,8 +26,8 @@ import StudentRecordDetail from './pages/categoryEnumSR/StudentRecordDetail';
 import PurchasedEnumSR from './pages/myPage/PurchasedEnumSR';
 import PurchasedEnumPS from './pages/myPage/PurchasedEnumPS';
 import FileUploaderExample from "./example/FileUploaderExample";
-import OAuth from './pages/auth/login/OAuth';
-import {useState} from "react";
+import UploadedEnumPS from './pages/myPage/UploadedEnumPS';
+import UploadedEnumSR from './pages/myPage/UploadedEnumSR';
 import PermissionDetailMain from "./pages/admin/auth/item/PermissionDetailMain";
 
 function App() {
@@ -47,19 +49,19 @@ function App() {
             <Route path='studentRecord' element={<StudentRecord/>}/>
             <Route path='studentRecordDetail' element={<StudentRecordDetail/>}/>
 
-
             {/* 마이페이지 내비게이션 */}
             <Route path="myPageNavBar" element={<MyPageNavBar />}>
               <Route path="coverLetterRegister" element={<CoverLetterRegister />} />
               <Route path="purchasedEnumPS" element={<PurchasedEnumPS />} />
               <Route path="purchasedEnumSR" element={<PurchasedEnumSR />} />
+              <Route path="uploadedEnumPS" element={<UploadedEnumPS/>} />
+              <Route path="uploadedEnumSR" element={<UploadedEnumSR/>} />
             </Route>
 
             {/* 테스트 페이지 */}
             <Route path="test/modal" element={<ModalExample />} />
             <Route path="test/accordion" element={<AccordionExample />} />
             <Route path="test/upload" element={<FileUploaderExample/>}/>
-            
 
             {/* 어드민 페이지 */}
             <Route path="admin" element={<PermissionStore><AdminNav /></PermissionStore>}>

@@ -1,7 +1,9 @@
 package kh.BackendCapstone.service;
 
 import kh.BackendCapstone.constant.Authority;
+import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.request.PayReqDto;
+import kh.BackendCapstone.dto.response.PayResDto;
 import kh.BackendCapstone.entity.FileBoard;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.Pay;
@@ -12,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -113,4 +117,20 @@ public class PayService {
         paymentMap.remove(orderId);
         log.info("paymentMap에서 결제 정보 삭제: {}", orderId);
     }
+
+    // 내가 구매한 자료 가져오기
+    public List<PayResDto> getPurchasedData(Long memberId, FileCategory fileCategory) {
+        // fileCategory(를) "PERSONAL_STATEMENT", "STUDENT_RECORD" 파라미터로 받는 방식으로 처리
+        List<Pay> pays = payRepository.findByMember_MemberIdAndFileBoard_FileCategory(memberId, fileCategory);
+
+        return pays.stream().map(pay -> new PayResDto(
+                pay.getPayId(),
+                pay.getFileBoard().getTitle(),
+                pay.getFileBoard().getUniv().getUnivName(),
+                pay.getFileBoard().getUniv().getUnivDept(),
+                pay.getPrice(),
+                pay.getRegDate()
+        )).collect(Collectors.toList());
+    }
+
 }
