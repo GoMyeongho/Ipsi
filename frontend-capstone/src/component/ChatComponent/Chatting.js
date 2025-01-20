@@ -40,27 +40,40 @@ const SendButton = styled.img`
 const MessagesContainer = styled.div`
     display: flex;
     flex-direction: column;
-    /* height: 400px; */
-    height: calc(100% - 130px);
+    height: calc(100% - 145px);
     overflow-y: auto;
-    /* background-color: #777; */
     padding: 10px;
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+        height: 30%;
+        background: #ECE1FF;
+        background: #9f8fe4;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+        background: #FFF;
+        /* border-radius: 10px; */
+    }
 `;
 
 const MessageBox = styled.div`
-    max-width: 60%;
     align-self: ${(props) => (props.isSender ? "flex-end" : "flex-start")};
 `
 
-const Message = styled.div`
-    // 영문 넘침 방지
-    word-break: break-all;
-/*     word-wrap: break-word;      // IE 5.5-7
-    white-space: -moz-pre-wrap; // Firefox 1.0-2.0
-    white-space: pre-wrap;      // current browsers */
-
-    padding: 10px;
+const MsgTime = styled.div`
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
     margin: 10px 0;
+    flex-direction: ${(props) => (props.isSender ? "row-reverse" : "row")};
+`
+
+const Message = styled.div`
+    word-break: break-all;  // 영문 넘침 방지
+    padding: 10px;
+    max-width: 70%;
     border-radius: 20px;
     background-color: ${(props) => (props.isSender ? "#ECE1FF" : "#E0E0E0")};
     border: ${(props) =>
@@ -72,16 +85,18 @@ const Sender = styled.div`
 `
 
 const SentTime = styled.div`
-    color: purple;
+
 `
 
-const MsgInput = styled.input`
+const MsgInput = styled.textarea`
     padding: 5px 10px;
     width: 90%;
     outline-style: none;
     border: none;
     background: none;
     font-size: 1em;
+    resize: none;
+    height: 30px;
 `;
 
 const MsgInputBox = styled.div`
@@ -324,12 +339,14 @@ const Chatting = ({ setSelectedPage }) => {
                         <Sender isSender={chat.sender === sender}>
                             {chat.sender}
                         </Sender>
-                        <Message isSender={chat.sender === sender}>
-                            {chat.msg}
-                        </Message>
-                        <SentTime>
-                            {chat.regDate ? formatLocalDateTime(chat.regDate) : new Date().toLocaleString()}
-                        </SentTime>
+                        <MsgTime isSender={chat.sender === sender}>
+                            <Message isSender={chat.sender === sender}>
+                                {chat.msg}
+                            </Message>
+                            <SentTime>
+                                {chat.regDate ? formatLocalDateTime(chat.regDate) : new Date().toLocaleString()}
+                            </SentTime>
+                        </MsgTime>
                     </MessageBox>
                 ))}
             </MessagesContainer>

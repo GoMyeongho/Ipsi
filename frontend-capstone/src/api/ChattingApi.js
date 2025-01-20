@@ -55,6 +55,7 @@ const ChattingApi = {
     return await axios.get(Capstone + `/chat/message/${roomId}`)
   },
 
+  // 토큰에서 닉네임 가져오기
   getNickName: async () => {
     const token = localStorage.getItem("accessToken");
     const response = await axios.get(Capstone + `/member/nickName`, {
@@ -63,6 +64,18 @@ const ChattingApi = {
         },
     });
     return response;
+  },
+  
+  // 채팅방 데이터베이스 동기화
+  syncRoomToDb: async (roomId, data) => {
+    try {
+      const response = await axios.post(Capstone + `/chat/syncRoomToDb/${roomId}`, data);
+      console.log(response.data); // 응답 확인
+      return response.data;
+    } catch (error) {
+      console.error("Error syncing chat room to DB:", error);
+      throw error;
+    }
   },
 }
 
