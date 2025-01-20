@@ -39,6 +39,7 @@ const PermissionCategorySelector = () => {
 							borderRadius: "8px",
 							padding: "10px 20px",
 							textTransform: "none", // 기본 대문자 변환 방지
+							zIndex: "1",
 							"&:hover": {
 								backgroundColor: permissionCategory === category.id ? "#5241a2" : "#c6b8f7",
 							},

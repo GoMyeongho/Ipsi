@@ -1,7 +1,7 @@
 import {BackGround} from "../../../../styles/GlobalStyle";
+import { Document, Page } from 'react-pdf';
 import {useContext, useState} from "react";
 import {PermissionContext} from "../../../../context/admin/PermissionStore";
-import {Page} from "react-pdf";
 import {IconButton, Skeleton, Tooltip} from "@mui/material";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
