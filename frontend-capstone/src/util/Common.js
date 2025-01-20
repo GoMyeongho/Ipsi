@@ -1,9 +1,7 @@
 import moment from "moment"; // 시간을 경과 시간 형태로 표시
 import "moment/locale/ko";
-import axiosApi from "../api/AxiosApi";
 import axios from "axios";
 moment.locale("ko"); // 한국 시간 적용
-
 
 
 const Commons = {
@@ -15,7 +13,7 @@ const Commons = {
 	formatDateAndTime: (dateString) => {
 		const date = new Date(dateString);
 		const year = date.getFullYear();
-		const month = ("0" + (date.getMonth() + 1)).slice(-2);
+		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
 		const day = ("0" + date.getDate()).slice(-2);
 		const hour = ("0" + date.getHours()).slice(-2);
 		const minute = ("0" + date.getMinutes()).slice(-2);
@@ -24,46 +22,58 @@ const Commons = {
 	formatDate: (dateString) => {
 		const date = new Date(dateString);
 		const year = date.getFullYear();
-		const month = ("0" + (date.getMonth() + 1)).slice(-2);
+		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
 		const day = ("0" + date.getDate()).slice(-2);
-		return `${year}-${month}-${day}`;
+		return `${year}-${month}-${day}` ;
 	},
 	
-	// Token management functions
-	removeAccessToken: () => {
-		localStorage.removeItem("accessToken");
-	},
-	removeRefreshToken: () => {
-		localStorage.removeItem("refreshToken");
+	getAccessToken: () => {
+		console.log(localStorage.getItem("accessToken"))
+		return localStorage.getItem("accessToken")
 	},
 	setAccessToken: (token) => {
-		localStorage.setItem("accessToken", token);
+		localStorage.setItem("accessToken", token)
 	},
+	getRefreshToken: () => {
+		return localStorage.getItem("refreshToken")
+	},
+	setRefreshToken: (token) => {
+		localStorage.setItem("refreshToken",token)
+	},
+
+	  // accessToken 삭제하기 (로그아웃 시 사용)
+	  removeAccessToken: () => {
+		localStorage.removeItem("accessToken");
+	  },
 	
-	// 401 Error handling
+	  // refreshToken 삭제하기 (로그아웃 시 사용)
+	  removeRefreshToken: () => {
+		localStorage.removeItem("refreshToken");
+	  },
+	
+	// 401 에러 처리 함수
 	handleUnauthorized: async () => {
-		const accessToken = Commons.getAccessToken();
-		const refreshToken = Commons.getRefreshToken();
+		console.log("handleUnauthorized!!!")
+		const accessToken = Commons.getAccessToken()
+		const refreshToken = Commons.getRefreshToken()
 		const config = {
 			headers: {
-				Authorization: `Bearer ${accessToken}`,
+				Authorization: `Bearer ${accessToken}`
 			},
 		};
 		try {
 			const rsp = await axios.post(
 				`${Commons.Capstone}/auth/refresh`,
-				refreshToken,
-				config
+				refreshToken, config
 			);
-			console.log(rsp.data);
-			Commons.setAccessToken(rsp.data);
+			console.log(rsp.data)
+			Commons.setAccessToken(rsp.data)
 		} catch (e) {
-			console.log(e);
+			console.log(e)
 			return false;
 		}
 	},
-	
-	// Get member ID
+
 	getTokenByMemberId: async () => {
 		const accessToken = Commons.getAccessToken();
 		try {
@@ -88,20 +98,19 @@ const Commons = {
 			}
 		}
 	},
-	
-	// Check login status
-	IsLogin: async () => {
-		const accessToken = Commons.getAccessToken();
-		return await axiosApi.get(
-			Commons.Capstone + `/sale/isLogin/${accessToken}`,
-			{
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: "Bearer " + accessToken,
-				},
-			}
-		);
-	},
+// 	IsLogin: async () => {
+// 		const accessToken = Commons.getAccessToken();
+// 		return await axiosApi.get(
+// 		  Commons.Capstone + `/auth/isLogin/${accessToken}`,
+// 		  {
+// 			headers: {
+// 			  "Content-Type": "application/json",
+// 			  Authorization: "Bearer " + accessToken,
+// 			},
+// 		  }
+// 		);
+// 	  },
 };
 
-export default Commons;
+
+export default Commons

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AxiosApi from "../../../api/AxiosApi";
+import AuthApi from "../../../api/AuthApi";
 import SignupModal from "../signup/SingupModal";
 import FindPw from "../findPw/FIndPw";
 import FindIdByPhone from "../findId/FindIdByPhone";
@@ -173,7 +173,7 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
   const onClickLogin = async () => {
     console.log("로그인!");
     try {
-      const res = await AxiosApi.login(inputEmail, inputPw);
+      const res = await AuthApi.login(inputEmail, inputPw);
       // console.log(res.data);
       if (res.data.grantType === "Bearer") {
         console.log("accessToken : " + res.data.accessToken);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AxiosApi from "../../../api/AxiosApi";
+import AuthApi from "../../../api/AuthApi";
 
 const PasswordModal = ({ closeModal }) => {
   const [newPassword, setNewPassword] = useState("");
@@ -19,7 +19,7 @@ const PasswordModal = ({ closeModal }) => {
     }
 
     try {
-      const response = await AxiosApi.changePassword(newPassword); // 비밀번호 변경 API 호출
+      const response = await AuthApi.changePassword(newPassword); // 비밀번호 변경 API 호출
       if (response) {
         setSuccessMessage("비밀번호가 성공적으로 변경되었습니다.");
         setErrorMessage("");

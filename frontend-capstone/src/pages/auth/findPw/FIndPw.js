@@ -1,6 +1,7 @@
   import React, { useState } from "react";
   import styled from "styled-components";
-  import AxiosApi from "../../../api/AxiosApi"; // Assume you have a function for API requests
+  import AuthApi from "../../../api/AuthApi"; // API 요청 함수
+
   import PasswordModal from "./PasswordModal";
 
   const FindPw = ({ closeModal }) => {
@@ -22,10 +23,10 @@
     // 인증번호 보내기
     const sendVerificationCode = async () => {
       try {
-        const rsp = await AxiosApi.emailCheck(inputEmail);
+        const rsp = await AuthApi.emailCheck(inputEmail);
         console.log(rsp)
         if (rsp.data) {
-          const emailResponse = await AxiosApi.sendPw(inputEmail); // 인증번호 보내는 API
+          const emailResponse = await AuthApi.sendPw(inputEmail); // 인증번호 보내는 API
           if (emailResponse) {
             setErrorMessage("");
             setIsCodeSent(true);
@@ -45,7 +46,7 @@
     const verifyEmialToken = async () => {
     
       try {
-        const response = await AxiosApi.verifyEmialToken(inputEmail, inputCode); // 인증번호 검증 API
+        const response = await AuthApi.verifyEmialToken(inputEmail, inputCode); // 인증번호 검증 API
         if (response===true) {
           // 인증번호가 맞으면 이메일 전달하여 비밀번호 수정 모달 열기
           setIsCodeSent(false);
