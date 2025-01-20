@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../components/InputComponent";
 import Button from "../../components/ButtonComponent";
 import { Container, Items } from "../../components/SignupComponent";
-import AxiosApi from "../../../api/AxiosApi";// Assume you have a function for API requests
+import AuthApi from "../../../api/AuthApi";// Assume you have a function for API requests
 import { storage } from "../../api/Firebase";
 import styled from "styled-components";
 import NavBarModal from "../../components/NavBarModal";
@@ -76,7 +76,7 @@ const Signup = () => {
     }
 
     try {
-      const memberReg = await AxiosApi.signup(
+      const memberReg = await AuthApi.signup(
         inputName,
         inputId,
         inputPw,
@@ -98,7 +98,7 @@ const Signup = () => {
   // Validate email
   const memberRegCheck = async (email) => {
     try {
-      const resp = await AxiosApi.isEmailExist(email);
+      const resp = await AuthApi.isEmailExist(email);
       if (resp.data) {
         setMailMessage("사용 가능한 이메일 입니다.");
         setIsMail(true);
@@ -165,7 +165,7 @@ const Signup = () => {
     }
 
     try {
-      const resp = await AxiosApi.idCheck(idValue);
+      const resp = await AuthApi.idCheck(idValue);
       if (resp.data === true) {
         setIdMessage("사용 가능한 아이디입니다.");
         setIsId(true);

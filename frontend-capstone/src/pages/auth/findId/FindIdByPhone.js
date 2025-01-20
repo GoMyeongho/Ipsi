@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AxiosApi from "../../../api/AxiosApi"; // API 요청 함수
+import AuthApi from "../../../api/AuthApi"; // API 요청 함수
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -94,7 +94,7 @@ const FindIdByPhone = ({ closeModal }) => {
 
   const handleSendVerificationCode = async () => {
     try {
-      const response = await AxiosApi.sendVerificationCode(phone);
+      const response = await AuthApi.sendVerificationCode(phone);
       if (response) {
         setIsCodeSent(true);
         setErrorMessage("");
@@ -108,10 +108,10 @@ const FindIdByPhone = ({ closeModal }) => {
 
   const handleVerifyCode = async () => {
     try {
-      const response = await AxiosApi.verifySmsToken(phone, inputCode);
+      const response = await AuthApi.verifySmsToken(phone, inputCode);
   
       if (response) {
-        const rsp = await AxiosApi.findPhoneByEmail(phone);
+        const rsp = await AuthApi.findPhoneByEmail(phone);
         const fullEmail = rsp.data; // 전체 이메일 주소
         const [localPart, domainPart] = fullEmail.split("@"); // 이메일을 @로 분리
         const maskedEmail =
