@@ -1,7 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useLocation } from "react-router-dom";
+import DocumentsApi from "../api/DocumentsApi";
 
 const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
@@ -45,9 +45,6 @@ export function CheckoutPage() {
          */
         widgets.renderPaymentMethods({
           selector: "#payment-method",
-          // 렌더링하고 싶은 결제 UI의 variantKey
-          // 결제 수단 및 스타일이 다른 멀티 UI를 직접 만들고 싶다면 계약이 필요해요.
-          // @docs https://docs.tosspayments.com/guides/v2/payment-widget/admin#새로운-결제-ui-추가하기
           variantKey: "DEFAULT",
         }),
         /**
@@ -66,6 +63,37 @@ export function CheckoutPage() {
     renderPaymentWidgets();
   }, [widgets]);
 
+  const handlePayment = async () => {
+    const orderId = generateRandomString();
+    console.log(orderId);
+    // 2. 결제 정보를 서버에 저장합니다.
+    const formData = new FormData();
+    formData.append("fileBoardId", productItem?.fileBoardId); // fileBoardId 전송
+    formData.append("orderId", orderId); // 위젯에서 받은 orderId 전송
+
+    // 서버에 결제 정보를 저장하는 요청
+    const response = await DocumentsApi.getPaySave(formData);
+    try {
+      // 1. 결제를 요청하기 전에 fileBoardId를 서버로 보냅니다.
+      // 서버에 결제 정보를 저장하기 위한 요청
+
+      // 2. 결제 요청
+      await widgets?.requestPayment({
+        orderId: orderId,
+        orderName: productItem?.fileTitle,
+        customerName: productItem?.memberName,
+        customerEmail: "customer123@gmail.com",
+        successUrl:
+          window.location.origin + "/sandbox/success" + window.location.search,
+        failUrl:
+          window.location.origin + "/sandbox/fail" + window.location.search,
+      });
+    } catch (error) {
+      console.error("결제 처리 중 에러 발생:", error);
+      // 에러 처리 로직 추가 (UI에 에러 메시지 표시 등)
+    }
+  };
+
   return (
     <div className="wrapper w-100">
       <div className="max-w-540 w-100">
@@ -79,32 +107,7 @@ export function CheckoutPage() {
         <div className="btn-wrapper w-100">
           <button
             className="btn primary w-100"
-            onClick={async () => {
-              try {
-                /**
-                 * 결제 요청
-                 * 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
-                 * 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
-                 * @docs https://docs.tosspayments.com/sdk/v2/js#widgetsrequestpayment
-                 */
-                await widgets?.requestPayment({
-                  orderId: generateRandomString(),
-                  orderName: productItem?.fileTitle,
-                  customerName: productItem?.memberName,
-                  customerEmail: "customer123@gmail.com",
-                  successUrl:
-                    window.location.origin +
-                    "/sandbox/success" +
-                    window.location.search,
-                  failUrl:
-                    window.location.origin +
-                    "/sandbox/fail" +
-                    window.location.search,
-                });
-              } catch (error) {
-                // TODO: 에러 처리
-              }
-            }}
+            onClick={handlePayment} // 결제 처리 함수 호출
           >
             결제하기
           </button>

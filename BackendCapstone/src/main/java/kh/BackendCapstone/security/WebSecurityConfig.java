@@ -87,7 +87,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 			.accessDeniedHandler(jwtAccessDeniedHandler)
 			.and()
 			.authorizeRequests()
-			.antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/oauth2/**", "/api/v1/auth/**", "/api/v1/payments/**", "/chat/**", "/flask/**", "/file/**", "/univ/**").permitAll()
+			.antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/oauth2/**", "/api/v1/auth/**", "/api/v1/payments/**", "/chat/**", "/flask/**", "/file/**", "/univ/**", "/board/**","/pay/**").permitAll()
 			.antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
 			.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.antMatchers("/favicon.ico", "/manifest.json").permitAll()
@@ -101,8 +101,6 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 			)
 			.apply(new JwtSecurityConfig(tokenProvider));
 
-	return http.build();
+		return http.build();  // 설정을 적용한 http 객체 반환
+	}
 }
-
-}
-

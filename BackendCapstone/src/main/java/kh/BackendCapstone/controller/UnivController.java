@@ -35,6 +35,32 @@ public class UnivController {
         }
     }
 
+    // 대학 목록 조회 (추가된 메서드)
+    @GetMapping("/univList")
+    public ResponseEntity<List<Map<String, Object>>> getUnivList() {
+        try {
+            List<Map<String, Object>> univList = univService.getUnivList();
+            log.info("Univ List Response Data: {}", univList);
+            return ResponseEntity.ok(univList);
+        } catch (Exception e) {
+            log.error("대학 목록 조회 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 학과 목록 조회 (추가된 메서드)
+    @GetMapping("/deptList")
+    public ResponseEntity<List<Map<String, Object>>> getDeptList(@RequestParam String univName) {
+        try {
+            List<Map<String, Object>> deptList = univService.getDeptList(univName);
+            log.info("Dept List for University {}: {}", univName, deptList);
+            return ResponseEntity.ok(deptList);
+        } catch (Exception e) {
+            log.error("학과 목록 조회 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     
 
 }

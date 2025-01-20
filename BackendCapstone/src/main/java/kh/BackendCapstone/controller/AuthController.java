@@ -10,7 +10,6 @@
 	import kh.BackendCapstone.service.EmailService;
 	import kh.BackendCapstone.service.MemberService;
 	import kh.BackendCapstone.service.SmsService;
-	import kh.BackendCapstone.jwt.TokenProvider;
 
 	import lombok.RequiredArgsConstructor;
 	import lombok.extern.slf4j.Slf4j;
@@ -186,7 +185,7 @@
 			log.info("tokenDto : {}", tokenDto);
 			return ResponseEntity.ok(tokenDto);
 		}
-
+		
 		@PostMapping("/change-password")
 		public ResponseEntity<Boolean> changePassword(@RequestBody MemberReqDto memberReqDto) {
 			try {
@@ -196,9 +195,6 @@
 				return ResponseEntity.ok(false); // 실패했음을 false로 반환
 			}
 		}
-
-
-
 
 
 	}

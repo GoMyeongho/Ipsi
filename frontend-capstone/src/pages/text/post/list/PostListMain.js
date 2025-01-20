@@ -1,47 +1,78 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Box } from "@mui/material";
-import { TextContext } from "../../../../context/TextStore";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { TextContext } from "../../../../context/TextStore"; // context 사용
 import TextBoardApi from "../../../../api/TextBoardApi";
-import SortTable from "../../../../component/SortTable";
+
 import PageComponent from "../../../../component/PageComponent";
 import TextListComponent from "../../../../component/TextListCompomnent";
+import PostListHeader from "./PostListHeader";
 
 const PostListMain = () => {
-	const { size, page, postList, setPostList, maxPage, setMaxPage } = useContext(TextContext);
-	const [currentPage, setCurrentPage] = useState(page);
+	// context에서 상태 가져오기
+	const { size, page, setPage, postList, setPostList, maxPage, setMaxPage, setSearch, setSearchOption } = useContext(TextContext);
 	
+	const navigate = useNavigate();
+	const { category, search, searchOption } = useParams(); // URL 파라미터에서 검색어와 검색옵션 가져오기
 	
+	// URL에서 search와 searchOption을 추출하고, context 상태를 업데이트
+	useEffect(() => {
+		if (search) {
+			setSearch(search); // 상태 업데이트
+		}
+		if (searchOption) {
+			setSearchOption(searchOption); // 상태 업데이트
+		}
+	}, [search, searchOption, setSearch, setSearchOption]);
+	
+	// 페이지와 검색어에 따라 MaxPage 요청
 	useEffect(() => {
 		const fetchMaxPage = async () => {
 			try {
-				const rsp = await TextBoardApi.getAllTextBoardPage("default", size);
+				const rsp = search
+					? search === "title"
+						? await TextBoardApi.getAllTextBoardPageByTitle(search, category, size)
+						: search === "nickName"
+							? await TextBoardApi.getAllTextBoardPageByNickName(search, category, size)
+								: await TextBoardApi.getAllTextBoardPageByTitleOrContent(search, category, size)
+					: await TextBoardApi.getAllTextBoardPage(category, size);
 				setMaxPage(rsp.data);
 			} catch (error) {
 				console.error("Error fetching max page:", error);
 			}
 		};
 		fetchMaxPage();
-	}, [size]);
-	
+	}, [size, search, category, setMaxPage]);
+
+// 페이지와 검색어에 따라 게시글 목록 요청
 	useEffect(() => {
 		const fetchPostList = async () => {
 			try {
-				const rsp = await TextBoardApi.getAllTextBoardList("default", currentPage, size);
+				const rsp = search
+					? search === "title"
+						? await TextBoardApi.getAllTextBoardListByTitle(search, category, page, size)
+						: search === "nickName"
+							? await TextBoardApi.getAllTextBoardListByNickName(search, category, page, size)
+								: await TextBoardApi.getAllTextBoardListByTitleOrContent(search, category, page, size)
+					: await TextBoardApi.getAllTextBoardList(category, page, size);
 				setPostList(rsp.data);
 			} catch (error) {
 				console.error("Error fetching post list:", error);
 			}
 		};
 		fetchPostList();
-	}, [currentPage, size]);
+	}, [page, size, search, category, setPostList]);
+	
+	
 	
 	return (
 		<Box sx={styles.container}>
+			<PostListHeader  />
 			<TextListComponent list={postList} />
 			<PageComponent
 				maxPage={maxPage}
-				currentPage={currentPage}
-				setCurrentPage={setCurrentPage}
+				currentPage={page}
+				setCurrentPage={setPage}
 			/>
 		</Box>
 	);

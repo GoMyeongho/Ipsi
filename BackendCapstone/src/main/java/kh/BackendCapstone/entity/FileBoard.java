@@ -35,8 +35,8 @@ public class FileBoard {
 	@Column(name = "file_reg_date")
 	private LocalDateTime regDate; // 게시글 등록 일자
 
-	@ElementCollection
-	private List<String> keywords; // 키워드
+	@Column(name = "Keywords")
+	private String Keywords;
 	
 	@PrePersist
 	public void prePersist() {

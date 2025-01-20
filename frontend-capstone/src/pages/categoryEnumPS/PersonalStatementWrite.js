@@ -48,7 +48,7 @@ const MiddleTitle = styled.div`
 
 `;
 
-const CoverLetterWrite = () => {
+const PersonalStatementWrite = () => {
   return(
     <>
       <Background>
@@ -65,4 +65,4 @@ const CoverLetterWrite = () => {
   )
 }
 
-export default CoverLetterWrite;
+export default PersonalStatementWrite;
