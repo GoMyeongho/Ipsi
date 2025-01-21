@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class PaymentsService {
 
     private static final String TOSS_API_URL = "https://api.tosspayments.com/v1/payments/confirm";
-    private static final String TOSS_SECRET_KEY = "test_sk_LkKEypNArWeeXlQWZgNl3lmeax";
+    private static final String TOSS_SECRET_KEY = "test_sk_LkKEypNArWeeXlQWZgNl3lmeaxYG";
     private final PaymentsRepository paymentsRepository;
     private final PayService payService;  // PayService를 주입받음
 

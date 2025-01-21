@@ -114,7 +114,6 @@ const formatPrice = (price) => {
   return new Intl.NumberFormat("ko-KR").format(price); // 한국식 천 단위 구분 기호 추가
 };
 
-
 const StudentRecordDetail = () => {
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
   const location = useLocation();
@@ -130,7 +129,7 @@ const StudentRecordDetail = () => {
     console.log("선택된 상품:", productData);
     // 결제 로직 추가
     const productItem = {
-      id: productData.id, // 상품 ID
+      fileBoardId: productData.fileBoardId, // 상품 ID
       fileTitle: productData.fileTitle, // 상품명명
       univName: productData.univName, // 대학명
       univDept: productData.univDept, // 학과명
