@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="BackendCapstone" target="17" />
+      <module name="BackendCapstone.main" target="17" />
+      <module name="BackendCapstone.test" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
