@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
@@ -54,7 +55,18 @@ public class FileBoardRepositoryTest {
     @Rollback(false)  // 롤백을 하지 않게 설정
     @DisplayName("자소서 및 생기부 파일 저장 테스트")
     public void testSaveFileBoard() {
-        // 기존 데이터를 이용하여 FileBoard 생성
+        // 테스트 데이터 생성
+        Univ univ = new Univ();
+        univ.setUnivName("테스트 대학");
+        univ.setUnivDept("테스트 학과");
+        univ.setUnivImg("https://example.com/univ_img");
+        univRepository.save(univ); // 대학 저장
+
+        Member member = new Member();
+        member.setName("테스트 회원");
+        member.setEmail("test@example.com");
+        memberRepository.save(member); // 회원 저장
+
         FileBoard fileBoard = new FileBoard();
         fileBoard.setTitle("테스트 파일 제목");
         fileBoard.setSummary("테스트 요약");
@@ -112,4 +124,4 @@ public class FileBoardRepositoryTest {
         assertThat(fileBoards.get(0).getFileCategory()).isEqualTo(FileCategory.STUDENT_RECORD);
     }
 
-}
+
