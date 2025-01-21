@@ -1,3 +1,4 @@
+
 import OAuth from './pages/auth/login/OAuth';
 import {useState} from "react";
 import './style.css';
@@ -11,8 +12,9 @@ import AccordionExample from "./example/AccordionExample";
 import AdminNav from "./pages/admin/AdminNav";
 import PermissionMain from "./pages/admin/auth/list/PermissionMain";
 import PermissionStore from "./context/admin/PermissionStore";
-import MyPageNavBar from "./component/MyPageNavBar";
+import TestLogin from "./pages/auth/login/TestLogin";
 import ChatStore from './context/ChatStore';
+import MyPageNavBar from "./component/MyPageNavBar";
 import TextStore, { PostLayout } from "./context/TextStore";
 import PostListMain from "./pages/text/post/list/PostListMain";
 import PostItemMain from "./pages/text/post/item/PostItemMain";
@@ -41,7 +43,6 @@ function App() {
       {/* Router를 최상위에서만 사용 */}
       <Router>
         <Routes>
-
           {/* 메인 레이아웃 적용 */}
           <Route path="/" element={<ChatStore><Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /></ChatStore>}>
             <Route path="personalStatement" element={<PersonalStatement />} />

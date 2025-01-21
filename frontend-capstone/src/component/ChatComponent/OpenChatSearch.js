@@ -1,15 +1,17 @@
 import styled from "styled-components";
 import { ChatTitle } from "../ChatComponent/ChatMenuBar";
 import searchIcon from "../../images/search.svg";
-import React, { useEffect, useState } from "react";
-import AxiosApi from "../../api/AxiosApi";
+import React, { useContext, useEffect, useState } from "react";
+import ChattingApi from "../../api/ChattingApi";
 import { ChatUl, ChatRoom, ChatName } from "../ChatComponent/ChatList";
+import { ChatContext } from "../../context/ChatStore";
 
 const OpenChatBg = styled.div`
     width: 100%;
     height: 100%;
     /* background-color: pink; */
     padding: 0 30px;
+    position: relative;
 `
 const CreateBtn = styled.button`
     width: 25%;
@@ -108,23 +110,27 @@ export const BtnBox = styled.div`
 const OpenChatSearch = ({ setSelectedPage }) => {
     const [isOverlayOpen, setIsOverlayOpen] = useState(false); // Overlay 상태 관리
     const [chatRooms, setChatRooms] = useState([]);
+    const {setRoomId} = useContext(ChatContext);
 
     const [filteredChatRooms, setFilteredChatRooms] = useState([]);
     const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
 
     const [personCnt, setPersonCnt] = useState([]);
     const [chatRoomTitle, setChatRoomTitle] = useState([]);
-    const email = localStorage.getItem("email");
 
     const [errorMessage, setErrorMessage] = useState("");
 
     // 서버로부터 채팅방 목록을 가져오는 API
     const fetchChatRooms = async() => {
         try {
-            const response = await AxiosApi.chatList();
-            console.log(response.data);
-            setChatRooms(response.data);
-            setFilteredChatRooms(response.data);
+            const resp = await ChattingApi.chatList();
+            console.log(resp);
+
+            if (resp.status === 200) {
+              const response = await ChattingApi.chatList();
+              console.log(response.data);
+              setChatRooms(response.data);
+            }
         } catch (e) {
             console.log(e); // 서버와의 통신 실패 예외 처리
         }
@@ -149,19 +155,21 @@ const OpenChatSearch = ({ setSelectedPage }) => {
         }
 
         try {
-            const response = await AxiosApi.chatCreate(chatRoomTitle, personCnt);
+            const response = await ChattingApi.chatCreate(chatRoomTitle, personCnt);
             console.log("Response data:", response.data); // 응답 데이터 확인
-            setSelectedPage(`/chatting/${response.data}`);
+            // setSelectedPage(`/chatting/${response.data}`);
+            setRoomId(response.data);
+            setSelectedPage("chatting");
         } catch (e) {
             console.log(e);
             setErrorMessage(e.response.data);
         }
-        console.log("chatRoomTitle:", chatRoomTitle);
-        console.log("personCnt:", personCnt);
     };
 
     // 채팅방 이동
     const enterChatRoom = (roomId) => {
+        console.log("Room ID:", roomId);
+        setRoomId(roomId);
         setSelectedPage("chatting");
     };
 
@@ -197,7 +205,7 @@ const OpenChatSearch = ({ setSelectedPage }) => {
                 <SearchIcon src={searchIcon} alt="Search"/>
             </SearchBox>
             <ChatUl>
-            {filteredChatRooms.map(room => (
+                {chatRooms.map((room) => (
                     <ChatRoom key={room.roomId} onClick={() => enterChatRoom(room.roomId)}>
                         <ChatName>{room.name}</ChatName>
                     </ChatRoom>

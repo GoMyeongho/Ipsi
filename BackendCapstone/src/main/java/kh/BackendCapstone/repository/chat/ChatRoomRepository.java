@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom,String> {
-    List<ChatRoom> findAllByOrderByRegDateDesc();
+    List<ChatRoom> findAllByOrderByRegDateAsc();
 }

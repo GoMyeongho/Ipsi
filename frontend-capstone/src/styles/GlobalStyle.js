@@ -5,6 +5,10 @@ const GlobalStyle = createGlobalStyle`
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: "Nanum Gothic", serif;
+      font-optical-sizing: auto;
+      font-weight: 400;
+      font-style: normal;
     }
 
 `;

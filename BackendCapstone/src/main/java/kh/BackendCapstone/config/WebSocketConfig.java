@@ -15,7 +15,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
 	private final WebSocketHandler webSocketHandler;
 
-
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		log.info("소켓 핸들러 생성~~~~~~");
