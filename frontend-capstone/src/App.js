@@ -1,7 +1,6 @@
 import OAuth from './pages/auth/login/OAuth';
 import {useState} from "react";
 import './style.css';
-import { CheckoutPage } from './paySystem/CheckOut';
 import { FailPage } from './paySystem/Fail';
 import { SuccessPage } from './paySystem/Success';
 import GlobalStyle from './styles/GlobalStyle';
@@ -29,6 +28,7 @@ import FileUploaderExample from "./example/FileUploaderExample";
 import UploadedEnumPS from './pages/myPage/UploadedEnumPS';
 import UploadedEnumSR from './pages/myPage/UploadedEnumSR';
 import PermissionDetailMain from "./pages/admin/auth/item/PermissionDetailMain";
+import { CheckoutPage } from './paySystem/CheckOut';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -75,12 +75,11 @@ function App() {
               <Route path="detail/:id" element={<PostItemMain />} />
             </Route>
             <Route path='auth/oauth-response/:token/:expirationTime' element={<OAuth/>}/>
-           
+          </Route>
             {/* 결제 관련 페이지 */}
             <Route path="checkoutPage" element={<CheckoutPage />} />
             <Route path="sandbox/success" element={<SuccessPage />} />
             <Route path="checkoutPage/fail" element={<FailPage />} />
-          </Route>
         </Routes>
       </Router>
     </>

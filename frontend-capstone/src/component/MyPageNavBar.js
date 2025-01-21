@@ -116,9 +116,8 @@ const MyPageNavBar = () => {
             <SubTitle1>
               나의 계정정보
               {/* CheckLogin을 사용하여 인증 후 정보수정 페이지로 바로 이동 */}
-              <CheckLogin targetPage="MemberEdit">
                 <p>회원정보수정</p>
-              </CheckLogin>
+                <p onClick={() => navigate("")}>게시글</p>
               <p onClick={() => navigate("")}>업로드 권한 확인</p>
             </SubTitle1>
 
