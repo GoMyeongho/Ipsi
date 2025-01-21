@@ -4,10 +4,7 @@ package kh.BackendCapstone.dto.request;
 import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.Univ;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -21,6 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class MemberReqDto {
 	private String email;
 	private String pwd;
