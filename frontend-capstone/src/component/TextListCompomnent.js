@@ -1,4 +1,4 @@
-import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Commons from "../util/Common";
 
@@ -17,68 +17,63 @@ const BoardItem = styled.div`
     height: 80px; /* 높이를 고정하거나 적절하게 설정 */
     padding: 0 20px;
     border-bottom: 1px solid #e0e0e0;
-		margin: 0;
+    margin: 0;
+    width: 100%; /* 전체 너비를 차지하도록 설정 */
 `;
 
 const IndexCell = styled.div`
     font-size: 22px;
     color: #333;
     width: 50px;
-		margin: auto 0;
+    margin: auto 0;
     text-align: left;
     display: flex;
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
 `;
 
-const TitleContainer = styled.div`
+const TitleContainer = styled(Link)`
     display: flex;
-    flex-direction: column; /* 제목과 설명을 상하로 배치 */
-    flex: 1; /* 나머지 공간 차지 */
-    align-items: flex-start; /* 왼쪽 정렬 */
-    margin-bottom: 5px; /* 제목과 설명 간의 간격 */
-    max-width: 400px; /* 제목 최대 너비 설정 */
+    flex-direction: column;
+    flex-grow: 1; /* 가능한 모든 공간을 차지하도록 설정 */
+    align-items: flex-start;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0 20px; /* 양옆에 패딩을 줘서 간격을 확실히 설정 */
+    
 `;
 
 const TitleCell = styled.div`
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     color: #333;
-    text-align: left; /* 제목을 왼쪽 정렬 */
-    margin-bottom: 5px; /* 제목과 설명 간 간격 */
+    text-align: left;
+    margin-bottom: 5px;
+    width: 100%; /* 제목 영역을 100% 차지하게 설정 */
 `;
 
 const SummaryText = styled.p`
     font-size: 16px;
     color: #666;
     margin: 0;
-    text-align: left; /* 설명을 왼쪽 정렬 */
-`;
-
-const Text = styled.p`
-    font-size: 18px;
-    color: #333;
-`;
-
-const StyledLink = styled.a`
-    text-decoration: none; /* 링크 밑줄 제거 */
-    color: inherit; /* 링크 색상 상속 */
-    display: inline;
+    text-align: left;
+    width: 100%; /* 설명 영역을 100% 차지하게 설정 */
 `;
 
 const BoardFooter = styled.div`
     display: flex;
     justify-content: flex-end;
-    margin-top: 10px;
-    width: 100%;
-    align-items: center; /* 상하 정렬 */
+    align-items: center;
+    padding: 0 10px; /* 여백을 줄여서 불필요한 공간을 줄입니다 */
+    width: auto; /* 너비를 내용에 맞게 자동 조정 */
 `;
 
 const AuthorText = styled.p`
     cursor: pointer;
     font-size: 18px;
-    color: #333; /* 링크 색상 제거 후 일반 텍스트 색상 */
-    margin-right: 20px;
+    color: #333;
+    margin-right: 10px; /* 작성자와 날짜 간 간격을 줄임 */
     display: flex;
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
@@ -103,12 +98,8 @@ const TextListComponent = ({ list, onAuthorClick }) => {
 			{list.map((item, index) => (
 				<BoardItem key={index}>
 					<IndexCell>{index + 1}</IndexCell>
-					<TitleContainer>
-						<TitleCell>
-							<StyledLink href={`/post/detail/${item.boardId}`}>
-								{item.title}
-							</StyledLink>
-						</TitleCell>
+					<TitleContainer href={`/post/detail/${item.boardId}`}>
+						<TitleCell>{item.title}</TitleCell>
 						<SummaryText>{item.summary}</SummaryText>
 					</TitleContainer>
 					<BoardFooter>

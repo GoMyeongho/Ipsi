@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-
+import CheckLogin from "../function/LoginCheckButton";
 const Background = styled.div`
   width: 100%;
   height: 100%;
@@ -36,8 +36,8 @@ const SubTitle1 = styled.div`
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw; /* 원하는 크기로 변경 */
-    font-weight: normal; /* 필요에 따라 글자 두께도 변경 가능 */
+    font-size: 0.8vw;
+    font-weight: normal;
     cursor: pointer;
   }
 `;
@@ -50,8 +50,8 @@ const SubTitle2 = styled.div`
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw; /* 원하는 크기로 변경 */
-    font-weight: normal; /* 필요에 따라 글자 두께도 변경 가능 */
+    font-size: 0.8vw;
+    font-weight: normal;
     cursor: pointer;
   }
 `;
@@ -64,8 +64,8 @@ const SubTitle3 = styled.div`
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw; /* 원하는 크기로 변경 */
-    font-weight: normal; /* 필요에 따라 글자 두께도 변경 가능 */
+    font-size: 0.8vw;
+    font-weight: normal;
     cursor: pointer;
   }
 `;
@@ -78,8 +78,8 @@ const SubTitle4 = styled.div`
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw; /* 원하는 크기로 변경 */
-    font-weight: normal; /* 필요에 따라 글자 두께도 변경 가능 */
+    font-size: 0.8vw;
+    font-weight: normal;
     cursor: pointer;
   }
 `;
@@ -92,8 +92,8 @@ const SubTitle5 = styled.div`
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw; /* 원하는 크기로 변경 */
-    font-weight: normal; /* 필요에 따라 글자 두께도 변경 가능 */
+    font-size: 0.8vw;
+    font-weight: normal;
     cursor: pointer;
   }
 `;
@@ -104,6 +104,7 @@ const Right = styled.div`
 
 const MyPageNavBar = () => {
   const navigate = useNavigate(); // 페이지 전환 훅
+
   return (
     <>
       <Background>
@@ -114,14 +115,19 @@ const MyPageNavBar = () => {
 
             <SubTitle1>
               나의 계정정보
-              <p onClick={() => navigate("")}>회원정보수정</p>
+              {/* CheckLogin을 사용하여 인증 후 정보수정 페이지로 바로 이동 */}
+
+                <p>회원정보수정</p>
+                <p onClick={() => navigate("")}>게시글</p>
+
+
               <p onClick={() => navigate("")}>업로드 권한 확인</p>
             </SubTitle1>
 
             <SubTitle2>
               나의 구매목록
-              <p onClick={() => navigate("")}>구매한 자기소개서</p>
-              <p onClick={() => navigate("")}>구매한 생활기록부</p>
+              <p onClick={() => navigate("purchasedEnumPS")}>구매한 자기소개서</p>
+              <p onClick={() => navigate("purchasedEnumSR")}>구매한 생활기록부</p>
             </SubTitle2>
 
             <SubTitle3>
@@ -137,8 +143,8 @@ const MyPageNavBar = () => {
 
             <SubTitle5>
               내가 업로드한 파일
-              <p onClick={() => navigate("")}>자기소개서</p>
-              <p onClick={() => navigate("")}>생활기록부</p>
+              <p onClick={() => navigate("UploadedEnumPS")}>자기소개서</p>
+              <p onClick={() => navigate("UploadedEnumSR")}>생활기록부</p>
             </SubTitle5>
           </Left>
           <Right>

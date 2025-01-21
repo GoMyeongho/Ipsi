@@ -20,8 +20,10 @@
 		import org.springframework.stereotype.Service;
 		import org.springframework.transaction.annotation.Transactional;
 
+		import javax.servlet.http.HttpSession;
 		import java.util.HashMap;
 		import java.util.Map;
+		import java.util.Optional;
 		// 스프링게 조금 더 낫다
 
 
@@ -35,6 +37,7 @@
 			private final MemberRepository memberRepository;
 			private final PasswordEncoder passwordEncoder;
 			private final TokenProvider tokenProvider;
+			private final HttpSession session;
 
 			private  final RefreshTokenRepository refreshTokenRepository;
 			//---------------------------- 중복확인 ---------------------------------------------
@@ -130,7 +133,16 @@
 			}
 
 
-
+			@Transactional
+			public boolean updatePassword(String email, String newPassword) {
+				// 이메일로 회원 조회
+				return memberRepository.findByEmail(email).map(member -> {
+					// 비밀번호 변경 로직 (암호화 포함 가능)
+					member.setPwd(newPassword);
+					memberRepository.save(member);
+					return true;
+				}).orElse(false); // 회원이 없으면 false 반환
+			}
 
 
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AxiosApi from "../../../api/AxiosApi";
+import AuthApi from "../../../api/AuthApi";
 
 const SignupModal = ({ closeModal }) => {
   const [inputPhone, setInputPhone] = useState("");
@@ -44,9 +44,7 @@ const SignupModal = ({ closeModal }) => {
       const currentDate = new Date();
       const regDate = currentDate.toISOString(); 
 
-      const memberReg = await AxiosApi.signup(
-       
-        inputNickname,
+      const memberReg = await AuthApi.signup(
         inputEmail,
         inputPw,
         inputName,
@@ -66,7 +64,7 @@ const SignupModal = ({ closeModal }) => {
 
   const memberRegCheck = async (email) => {
     try {
-      const resp = await AxiosApi.isEmailExist(email);
+      const resp = await AuthApi.isEmailExist(email);
       if (resp.data) {
         setMailMessage("사용 가능한 이메일 입니다.");
         setIsMail(true);
@@ -121,7 +119,7 @@ const SignupModal = ({ closeModal }) => {
   const onVerifyCode = async () => {
     try {
       // 인증번호 검증을 위한 서버 API 호출
-      const response = await AxiosApi.verifyToken(inputEmail, inputVerificationCode);
+      const response = await AuthApi.verifyToken(inputEmail, inputVerificationCode);
   
       if (response === "토큰이 유효합니다.") {
         setPhoneVerified(true);
@@ -139,7 +137,7 @@ const SignupModal = ({ closeModal }) => {
   const onVerifySmsCode = async () => {
     try {
       // 인증번호 검증을 위한 서버 API 호출
-      const response = await AxiosApi.verifySmsToken(inputPhone, inputVerificationCode);
+      const response = await AuthApi.verifySmsToken(inputPhone, inputVerificationCode);
   
       if (response) {
         setPhoneVerified(true);
@@ -167,7 +165,7 @@ const SignupModal = ({ closeModal }) => {
     }
 
     try {
-      const resp = await AxiosApi.idCheck(nicknameValue);
+      const resp = await AuthApi.idCheck(nicknameValue);
       if (resp.data === true) {
         setNicknameMessage("사용 가능한 아이디입니다.");
         setIsNickname(true);
@@ -203,7 +201,7 @@ const SignupModal = ({ closeModal }) => {
   
     if (isPhone) {
       try {
-        const resp = await AxiosApi.sendVerificationCode(inputPhone);
+        const resp = await AuthApi.sendVerificationCode(inputPhone);
         if (resp.data) {
           setVerificationCode(resp.data.verificationCode);
           setShowVerificationInput(true);
@@ -235,7 +233,7 @@ const SignupModal = ({ closeModal }) => {
       <ModalContainer>
         <h3>회원가입</h3>
 
-        <InputContainer>
+        {/* <InputContainer>
           <p>닉네임</p>
           <Input
             type="text"
@@ -244,7 +242,7 @@ const SignupModal = ({ closeModal }) => {
             onChange={onChangeNickname}
           />
           {nicknameMessage && <Message isValid={isNickname}>{nicknameMessage}</Message>}
-        </InputContainer>
+        </InputContainer> */}
         <InputContainer>
           <p>이메일</p>
           <Input

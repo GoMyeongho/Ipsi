@@ -1,6 +1,7 @@
 import os
-from flask import jsonify
+from flask import request, jsonify
 from google.cloud import storage
+import mimetypes
 
 # Firebase Admin SDK 인증 파일
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "ipsi-firebase-adminsdk.json"
@@ -46,3 +47,41 @@ def upload_firebase():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+def upload_file():
+    try:
+        # 파일 받기
+        file = request.files["file"]
+        folder_path = request.form["folderPath"]
+
+        # Firebase Storage 경로 설정
+        firebase_file_path = f"{folder_path}/{file.filename}".replace("\\", "/")
+
+        # Firebase Storage에 업로드할 Blob 생성
+        blob = bucket.blob(firebase_file_path)
+
+        # MIME 타입 자동 감지 후 설정
+        content_type = mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
+        blob.upload_from_file(file, content_type=content_type)
+
+
+
+        # 🔥 `Content-Disposition: inline` 설정 (브라우저에서 바로 보기 가능하도록)
+        blob.content_disposition = "attachment"
+        blob.patch()
+        blob.make_public()
+
+        # 🌐 웹에서 바로 보이는 URL
+        display_url = f"https://firebasestorage.googleapis.com/v0/b/{bucket_name}/o/{firebase_file_path.replace('/', '%2F')}?alt=media"
+        # 리턴 값 : 다운로드 url, 보여주기 url 나눠서 반환
+        return jsonify({
+            "message": "File uploaded successfully",
+            "url": display_url  # 웹에서 직접 보기 링크
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+

@@ -5,15 +5,23 @@
 	import kh.BackendCapstone.dto.request.MemberReqDto;
 	import kh.BackendCapstone.dto.response.MemberResDto;
 	import kh.BackendCapstone.entity.Member;
+	import kh.BackendCapstone.security.SecurityUtil;
 	import kh.BackendCapstone.service.AuthService;
 	import kh.BackendCapstone.service.EmailService;
+	import kh.BackendCapstone.service.MemberService;
 	import kh.BackendCapstone.service.SmsService;
-	import kh.BackendCapstone.jwt.TokenProvider;
 
 	import lombok.RequiredArgsConstructor;
 	import lombok.extern.slf4j.Slf4j;
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.http.HttpStatus;
 	import org.springframework.http.ResponseEntity;
+	import org.springframework.security.crypto.password.PasswordEncoder;
 	import org.springframework.web.bind.annotation.*;
+
+	import javax.servlet.http.HttpSession;
+	import java.util.HashMap;
+	import java.util.Map;
 
 	@Slf4j
 	@CrossOrigin(origins = "http://localhost:3000")
@@ -24,14 +32,26 @@
 		private final AuthService authService;
 		private final SmsService smsService;
 		private final EmailService emailService;
+		private final MemberService memberService;
+		private final PasswordEncoder passwordEncoder;
 
+
+
+		@GetMapping("/getMemberId")
+		public ResponseEntity<Long> getMemberId() {
+			Long memberId = SecurityUtil.getCurrentMemberId();  // 현재 인증된 사용자의 memberId를 가져옴
+			if (memberId == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();  // 인증되지 않은 경우
+			}
+			return ResponseEntity.ok(memberId);
+		}
 
 		// 회원가입 여부 확인 , 이메일 중복 확인
 		@GetMapping("/exist/{email}")
 		public ResponseEntity<Boolean> existEmail(@PathVariable String email) {
 			boolean isMember = authService.existEmail(email);
 			log.info("isMember : {}", isMember);
-			return ResponseEntity.ok(!isMember);
+			return ResponseEntity.ok(isMember);
 		}
 
 		// 닉네임 중복 확인
@@ -63,7 +83,7 @@
 			log.info("메일:{}", member.getEmail());
 
 			// 이메일로 비밀번호 재설정 토큰 전송
-			boolean result = emailService.sendPasswordResetToken(member);
+			boolean result = emailService.sendPasswordResetToken(member.getEmail());
 
 			return ResponseEntity.ok(result);
 		}
@@ -74,6 +94,8 @@
 			boolean isValid = emailService.verifyEmailToken(request.getEmail(), request.getInputToken());
 			return ResponseEntity.ok(isValid);
 		}
+
+
 
 		// 이메일과 입력된 토큰을 받을 DTO 클래스
 		public static class TokenVerificationRequest {
@@ -135,6 +157,19 @@
 			}
 		}
 
+		@GetMapping("/email/{phone}")
+		public ResponseEntity<?> findEmailByPhone(@PathVariable String phone) {
+			try {
+				MemberResDto memberResDto = memberService.findEmailByPhone(phone);
+				log.info("memberResDto : {}", memberResDto);
+				return ResponseEntity.ok(memberResDto.getEmail());
+			} catch (RuntimeException e) {
+				log.warn("회원 정보를 찾을 수 없습니다. phone: {}", phone, e);
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body("해당 회원이 존재하지 않습니다.");
+			}
+		}
+
 
 		// 리프레시 토큰으로 새 액세스 토큰 발급
 		@PostMapping("/refresh")
@@ -150,7 +185,18 @@
 			log.info("tokenDto : {}", tokenDto);
 			return ResponseEntity.ok(tokenDto);
 		}
-	//
+		
+		@PostMapping("/change-password")
+		public ResponseEntity<Boolean> changePassword(@RequestBody MemberReqDto memberReqDto) {
+			try {
+				emailService.changePassword(memberReqDto.getPwd(), passwordEncoder); // 비밀번호 변경 로직 호출
+				return ResponseEntity.ok(true); // 성공적으로 변경되었음을 true로 반환
+			} catch (RuntimeException e) {
+				return ResponseEntity.ok(false); // 실패했음을 false로 반환
+			}
+		}
+
+
 	}
 
 

@@ -1,9 +1,9 @@
-// import './App.css';
+
+import OAuth from './pages/auth/login/OAuth';
+import {useState} from "react";
 import './style.css';
-import { CheckoutPage } from './paySystem/CheckOut';
 import { FailPage } from './paySystem/Fail';
 import { SuccessPage } from './paySystem/Success';
-import CoverLetter from './pages/CoverLetter';
 import GlobalStyle from './styles/GlobalStyle';
 import Layout from './styles/Layout';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -14,32 +14,74 @@ import PermissionMain from "./pages/admin/auth/list/PermissionMain";
 import PermissionStore from "./context/admin/PermissionStore";
 import TestLogin from "./pages/auth/login/TestLogin";
 import ChatStore from './context/ChatStore';
-// import ChatList from './pages/chat/ChatList';
-// import ChatRoomCreate from './component/ChatComponent/ChatRoomCreate';
-// import Chatting from './pages/chat/Chatting';
+import MyPageNavBar from "./component/MyPageNavBar";
+import TextStore, { PostLayout } from "./context/TextStore";
+import PostListMain from "./pages/text/post/list/PostListMain";
+import PostItemMain from "./pages/text/post/item/PostItemMain";
+import CoverLetterRegister from './pages/myPage/CoverLetterRegister';
+import PersonalStatement from './pages/categoryEnumPS/PersonalStatement';
+import PersonalStatementDetail from './pages/categoryEnumPS/PersonalStatementDetail';
+import PersonalStatementWrite from './pages/categoryEnumPS/PersonalStatementWrite';
+import StudentRecord from './pages/categoryEnumSR/StudentRecord';
+import StudentRecordDetail from './pages/categoryEnumSR/StudentRecordDetail';
+import PurchasedEnumSR from './pages/myPage/PurchasedEnumSR';
+import PurchasedEnumPS from './pages/myPage/PurchasedEnumPS';
+import FileUploaderExample from "./example/FileUploaderExample";
+import UploadedEnumPS from './pages/myPage/UploadedEnumPS';
+import UploadedEnumSR from './pages/myPage/UploadedEnumSR';
+import PermissionDetailMain from "./pages/admin/auth/item/PermissionDetailMain";
+import { CheckoutPage } from './paySystem/CheckOut';
+
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("accessToken")
+  );
   return (
     <>
-      <GlobalStyle/>
+      <GlobalStyle />
+      {/* Router를 최상위에서만 사용 */}
       <Router>
         <Routes>
-          <Route path='/login' element={<TestLogin/>}></Route>
-          <Route path='/' element={<ChatStore><Layout/></ChatStore>}>
-           <Route path='/coverLetter' element={<CoverLetter/>}/>
-            <Route path='/test/modal' element={<ModalExample/>}/>
-            <Route path='/test/accordion' element={<AccordionExample/>}/>
-            {/*<Route path='/chat' element={<ChatList />} />*/}
-            {/* <Route path='/chat-create' element={<ChatRoomCreate />}/> */}
-            {/*<Route path='/chatting/:roomId' element={<Chatting />}/>*/}
-            <Route path="/admin" element={<PermissionStore><AdminNav/></PermissionStore>}>
-              <Route path="auth" element={<PermissionMain/>}/>
+          {/* 메인 레이아웃 적용 */}
+          <Route path="/" element={<ChatStore><Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /></ChatStore>}>
+            <Route path="personalStatement" element={<PersonalStatement />} />
+            <Route path="personalStatementDetail" element={<PersonalStatementDetail />} />
+            <Route path="personalStatementWrite" element={<PersonalStatementWrite />} />
+            <Route path='studentRecord' element={<StudentRecord/>}/>
+            <Route path='studentRecordDetail' element={<StudentRecordDetail/>}/>
+
+            {/* 마이페이지 내비게이션 */}
+            <Route path="myPageNavBar" element={<MyPageNavBar />}>
+              <Route path="coverLetterRegister" element={<CoverLetterRegister />} />
+              <Route path="purchasedEnumPS" element={<PurchasedEnumPS />} />
+              <Route path="purchasedEnumSR" element={<PurchasedEnumSR />} />
+              <Route path="uploadedEnumPS" element={<UploadedEnumPS/>} />
+              <Route path="uploadedEnumSR" element={<UploadedEnumSR/>} />
             </Route>
+
+            {/* 테스트 페이지 */}
+            <Route path="test/modal" element={<ModalExample />} />
+            <Route path="test/accordion" element={<AccordionExample />} />
+            <Route path="test/upload" element={<FileUploaderExample/>}/>
+
+            {/* 어드민 페이지 */}
+            <Route path="admin" element={<PermissionStore><AdminNav /></PermissionStore>}>
+              <Route path="auth" element={<PermissionMain />} />
+              <Route path="auth/:permissionId" element={<PermissionDetailMain />} />
+            </Route>
+
+            {/* 게시판 (text Board) */}
+            <Route path="post" element={<TextStore><PostLayout /></TextStore>}>
+              <Route path="list/:category/:search?/:searchOption?" element={<PostListMain />} />
+              <Route path="detail/:id" element={<PostItemMain />} />
+            </Route>
+            <Route path='auth/oauth-response/:token/:expirationTime' element={<OAuth/>}/>
           </Route>
-          {/* CheckoutPage와 관련된 경로 */}
-          <Route path="/checkoutPage" element={<CheckoutPage />} />
-          <Route path="/sandbox/success" element={<SuccessPage />} />
-          <Route path="/checkoutPage/fail" element={<FailPage />} />
+            {/* 결제 관련 페이지 */}
+            <Route path="checkoutPage" element={<CheckoutPage />} />
+            <Route path="sandbox/success" element={<SuccessPage />} />
+            <Route path="checkoutPage/fail" element={<FailPage />} />
         </Routes>
       </Router>
     </>

@@ -17,5 +17,11 @@ public interface UnivRepository extends JpaRepository<Univ, Long> {
 	List<Univ> findAllByUnivNameAndUnivDept(String univName, String univDept);
 
 	// 단일 조회를 원할 때 사용할 수도 있음
-	Optional<Univ> findByUnivNameAndUnivDept(String univName, String univDept);
+	Univ findByUnivNameAndUnivDept(String univName, String univDept);
+
+	// 대학 이름을 기준으로 모든 대학 목록을 조회 (학과는 쉼표로 구분된 문자열)
+	List<Univ> findAllByUnivName(String univName);
+
+	// 특정 대학 이름을 기준으로 하나의 대학 정보 조회 (학과 목록을 포함)
+	List<Univ> findByUnivName(String univName);
 }

@@ -1,9 +1,6 @@
 import styled from "styled-components";
 import TopNavBar from "../component/TopNavBar"
-import { Outlet } from 'react-router-dom';
-import CoverLetter from "../pages/CoverLetter";
 import ChatModal from "../pages/chat/ChatModal";
-import ChatStore from "../context/ChatStore";
 
 const Background = styled.div`
   width: 100%;
@@ -18,17 +15,18 @@ const Header = styled.div`
   z-index: 1000;
 `
 
-const Layout = () => {
-  return(
-   <>
-      <Background>
-        <Header>
-          <TopNavBar/>
-        </Header>
-        <ChatModal/>
-      </Background>
-   </>
-  )
-}
+
+
+const Layout = ({ isLoggedIn, setIsLoggedIn }) => {
+  return (
+    <Background>
+      <Header>
+        <TopNavBar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      </Header>
+      <ChatModal />
+    </Background>
+  );
+};
+
 
 export default Layout

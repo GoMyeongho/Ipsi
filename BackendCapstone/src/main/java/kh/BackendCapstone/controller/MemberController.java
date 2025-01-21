@@ -47,7 +47,10 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 		}
 	}
-	
+
+
+
+
 	@PostMapping("/updateUser")
 	public ResponseEntity<Boolean> updateMember(@RequestBody MemberReqDto memberReqDto) {
 		boolean isSuccess = memberService.updateMember(memberReqDto);

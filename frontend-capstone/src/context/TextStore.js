@@ -11,10 +11,14 @@ const TextStore = ({children}) => {
 	const [page, setPage] = useState(0);
 	const [size, setSize] = useState(10);
 	const [maxPage, setMaxPage] = useState(0);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [sortOption, setSortOptions] = useState("")
+	const [search, setSearch] = useState("");
 	
 	return (
 		<TextContext.Provider value={{postList, setPostList, post, setPost, commentList, setCommentList
-			, page, setPage, size, setSize, maxPage, setMaxPage, }}>
+			, page, setPage, size, setSize, maxPage, setMaxPage, searchQuery, setSearchQuery, sortOption, setSortOptions
+			, search, setSearch}}>
 			{children}
 		</TextContext.Provider>
 	)
