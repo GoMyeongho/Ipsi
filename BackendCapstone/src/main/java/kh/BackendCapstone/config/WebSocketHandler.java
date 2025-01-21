@@ -95,12 +95,4 @@ public class WebSocketHandler extends TextWebSocketHandler {
 			log.error("채팅방 종료 에러", e);
 		}
 	}
-
-/*	// 실시간으로 채팅방 참여자 목록을 가져오기 위한 메서드
-	@GetMapping("/chat/members/{roomId}")
-	public ResponseEntity<Set<String>> getChatMembers(@PathVariable String roomId) {
-		Set<String> members = roomMembersMap.getOrDefault(roomId, Collections.emptySet());
-		log.info("실시간 채팅방 참여자 룸멤버맵 어떻게 가져오나? : {}", roomMembersMap);
-		return ResponseEntity.ok(members);
-	}*/
 }

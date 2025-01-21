@@ -203,7 +203,7 @@ const Chatting = ({ setSelectedPage }) => {
         setSelectedPage("chatList");   // 채팅 목록으로 이동 
     };
 
-    // 로컬 스토리지의 토큰에서 닉네임 추출 -> sender에 저장
+    /*// 로컬 스토리지의 토큰에서 닉네임 추출 -> sender에 저장
     useEffect(() => {
         const fetchNickName = async () => {
             const token = localStorage.getItem("accessToken");  // 로컬 스토리지에서 가져오기
@@ -252,7 +252,65 @@ const Chatting = ({ setSelectedPage }) => {
             }
             setChatList(prev => Array.isArray(prev) ? [...prev, data] : [data]);
         };
-    }, [socketConnected]);
+    }, [socketConnected]);*/
+
+
+
+
+
+    useEffect(() => {
+        // 웹소켓 연결하는 부분, 이전 대화내용 불러오는 함수 호출
+        if (!ws.current) {
+            ws.current = new WebSocket(Commons.Capstone_URL);
+            ws.current.onopen = () => {
+                setSocketConnected(true);
+
+                // 채팅방 입장하기 전에 sender에 nickName을 설정
+                if (sender === "") {  // sender가 비어있을 경우에만 nickName을 가져와서 설정
+                    const fetchNickName = async () => {
+                        const token = localStorage.getItem("accessToken");  // 로컬 스토리지에서 가져오기
+                        if (!token) {
+                            console.error("토큰이 없습니다.");
+                            return;
+                        }
+                        try {
+                            const response = await ChattingApi.getNickName();   // 토큰에서 닉네임 가져오기
+                            const nickName = await response.data;
+                            setSender(nickName); // sender에 닉네임 저장 후 웹소켓으로 보내기 전에 준비
+                        } catch (error) {
+                            console.error("Error fetching nickName: ", error);
+                        }
+                    };
+                    fetchNickName();
+                }
+            };
+        }
+        if (socketConnected) {
+            // 웹소켓 연결이 되어있다면,
+            ws.current.send(
+                JSON.stringify({
+                    type: "ENTER",
+                    roomId: roomId,
+                    sender: sender,
+                    profile: profile,
+                    nickName: nickName,
+                    msg: "첫 입장",
+                })
+            );
+            loadPreviousChat();
+        }
+        ws.current.onmessage = msg => {
+            const data = JSON.parse(msg.data);
+            if (!data.regDate) {
+                data.regDate = new Date().toLocaleString();  // 메시지가 전송된 현재 시간으로 대체
+            }
+            setChatList(prev => Array.isArray(prev) ? [...prev, data] : [data]);
+        };
+    }, [socketConnected, sender, ws.current, roomId]);
+
+
+
+
 
     // 이전 채팅 내용을 가져오는 함수
     const loadPreviousChat = async () => {

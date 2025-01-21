@@ -38,8 +38,8 @@ public class ChatRoom {
     @JsonManagedReference
     private List<Chat> chats = new ArrayList<>(); // 채팅방 대화 내용 저장
 
-/*    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatRoomMember> members = new ArrayList<>(); // 채팅방 멤버들*/
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatMember> chatMember = new ArrayList<>();
 
     // 채팅방 최대 멤버 수 설정
     @Column(name = "max_members", nullable = false)

@@ -1,6 +1,7 @@
 package kh.BackendCapstone.dto.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kh.BackendCapstone.constant.ChatRoomType;
 import kh.BackendCapstone.service.chat.ChatService;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ public class ChatRoomResDto {
     private String roomId;
     private String name;
     private LocalDateTime regDate;
+    private ChatRoomType roomType = ChatRoomType.PRIVATE; // 기본값 설정
+    private int personCnt; // 참여 가능 인원 필드 추가
 
     @JsonIgnore // 웹소켓 세션의 직렬화 방지
     private Set<WebSocketSession> sessions = Collections.newSetFromMap(new ConcurrentHashMap<>());

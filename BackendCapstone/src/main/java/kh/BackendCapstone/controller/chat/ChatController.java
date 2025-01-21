@@ -102,4 +102,17 @@ public class ChatController {
         boolean isTrue = chatService.removeRoom(roomId);
         return ResponseEntity.ok(isTrue);
     }
+
+    // DB와 상태 동기화 유지
+    @PostMapping("/syncRoomToDb")
+    public ResponseEntity<String> syncRoomToDb() {
+        try {
+            chatService.syncRoomToDb();
+            return ResponseEntity.ok("채팅방 정보 DB 동기화");
+        } catch (Exception e) {
+            log.error("채팅방 정보 DB 동기화 중 오류 발생 : {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("채팅방 정보 DB 동기화 실패");
+
+        }
+    }
 }

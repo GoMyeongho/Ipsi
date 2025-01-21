@@ -5,8 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kh.BackendCapstone.dto.chat.ChatMsgDto;
 import kh.BackendCapstone.dto.chat.ChatRoomReqDto;
 import kh.BackendCapstone.dto.chat.ChatRoomResDto;
+import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.chat.Chat;
+import kh.BackendCapstone.entity.chat.ChatMember;
 import kh.BackendCapstone.entity.chat.ChatRoom;
+import kh.BackendCapstone.repository.MemberRepository;
+import kh.BackendCapstone.repository.chat.ChatMemberRepository;
 import kh.BackendCapstone.repository.chat.ChatRepository;
 import kh.BackendCapstone.repository.chat.ChatRoomRepository;
 import lombok.Builder;
@@ -34,6 +38,8 @@ public class ChatService {
     private Map<String, ChatRoomResDto> chatRooms; // 채팅방 정보를 담을 맵
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
+    private final ChatMemberRepository chatMemberRepository;
+    private final MemberRepository memberRepository;
 
     @PostConstruct // 의존성 주입 이후 초기화 수행하는 메소드
 //    private void init() {chatRooms = new LinkedHashMap<>();}
@@ -49,7 +55,7 @@ public class ChatService {
     // 채팅방 리스트 반환
     public List<ChatRoomResDto> findRoomList() {
         List<ChatRoomResDto> chatRoomResDtoList = new ArrayList<>();
-        for (ChatRoom chatRoom : chatRoomRepository.findAllByOrderByRegDateDesc()) {
+        for (ChatRoom chatRoom : chatRoomRepository.findAllByOrderByRegDateAsc()) {
             ChatRoomResDto chatRoomDto = convertEntityToRoomDto(chatRoom);
             chatRoomResDtoList.add(chatRoomDto);
         }
@@ -84,11 +90,21 @@ public class ChatService {
         return chatRoom;
     }
 
-/*    // 이전 채팅 내역
-    public List<Chat> getRecentMsg(String roomId) {
-        List<Chat> chatList = chatRepository.findRecentMsg(roomId);
-        return chatRepository.findRecentMsg(roomId);
-    }*/
+    // DB와 상태 동기화 유지
+    public void syncRoomToDb() {
+        for (Map.Entry<String, ChatRoomResDto> entry : chatRooms.entrySet()) {
+            String roomId = entry.getKey();
+            ChatRoomResDto chatRoomDto = entry.getValue();
+            ChatRoom chatRoomEntity = chatRoomRepository.findById(roomId).orElse(new ChatRoom());
+            chatRoomEntity.setRoomId(roomId);
+            chatRoomEntity.setRoomName(chatRoomDto.getName());
+            chatRoomEntity.setRegDate(chatRoomDto.getRegDate());
+            chatRoomEntity.setRoomType(chatRoomDto.getRoomType());
+            chatRoomEntity.setMaxMembers(chatRoomDto.getPersonCnt());
+            chatRoomRepository.save(chatRoomEntity);
+        }
+        log.info("DB와 채팅방 상태 동기화 완료");
+    }
 
     // 전체 채팅 내역
     public List<ChatMsgDto> findAllChatting(String roomId) {
@@ -103,11 +119,15 @@ public class ChatService {
     // 채팅방 삭제
     public boolean removeRoom(String roomId) {
         ChatRoomResDto room = chatRooms.get(roomId); // 방 정보 가져오기
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(
+                        () -> new RuntimeException("해당 채팅방이 존재하지 않습니다.1")
+                );
         if (room != null) { // 방이 존재하면
-            if (room.isSessionEmpty()) { // 방에 세션이 없으면
+            if (room.isSessionEmpty() && chatMemberRepository.findByChatRoom(chatRoom).isEmpty()) {
                 chatRooms.remove(roomId); // 방 삭제
                 ChatRoom chatRoomEntity = chatRoomRepository.findById(roomId).orElseThrow(
-                        () -> new RuntimeException("해당 채팅방이 존재하지 않습니다.")
+                        () -> new RuntimeException("해당 채팅방이 존재하지 않습니다.2")
                 );
                 if (chatRoomEntity != null) {
                     chatRoomRepository.delete(chatRoomEntity);
@@ -123,12 +143,31 @@ public class ChatService {
         ChatRoomResDto room = findRoomById(roomId);
         if (room != null) {
             room.getSessions().add(session);    // 채팅방에 입장한 세션을 추가
-/*            if (chatMessage.getSender() != null) {   // 채팅방에 입장한 사용자가 있으면
-                chatMessage.setMsg(chatMessage.getSender() + "님이 입장했습니다.");
-                // 채팅방에 입장 메시지 전송 코드 추가
-                sendMsgToAll(roomId, chatMessage);  // 메세지를 보내기 위한 메소드
-            }*/
             log.debug("새로운 세션 추가");
+
+            Member member = memberRepository.findByNickName(chatMessage.getSender()).orElseThrow(
+                    () -> new RuntimeException("해당 멤버 없음")
+            );
+            ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(
+                    () -> new RuntimeException("해당 채팅방 없음")
+            );
+
+/*            ChatMember chatMember = new ChatMember();
+            chatMember.setMember(member);
+            chatMember.setChatRoom(chatRoom);
+
+            chatMemberRepository.save(chatMember);*/
+
+            Optional<ChatMember> existingChatMember = chatMemberRepository.findByMemberAndChatRoom(member, chatRoom);
+            if (!existingChatMember.isPresent()) {
+                ChatMember chatMember = new ChatMember();
+                chatMember.setMember(member);
+                chatMember.setChatRoom(chatRoom);
+
+                chatMemberRepository.save(chatMember);
+            } else {
+                log.info("이미 참여한 채팅방 멤버입니다.");
+            }
         }
     }
 
@@ -137,14 +176,24 @@ public class ChatService {
         ChatRoomResDto room = findRoomById(roomId);
         if (room != null) {
             room.getSessions().remove(session); // 채팅방에서 퇴장한 세션 제거
-/*            if (chatMessage.getSender() != null) {  //  채팅방에 퇴장한 사용자가 있으면
-                chatMessage.setMsg(chatMessage.getSender() + "님이 퇴장했습니다.");
-                // 채팅방에 퇴장 메시지 전송 코드 추가
-                sendMsgToAll(roomId, chatMessage);  // 메세지를 보내기 위한 메소드
-            }*/
             log.debug("세션 제거됨 : {}", session);
-            if (room.isSessionEmpty()) {
-                removeRoom(roomId); // 세션이 남아 있지 않으면 채팅방 삭제
+
+            Member member = memberRepository.findByNickName(chatMessage.getSender()).orElseThrow(
+                    () -> new RuntimeException("해당 멤버 없음")
+            );
+
+            ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(
+                    () -> new RuntimeException("해당 채팅방 없음")
+            );
+
+            ChatMember chatMember = chatMemberRepository.findByMemberAndChatRoom(member, chatRoom).orElseThrow(
+                    () -> new RuntimeException("해당 멤버가 있는 채팅방 없음")
+            );
+
+            if (chatMember != null) {
+                chatMemberRepository.delete(chatMember);
+                log.debug("ChatMember 삭제 : member = {}, chatRoom = {}", member.getNickName(), chatRoom.getRoomId());
+//                removeRoom(roomId); // 세션이 남아 있지 않으면 채팅방 삭제
             }
         }
     }
