@@ -3,7 +3,6 @@ package kh.BackendCapstone.controller;
 import kh.BackendCapstone.dto.request.MemberReqDto;
 import kh.BackendCapstone.dto.response.MemberResDto;
 import kh.BackendCapstone.jwt.TokenProvider;
-import kh.BackendCapstone.security.SecurityUtil;
 import kh.BackendCapstone.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,15 +46,21 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
 		}
 	}
-
-
-
-
 	@PostMapping("/updateUser")
 	public ResponseEntity<Boolean> updateMember(@RequestBody MemberReqDto memberReqDto) {
 		boolean isSuccess = memberService.updateMember(memberReqDto);
 		log.info("수정 성공 여부 : {}", isSuccess);
 		return ResponseEntity.ok(isSuccess);
+	}
+
+	@GetMapping("/memberId")
+	public ResponseEntity<Long> getMemberIdFromToken(@RequestHeader("Authorization") String token) {
+		try {
+			Long memberId = memberService.convertTokenToEntity(token).getMemberId();
+			return ResponseEntity.ok(memberId);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Long.valueOf("Invalid token"));
+		}
 	}
 	
 	@PostMapping("/deleteUser/{email}")

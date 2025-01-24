@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef, useContext, useCallback } from "react";
 import styled from "styled-components";
-import backIcon from "../../images/back.png";
-import exitIcon from "../../images/exit_gray.png";
+import backIcon from "../../images/back.svg";
+import exitIcon from "../../images/exit.svg";
 import sendIcon from "../../images/send_color.png";
 import { OverlayContainer, OverlayContent, BtnBox } from "../ChatComponent/OpenChatSearch";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,9 +12,11 @@ import ChattingApi from "../../api/ChattingApi";
 const ChattingRoomBg = styled.div`
     width: 100%;
     height: 100%;
-    /* background-color: peachpuff; */
+    background: #FFF;
     padding: 0 30px;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `
 const ChattingTitle = styled.div`
     width: 100%;
@@ -27,6 +29,10 @@ const ChattingTitle = styled.div`
 `
 const ChattingIcon = styled.img`
     width: 25px;
+    filter: brightness(0);
+    &:hover {
+      filter: none;
+    }
 `
 const SendButton = styled.img`
     width: 25px;
@@ -40,21 +46,21 @@ const SendButton = styled.img`
 const MessagesContainer = styled.div`
     display: flex;
     flex-direction: column;
-    height: calc(100% - 145px);
+    //height: calc(100% - 165px);
     overflow-y: auto;
+    transition: height 0.2s ease;
     padding: 10px;
     &::-webkit-scrollbar {
         width: 10px;
     }
     &::-webkit-scrollbar-thumb {
         height: 30%;
-        background: #ECE1FF;
         background: #9f8fe4;
         border-radius: 10px;
     }
     &::-webkit-scrollbar-track {
         background: #FFF;
-        /* border-radius: 10px; */
+        border-radius: 10px; 
     }
 `;
 
@@ -91,25 +97,36 @@ const SentTime = styled.div`
 const MsgInput = styled.textarea`
     padding: 5px 10px;
     width: 90%;
+    box-sizing: border-box;
     outline-style: none;
     border: none;
     background: none;
     font-size: 1em;
     resize: none;
-    height: 30px;
+    max-height: 100px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+    width: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+    height: 30%;
+    background: #9f8fe4;
+    border-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+    background: #FFF;
+    border-radius: 10px;
+    }
 `;
 
 const MsgInputBox = styled.div`
-    width: calc(100% - 20px);
+    width: 110%;
     padding: 10px;
+    margin-bottom: 2vw;
     border-radius: 10px;
     background-color: #EEE;
     display: flex;
     justify-content: space-between;
-    position: absolute;
-    left: 50%;
-    bottom: 10px;
-    transform: translateX(-50%);
 `
 const ExitMsg = styled.p`
     font-size: 1.1em;
@@ -203,61 +220,6 @@ const Chatting = ({ setSelectedPage }) => {
         setSelectedPage("chatList");   // 채팅 목록으로 이동 
     };
 
-    /*// 로컬 스토리지의 토큰에서 닉네임 추출 -> sender에 저장
-    useEffect(() => {
-        const fetchNickName = async () => {
-            const token = localStorage.getItem("accessToken");  // 로컬 스토리지에서 가져오기
-            if (!token) {
-                console.error("토큰이 없습니다.");
-                return;
-            }
-            try {
-                const response = await ChattingApi.getNickName();   // 토큰에서 닉네임 가져오기
-                console.log(response)
-                const nickName = await response.data;
-                setSender(nickName); // sender에 닉네임 저장
-            } catch (error) {
-                console.error("Error fetching nickName: ", error);
-            }
-        };
-        fetchNickName();
-    }, []);
-
-    useEffect(() => {
-        // 웹소켓 연결하는 부분, 이전 대화내용 불러오는 함수 호출
-        if (!ws.current) {
-            ws.current = new WebSocket(Commons.Capstone_URL);
-            ws.current.onopen = () => {
-                setSocketConnected(true);
-            };
-        }
-        if (socketConnected) {
-            // 웹소켓 연결이 되어있다면,
-            ws.current.send(
-                JSON.stringify({
-                    type: "ENTER",
-                    roomId: roomId,
-                    sender: sender,
-                    profile: profile,
-                    nickName: nickName,
-                    msg: "첫 입장",
-                })
-            );
-            loadPreviousChat();
-        }
-        ws.current.onmessage = msg => {
-            const data = JSON.parse(msg.data);
-            if (!data.regDate) {
-                data.regDate = new Date().toLocaleString();  // 메시지가 전송된 현재 시간으로 대체
-            }
-            setChatList(prev => Array.isArray(prev) ? [...prev, data] : [data]);
-        };
-    }, [socketConnected]);*/
-
-
-
-
-
     useEffect(() => {
         // 웹소켓 연결하는 부분, 이전 대화내용 불러오는 함수 호출
         if (!ws.current) {
@@ -307,10 +269,6 @@ const Chatting = ({ setSelectedPage }) => {
             setChatList(prev => Array.isArray(prev) ? [...prev, data] : [data]);
         };
     }, [socketConnected, sender, ws.current, roomId]);
-
-
-
-
 
     // 이전 채팅 내용을 가져오는 함수
     const loadPreviousChat = async () => {
@@ -369,6 +327,12 @@ const Chatting = ({ setSelectedPage }) => {
         }
     };
 
+    const textRef = useRef();
+    const handleResizeHeight = useCallback(() => {
+        textRef.current.style.height = "auto";
+        textRef.current.style.height = textRef.current.scrollHeight + "px";
+    }, []);
+
     // 화면 하단으로 자동 스크롤
     const ChatContainerRef = useRef(null);  // DOM 요소 추적
     useEffect(() => {
@@ -410,10 +374,13 @@ const Chatting = ({ setSelectedPage }) => {
             </MessagesContainer>
             <MsgInputBox>
                 <MsgInput
-                placeholder="문자 전송"
-                value={inputMsg}
-                onChange={onChangeMsg}
-                onKeyUp={onEnterKey}
+                    type="text"
+                    ref={textRef}
+                    placeholder="문자 전송"
+                    value={inputMsg}
+                    onInput={handleResizeHeight}
+                    onChange={onChangeMsg}
+                    onKeyUp={onEnterKey}
                 />
                 <SendButton
                     src={sendIcon} alt="Send"

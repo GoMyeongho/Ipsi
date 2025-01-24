@@ -1,4 +1,5 @@
 import axios from "axios";
+import Commons from "../util/Common";
 const Capstone = "http://localhost:8111";
 
 // return 값을 반환할때 객체를 풀어서 반환하지말고 component 개별적으로 객체를 풀어서 사용할 것
@@ -10,6 +11,17 @@ const ChattingApi = {
   },
   getRooms : async () => {
     return await axios.get(Capstone + "/chat/rooms")
+  },
+
+  getMyChatRoom: async (memberId) => {
+    try {
+      const response = await axios.get(Capstone + `/chat/myRooms/${memberId}`);
+      // 성공 시 데이터 반환
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching chat rooms:", error);
+      throw new Error("Failed to fetch chat rooms.");
+    }
   },
 
   // 채팅방 생성하기
@@ -24,11 +36,11 @@ const ChattingApi = {
 
   // 채팅방 정보 가져오기
   chatDetail: async (roomId) => {
-    // return await axios.get(Capstone + `/chat/room/${roomId}`, roomId);
     try {
       const response = await axios.get(Capstone + `/chat/room/${roomId}`);
-      console.log(response.data); // 잘 찍힘
-      console.log(response.data.name);  // 잘 찍힘
+      console.log(response.data);
+      console.log(response.data.name);
+      console.log("입장 가능 인원 : {}", response.data.personCnt);
       return response.data;
     } catch (error) {
       console.error("Error fetching chat room details:", error);
@@ -36,22 +48,8 @@ const ChattingApi = {
     }
   },
 
-/*   // 해당 채팅방의 이전 채팅 내역 가져오기
-  chatHistory: async (roomId) => {
-    const response = await axios.get(Capstone + `/chat/message/${roomId}`);
-    if (response.data && Array.isArray(response.data.messages)) {
-      return response.data.messages;  // 메시지 목록을 반환
-    }
-    return response.data;
-  }, */
-
   // 해당 채팅방의 이전 채팅 내역 가져오기
   chatHistory: async (roomId) => {
-/*     const response = await axios.get(Capstone + `/chat/message/${roomId}`);
-    if (response.data && Array.isArray(response.data.messages)) {
-      return response.data.messages;  // 메시지 목록을 반환
-    }
-    return response.data; */
     return await axios.get(Capstone + `/chat/message/${roomId}`)
   },
 
@@ -65,18 +63,18 @@ const ChattingApi = {
     });
     return response;
   },
-  
-  // 채팅방 데이터베이스 동기화
-  syncRoomToDb: async (roomId, data) => {
+
+  // 채팅방 참여 인원 확인
+  cntRoomMember: async (roomId) => {
     try {
-      const response = await axios.post(Capstone + `/chat/syncRoomToDb/${roomId}`, data);
-      console.log(response.data); // 응답 확인
+      const response = await axios.get(Capstone + `/chat/cntRoomMember/${roomId}`);
+      console.log(response.data);
       return response.data;
     } catch (error) {
-      console.error("Error syncing chat room to DB:", error);
-      throw error;
+      console.error("Error fetching chat rooms:", error);
+      throw new Error("Failed to fetch chat rooms.");
     }
-  },
+  }
 }
 
 export default ChattingApi;

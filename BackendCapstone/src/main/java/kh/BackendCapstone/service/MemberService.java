@@ -97,9 +97,11 @@ public class MemberService {
 		// 이메일을 반환하여 클라이언트에서 처리하도록 함
 		String email = member.getEmail();
 		String nickName = member.getNickName();
+		Long memberId = member.getMemberId();
 //		String profile = member.getProfile();
 		log.warn("토큰으로부터 얻은 이메일: {}", email);
 		log.warn("토큰으로부터 얻은 닉네임: {}", nickName);
+		log.warn("토큰으로부터 얻은 멤버아이디: {}", memberId);
 		log.warn("토큰으로부터 얻은 Member: {}", member);
 		return member;
 	}
