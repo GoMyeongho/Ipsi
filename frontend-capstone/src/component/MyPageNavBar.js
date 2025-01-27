@@ -1,16 +1,15 @@
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import CheckLogin from "../function/LoginCheckButton";
+
 const Background = styled.div`
   width: 100%;
   height: 100%;
 `;
 
 const Container = styled.div`
-  width: 70%;
+  width: 100%;
   margin-top: 3%;
-  margin-left: 15%;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -18,81 +17,82 @@ const Container = styled.div`
 
 const Left = styled.div`
   width: 25%;
+  padding-left: 5%;
   display: flex;
   flex-direction: column;
 `;
 
 const LeftTitle = styled.div`
   margin-bottom: 10%;
-  font-size: 1.5vw;
+  font-size: clamp(1.3rem, 1.8vw, 2.5rem);
   font-weight: bold;
 `;
 
 const SubTitle1 = styled.div`
-  font-size: 1vw;
+  font-size: clamp(1rem, 1vw, 2.5rem);
   font-weight: bold;
-  margin-bottom: 2%;
+  margin-bottom: 5%;
   margin-top: 5%;
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw;
+    font-size: clamp(0.8rem, 1vw, 1rem);
     font-weight: normal;
     cursor: pointer;
   }
 `;
 
 const SubTitle2 = styled.div`
-  font-size: 1vw;
+  font-size: clamp(1rem, 1vw, 2.5rem);
   font-weight: bold;
-  margin-bottom: 2%;
+  margin-bottom: 5%;
   margin-top: 5%;
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw;
+    font-size: clamp(0.8rem, 1vw, 1rem);
     font-weight: normal;
     cursor: pointer;
   }
 `;
 
 const SubTitle3 = styled.div`
-  font-size: 1vw;
+  font-size: clamp(1rem, 1vw, 2.5rem);
   font-weight: bold;
-  margin-bottom: 2%;
+  margin-bottom: 5%;
   margin-top: 5%;
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw;
+    font-size: clamp(0.8rem, 1vw, 1rem);
     font-weight: normal;
     cursor: pointer;
   }
 `;
 
 const SubTitle4 = styled.div`
-  font-size: 1vw;
+  font-size: clamp(1rem, 1vw, 2.5rem);
   font-weight: bold;
-  margin-bottom: 2%;
+  margin-bottom: 5%;
   margin-top: 5%;
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw;
+    font-size: clamp(0.8rem, 1vw, 1rem);
     font-weight: normal;
     cursor: pointer;
   }
 `;
 
 const SubTitle5 = styled.div`
-  font-size: 1vw;
+ font-size: clamp(1rem, 1vw, 2.5rem);
   font-weight: bold;
-  margin-bottom: 2%;
+  margin-bottom: 5%;
   margin-top: 5%;
 
   p {
     margin-top: 2%;
-    font-size: 0.8vw;
+    font-size: clamp(0.8rem, 1vw, 1rem);
     font-weight: normal;
     cursor: pointer;
   }

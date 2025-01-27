@@ -35,12 +35,14 @@ public class Pay {
 	@Column(name = "price", nullable = false)
 	private int price; // 결제 금액
 
-
 	@Column(name = "fileOwner_amount", nullable = true)
 	private int fileOwnerAmount; // 파일 등록자가 받는 금액
 
 	@Column(name = "admin_amount", nullable = true)
 	private int adminAmount; // 관리자가 받는 금액
+
+	@Column(name = "purchased")
+	private boolean purchased;
 
 	@PrePersist
 	public void prePersist() {
@@ -49,4 +51,5 @@ public class Pay {
 			status = "PENDING"; // 기본 상태를 PENDING으로 설정
 		}
 	}
+
 }

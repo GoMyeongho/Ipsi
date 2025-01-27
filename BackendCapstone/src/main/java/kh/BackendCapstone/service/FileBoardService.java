@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
+import kh.BackendCapstone.dto.response.PayResDto;
 import kh.BackendCapstone.entity.FileBoard;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.Univ;
 import kh.BackendCapstone.repository.FileBoardRepository;
 import kh.BackendCapstone.repository.MemberRepository;
+import kh.BackendCapstone.repository.PayRepository;
 import kh.BackendCapstone.repository.UnivRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,8 @@ public class FileBoardService {
 	private final FirebaseUploadService firebaseUploadService;
 	private final UnivRepository univRepository;
 	private final MemberRepository memberRepository;
-	
+	private final PayRepository payRepository;
+
 	public int getPageSize(int limit, String univName, String univDept, String category) {
 		Pageable pageable = PageRequest.of(0, limit);
 		try{
@@ -82,11 +85,17 @@ public class FileBoardService {
 
 		// 조회된 파일 데이터를 DTO로 변환하여 반환
 		return fileBoards.stream().map(fileBoard -> new FileBoardResDto(
-				fileBoard.getUniv().getUnivName(), // 대학 이름
-				fileBoard.getUniv().getUnivDept(), // 대학 전공(학과)
-				fileBoard.getTitle(),
+				fileBoard.getTitle(), // 파일 제목
 				fileBoard.getPrice(), // 파일 금액
-				fileBoard.getRegDate() // 업로드 날짜
+				fileBoard.getRegDate(), // 업로드 날짜
+				fileBoard.getMainFile(),
+				fileBoard.getPreview(),
+				fileBoard.getKeywords(),
+				fileBoard.getSummary(),
+				fileBoard.getMember().getName(),
+				fileBoard.getUniv().getUnivImg(),
+				fileBoard.getUniv().getUnivName(), // 대학 이름
+				fileBoard.getUniv().getUnivDept() // 대학 전공(학과)
 		)).collect(Collectors.toList());
 	}
 
@@ -108,15 +117,19 @@ public class FileBoardService {
 		String mainFilePath = firebaseUploadService.handleFileUpload(mainFile, folderPath); // Firebase로 파일 업로드
 		// preview 파일이 존재하면 Firebase로 업로드
 		String previewFilePath = (preview != null && !preview.isEmpty()) ? firebaseUploadService.handleFileUpload(preview, folderPath) : null;
+
+		// 파일 경로에서 파일 이름을 추출
 		mainFilePath = convertJSONToPath(mainFilePath);
 		previewFilePath = convertJSONToPath(previewFilePath);
+
 		try {
-			// 엔티티 생성;
+			// 엔티티 생성
 			FileBoard fileBoard = new FileBoard();
 			fileBoard.setTitle(title);
 			fileBoard.setMainFile(mainFilePath);
 			fileBoard.setPreview(previewFilePath); // preview 파일 경로도 저장
 			fileBoard.setSummary(summary);
+
 			fileBoard.setPrice(price);
 			fileBoard.setFileCategory(fileCategory);
 			fileBoard.setKeywords(String.join(", ", keywords)); // List<String>을 문자열로 변환하여 저장
@@ -136,9 +149,10 @@ public class FileBoardService {
 			// DB 저장
 			fileBoardRepository.save(fileBoard);
 		} catch (Exception e) {
-			log.error("JSON 변환중 오류 : {}",e.getMessage());
+			log.error("파일 처리 중 오류 : {}", e.getMessage());
 		}
 	}
+
 
 	private List<FileBoardResDto> convertEntityToDto(List<FileBoard> fileBoardList) {
 		List<FileBoardResDto> fileBoardResDtoList = new ArrayList<>();

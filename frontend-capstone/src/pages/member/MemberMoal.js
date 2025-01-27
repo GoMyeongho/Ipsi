@@ -43,24 +43,11 @@ const MemberModal = ({ isOpen, closeModal, handleModalLinkClick, isAdmin }) => {
   const navigate = useNavigate();
   if (!isOpen) return null;
 
-  // const handleNavigate = () => {
-  //   closeModal(); // 모달 닫기
-  //   navigate("/Member"); // 해당 경로로 이동
-  // };
-  // const handleLogout = () => {
-  //   // 로그아웃 처리
-  //   closeModal(); // 모달 닫기
-  //   localStorage.removeItem("loggedInUserId"); // 로컬스토리지 데이터 삭제
-  //   handleModalLinkClick(false); // 로그인 상태 false로 업데이트
-  //   navigate("/"); // 홈으로 이동
-  //   alert("로그아웃 되었습니다."); // 알림
-  // };
-
   return (
     <>
       <ModalOverlay onClick={closeModal} />
       <ModalContent>
-        <ModalTextLink onClick={() => navigate("/myPageNavBar")}>
+        <ModalTextLink onClick={() => {navigate("/myPageNavBar"); closeModal()}}>
           마이페이지
         </ModalTextLink>
         {isAdmin && <ModalTextLink onClick={() => {navigate("/admin"); closeModal()}}>

@@ -66,7 +66,8 @@ const MyPageApi = {
       const response = await axios.get(baseUrl + `/pay/purchasedEnumPS`, {
         params: { 
           memberId: memberId, 
-          fileCategory: fileCategory  // category도 파라미터로 전달
+          fileCategory: fileCategory,  // category도 파라미터로 전달
+          status: "COMPLETED"
         }
       });
       console.log('API 응답:', response);  // 응답 데이터 로깅
@@ -90,7 +91,8 @@ const MyPageApi = {
       const response = await axios.get(baseUrl + `/pay/purchasedEnumSR`, {
         params: { 
           memberId: memberId, 
-          fileCategory: fileCategory  // category도 파라미터로 전달
+          fileCategory: fileCategory,  // category도 파라미터로 전달
+             status: "COMPLETED"
         }
       });
       console.log('API 응답:', response);  // 응답 데이터 로깅

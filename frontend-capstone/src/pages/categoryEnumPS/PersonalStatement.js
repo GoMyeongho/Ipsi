@@ -22,8 +22,8 @@ const Top = styled.div`
 `;
 
 const Title = styled.div`
-  width: 100%;
-  font-size: 1vw;
+  width: 50%;
+  font-size: clamp(1rem, 1.3vw, 2.5rem);
   font-weight: bold;
 `;
 
@@ -50,7 +50,7 @@ const Dropdown = styled.select`
   border: none;
   border-radius: 5px;
   background-color: #fff;
-  font-size: calc(5px + 0.6vw);
+  font-size: clamp(0.8rem, 1vw, 2.5rem); /* 기본 옵션 텍스트 크기 */
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -63,8 +63,14 @@ const Dropdown = styled.select`
     outline: none;
   }
 
+  /* 기본 옵션인 "대학명", "학과명"에 대한 폰트 크기 조정 */
+  option[value=""] {
+    font-weight: bold; /* 강조 옵션 (선택사항) */
+    font-size: clamp(0.8rem, 1vw, 2.5rem); /* 기본 옵션 텍스트 크기 */
+  }
+
   option {
-    width: 100%;
+    font-size: clamp(0.8rem, 1vw, 2.5rem);
   }
 `;
 
@@ -130,19 +136,24 @@ const UnivLogo = styled.div`
   width: 100%;
   margin-top: 5%;
   img {
-    width: 50%; // 원하는 크기로 비율을 설정하거나 px 값으로 설정할 수 있습니다
-    height: auto; // 자동으로 비율에 맞게 높이를 조정
+    width: 60%; // 원하는 크기로 비율을 설정하거나 px 값으로 설정할 수 있습니다
+    object-fit: cover;
   }
 `;
 
 const UnivName = styled.div`
   width: 100%;
+  font-size: clamp(0.7rem, 0.8vw, 2.5rem);
   margin-bottom: 2%;
 `;
 
 const UnivDeptName = styled.div`
   width: 100%;
+  font-size: clamp(0.7rem, 0.8vw, 2.5rem);
   margin-bottom: 5%;
+  white-space: nowrap; /* 텍스트가 줄 바꿈되지 않도록 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 텍스트가 넘칠 경우 '...' 표시 */
 `;
 
 const ContentsBottom = styled.div`
@@ -165,13 +176,28 @@ const ContentsBottomBox = styled.div`
 
 const AuthName = styled.div`
   width: 100%;
+  font-size: clamp(0.7rem, 0.8vw, 2.5rem);
+
+  @media (max-width: 1000px) {
+    width: 50%;
+    display: flex;
+    justify-content: end;
+  }
 `;
 
 const ContentsPrice = styled.div`
   width: 100%;
+  font-size: clamp(0.8rem, 0.8vw, 2.5rem);
+  white-space: nowrap; /* 텍스트가 줄 바꿈되지 않도록 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 텍스트가 넘칠 경우 '...' 표시 */
+  @media (max-width: 1000px) {
+    display: flex;
+    justify-content: end;
+  }
 `;
 
-const BuyButton = styled.div`
+const DetailDisplay = styled.div`
   background-color: #6200ea;
   color: white;
   border: none;
@@ -192,8 +218,12 @@ const PaginationContainer = styled.div`
 `;
 
 const PaginationButton = styled.button`
-  background-color: #6200ea;
-  color: white;
+  background-color: ${(props) =>
+    props.isActive
+      ? "#6200ea"
+      : "transparent"}; // 활성화된 페이지일 때 보라색 배경
+  color: ${(props) =>
+    props.isActive ? "white" : "black"}; // 활성화된 페이지일 때 글자색 흰색
   border: none;
   padding: 10px;
   margin: 0 5px;
@@ -201,29 +231,11 @@ const PaginationButton = styled.button`
   border-radius: 5px;
 
   &:hover {
-    background-color: #3700b3;
-  }
-
-  &:disabled {
-    background-color: #e0e0e0;
-    cursor: not-allowed;
+    background-color: ${(props) =>
+      props.isActive ? "#3700b3" : "#f0f0f0"}; // hover 시 배경색 변화
   }
 `;
 
-// 이름 가운제 * 변경 관련련
-const replaceMiddleChar = (str) => {
-  if (!str || typeof str !== "string") {
-    // str이 falsy(null, undefined, 빈 문자열)거나 문자열이 아닌 경우 기본값 반환
-    console.warn("Invalid input for replaceMiddleChar:", str);
-    return ""; // 기본값으로 빈 문자열 반환
-  }
-
-  const len = str.length;
-  if (len === 0) return str; // 빈 문자열일 경우 원본 반환
-
-  const middleIndex = Math.floor(len / 2); // 가운데 글자 인덱스
-  return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1); // 가운데 글자를 '*'로 변경
-};
 
 const PersonalStatement = () => {
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
@@ -236,12 +248,13 @@ const PersonalStatement = () => {
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [dropDownError, setDropDownError] = useState(null); // DropDown 에러 상태
   const [contentsError, setContentsError] = useState(null); // 자소서 데이터 에러 상태
+  const [purchasedFileIds, setPurchasedFileIds] = useState([]); // 해당 유저가 구매한 자료 현황
 
   // 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const [itemsPerPage, setItemsPerPage] = useState(12); // 페이지당 항목 수
   const [totalPages, setTotalPages] = useState(0); // 전체 페이지 수
-  
+
   // 페이지네이션 로직: 현재 페이지에 맞는 항목 가져오기
   const indexOfFirstItem = 0;
   const currentItems = filteredItems.slice(
@@ -323,14 +336,17 @@ const PersonalStatement = () => {
         params.page,
         params.limit,
         params.univName,
-        params.univDept
+        params.univDept,
       );
 
+      console.log(response);
       const items = response.content || response.items;
+
 
       // console.log(items); // 데이터 확인용
       setContentItems(items);
       setFilteredItems(items); // 필터링된 항목 업데이트
+      setPurchasedFileIds(response.purchasedFileIds);
       setTotalPages(
         response.totalPages || Math.ceil(items.length / itemsPerPage)
       ); // 전체 페이지 수 계산
@@ -401,18 +417,34 @@ const PersonalStatement = () => {
   }
 
   const handleTopClick = (selectedData) => {
-    navigate("/PersonalStateMentDetail", { state: { item: selectedData } } );
+    navigate("/PersonalStateMentDetail", { state: { item: selectedData, purchasedFileIds : purchasedFileIds }});
   };
 
-  // 자릿수만 포맷팅하는 함수
-const formatPrice = (price) => {
-  if (typeof price !== 'number') {
-    console.warn("Invalid price value:", price);
-    return price; // 잘못된 가격 값이 들어오면 원본 반환
+  
+// 이름 가운제 * 변경 관련련
+const replaceMiddleChar = (str) => {
+  if (!str || typeof str !== "string") {
+    // str이 falsy(null, undefined, 빈 문자열)거나 문자열이 아닌 경우 기본값 반환
+    console.warn("Invalid input for replaceMiddleChar:", str);
+    return ""; // 기본값으로 빈 문자열 반환
   }
 
-  return new Intl.NumberFormat("ko-KR").format(price); // 한국식 천 단위 구분 기호 추가
+  const len = str.length;
+  if (len === 0) return str; // 빈 문자열일 경우 원본 반환
+
+  const middleIndex = Math.floor(len / 2); // 가운데 글자 인덱스
+  return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1); // 가운데 글자를 '*'로 변경
 };
+
+  // 자릿수만 포맷팅하는 함수
+  const formatPrice = (price) => {
+    if (typeof price !== "number") {
+      console.warn("Invalid price value:", price);
+      return price; // 잘못된 가격 값이 들어오면 원본 반환
+    }
+
+    return new Intl.NumberFormat("ko-KR").format(price); // 한국식 천 단위 구분 기호 추가
+  };
 
   return (
     <Background>
@@ -466,9 +498,7 @@ const formatPrice = (price) => {
                   <AuthName>{replaceMiddleChar(item.memberName)}</AuthName>
                   <ContentsPrice>{formatPrice(item.price)}원</ContentsPrice>
                 </ContentsBottomBox>
-                <BuyButton>
-                  구매하기
-                </BuyButton>
+                <DetailDisplay>상세보기</DetailDisplay>
               </ContentsBottom>
             </ContentsBox>
           ))
@@ -476,6 +506,7 @@ const formatPrice = (price) => {
           <div>조건에 맞는 데이터가 없습니다.</div>
         )}
       </Contents>
+
       {/* 페이지네이션 컨트롤 */}
       <PaginationContainer>
         <PaginationButton
@@ -493,7 +524,7 @@ const formatPrice = (price) => {
           <PaginationButton
             key={startPage + index}
             onClick={() => handlePageChange(startPage + index)}
-            disabled={currentPage === startPage + index}
+            isActive={currentPage === startPage + index} // 현재 페이지일 때만 보라색 배경
           >
             {startPage + index}
           </PaginationButton>

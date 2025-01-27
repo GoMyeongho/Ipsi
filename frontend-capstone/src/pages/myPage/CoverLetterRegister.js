@@ -40,19 +40,32 @@ const ItemTitle = styled.div`
   input {
     text-align: left;
     width: 70%;
+    height: 20px;
     margin-left: 5%;
     border: none;
+
+    &:focus {
+      outline: none;
+    }
   }
 `;
 
-const FileInput = styled.div`
+const MainFile = styled.div`
   width: 100%;
   margin-top: 2%;
   padding-left: 3%;
 
   input {
-    margin-left: 10%;
-    border: none;
+    opacity: 0; /* 파일 선택 버튼을 숨김 */
+  }
+
+  label {
+    margin-left: 5%;
+    background-color: #6154d4;
+    color: white;
+    padding: 5px 5px;
+    cursor: pointer;
+    border-radius: 4px;
   }
 `;
 
@@ -62,10 +75,14 @@ const ItemPrice = styled.div`
   padding-left: 3%;
 
   input {
-    text-align: right;
-    width: 15%;
+    text-align: start;
+    width: 30%;
     margin-left: 5%;
     border: none;
+
+    &:focus {
+      outline: none;
+    }
 
     /* 화살표 숨기기 */
     &::-webkit-outer-spin-button,
@@ -117,6 +134,7 @@ const SubBox = styled.div`
     margin-top: 2%;
     padding-left: 3%;
     font-size: medium;
+    font-weight: bold;
   }
 `;
 
@@ -126,8 +144,16 @@ const Preview = styled.div`
   padding-left: 3%;
 
   input {
+    opacity: 0; /* 파일 선택 버튼을 숨김 */
+  }
+
+  label {
     margin-left: 5%;
-    border: none;
+    background-color: #6154d4;
+    color: white;
+    padding: 5px 5px;
+    cursor: pointer;
+    border-radius: 4px;
   }
 `;
 
@@ -179,20 +205,17 @@ const KeyWordTag = styled.div`
 
 const SaveButton = styled.button`
   width: 15%;
-  height: 30%;
+  min-width: 100px;
+  height: 50px;
   margin-top: 5%;
+  margin-bottom: 100px;
   align-self: flex-end; /* 부모의 오른쪽 끝으로 이동 */
-  background-color: #4caf50; /* 활성화된 버튼 색상 */
-  color: white;
-  border: none;
-  cursor: pointer;
   background-color: #6200ea;
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 5px 10px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 0.8vw, 2.5rem);
 
   &:hover {
     background-color: #3700b3;
@@ -223,16 +246,63 @@ const Line = styled.hr`
   color: silver;
 `;
 
+const FileItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+
+  span {
+    margin-right: 10px;
+  }
+
+  button {
+    background-color: #e53935; /* 빨간색 */
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 8px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #b71c1c; /* 더 어두운 빨간색 */
+    }
+  }
+`;
+
+const PreviewFileItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+
+  span {
+    margin-right: 10px;
+  }
+
+  button {
+    background-color: #e53935; /* 빨간색 */
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 8px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #b71c1c; /* 더 어두운 빨간색 */
+    }
+  }
+`;
 const CoverLetterRegister = () => {
   const [title, setTitle] = useState("");
-  const [file, setFile] = useState(null);
   const [introduction, setIntroduction] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [keywords, setKeywords] = useState([""]);
   const [univName, setUnivName] = useState("");
   const [univDept, setUnivDept] = useState("");
-  const [previewFile, setPreviewFile] = useState(null);
+  const [file, setFile] = useState(null); // mainFile 첨부파일
+  const [previewFile, setPreviewFile] = useState(null); // previewFile 첨부 파일
+  const [mainFileErr, setMainFileErr] = useState(""); // 첨부 파일 검증 Err
+  const [previewFileErr, setPreviewFileErr] = useState(""); // 첨부 파일 검증 Err
 
   // 대학과 학과 데이터를 저장할 상태
   const [univList, setUnivList] = useState([]);
@@ -297,10 +367,10 @@ const CoverLetterRegister = () => {
   }, [univName]);
 
   // 데이터 저장 요청
-  const handleSave = async () => {  
+  const handleSave = async () => {
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("mainFile", file); 
+    formData.append("mainFile", file);
     formData.append("summary", introduction);
     formData.append("fileCategory", category);
     formData.append("price", price);
@@ -326,6 +396,7 @@ const CoverLetterRegister = () => {
 
   // 드롭다운 옵션 설정
   const options = [
+    // value 값 ==  BackEnd enum 값
     { value: "PERSONAL_STATEMENT", label: "자기소개서" },
     { value: "STUDENT_RECORD", label: "생활기록부" },
   ];
@@ -354,8 +425,101 @@ const CoverLetterRegister = () => {
     setKeywords(updatedKeywords);
   };
 
-  // 버튼 활성화 조건: 제목, 가격, 분류, 파일이 모두 입력되어야 함
-  const isFormValid = title && price && category && file;
+  // 파일 첨부 관련 제한 조건
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 최대 파일 크기 (5MB)
+  const ALLOWED_EXTENSIONS = ["jpg", "png", "pdf", "zip"]; // 허용 확장자
+  const ENGLISH_ONLY_REGEX = /^[a-zA-Z0-9_.-]+$/; // 영어, 숫자, _, ., - 만 허용
+
+  // MainFile 자료 첨부
+  const handleMainFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+
+    const fileName = selectedFile.name;
+    const fileExtension = fileName.split(".").pop().toLowerCase();
+    const errors = []; // 에러 메시지 배열
+
+    // 파일 이름 검증
+    if (!ENGLISH_ONLY_REGEX.test(fileName)) {
+      errors.push("파일 이름은 영어와 숫자만 허용됩니다.");
+    }
+    // 파일 크기 검증
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      errors.push("파일 크기가 10MB를 초과합니다.");
+    }
+    // 파일 확장자 검증
+    if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+      errors.push(
+        `허용되지 않는 파일 형식입니다. (${ALLOWED_EXTENSIONS.join(", ")})`
+      );
+    }
+
+    if (errors.length > 0) {
+      // 에러가 있으면 첫 번째 에러 메시지를 보여주고 파일 초기화
+      setMainFileErr(errors[0]);
+      setFile(null); // 파일 초기화
+    } else {
+      // 검증 통과 시 파일 설정
+      setMainFileErr(""); // 에러 초기화
+      setFile(selectedFile);
+    }
+  };
+
+  // previewFile 자료 첨부
+  const handlePreviewFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+
+    const fileName = selectedFile.name;
+    const fileExtension = fileName.split(".").pop().toLowerCase();
+    const errors = []; // 에러 메시지 배열
+
+    // 파일 이름 검증
+    if (!ENGLISH_ONLY_REGEX.test(fileName)) {
+      errors.push("파일 이름은 영어와 숫자만 허용됩니다.");
+    }
+    // 파일 크기 검증
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      errors.push("파일 크기가 10MB를 초과합니다.");
+    }
+    // 파일 확장자 검증
+    if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+      errors.push(
+        `허용되지 않는 파일 형식입니다. (${ALLOWED_EXTENSIONS.join(", ")})`
+      );
+    }
+
+    if (errors.length > 0) {
+      // 에러가 있으면 첫 번째 에러 메시지를 보여주고 파일 초기화
+      setPreviewFileErr(errors[0]);
+      setPreviewFile(null); // 파일 초기화
+    } else {
+      // 검증 통과 시 파일 설정
+      setPreviewFileErr(""); // 에러 초기화
+      setPreviewFile(selectedFile);
+    }
+  };
+
+  // 파일 삭제 함수 추가
+  const removeMainFile = () => {
+    setFile(null);
+    setMainFileErr("");
+  };
+
+  const removePreviewFile = () => {
+    setPreviewFile(null);
+    setPreviewFileErr("");
+  };
+
+  // 자료 업로드 버튼 활성화 조건: 제목, 가격, 분류, 파일이 모두 입력되어야 함
+  const isFormValid =
+    title &&
+    price &&
+    category &&
+    file &&
+    univName &&
+    univDept &&
+    previewFileErr === "";
 
   return (
     <Background>
@@ -371,22 +535,44 @@ const CoverLetterRegister = () => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              placeholder="제목을 입력하세요."
             />
           </ItemTitle>
           <Line />
-          <FileInput>
+          <MainFile>
             자료파일
-            <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-          </FileInput>
+            <label htmlFor="mainFile-upload">파일 첨부</label>
+            <input
+              type="file"
+              id="mainFile-upload"
+              onChange={handleMainFileChange}
+            />
+            {file && (
+              <FileItem>
+                <span>{file.name}</span>
+                <button onClick={removeMainFile}>삭제</button>
+              </FileItem>
+            )}
+            {/* 파일 에러 메시지 표시 */}
+            {mainFileErr && (
+              <div style={{ color: "red", marginTop: "5px" }}>
+                {mainFileErr}
+              </div>
+            )}
+          </MainFile>
           <Line />
           <ItemPrice>
             가격
             <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              type="text"
+              value={price ? `${price}원` : ""}
+              onChange={(e) => {
+                // 숫자만 입력받도록 정규식 사용
+                const inputValue = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 남기기
+                setPrice(inputValue); // 숫자만 상태에 저장
+              }}
+              placeholder="가격을 입력하세요."
             />
-            원
           </ItemPrice>
           <Line />
           <Classification>
@@ -433,10 +619,24 @@ const CoverLetterRegister = () => {
           <p>추가정보</p>
           <Preview>
             미리보기 파일
+            <label htmlFor="previewFile-upload">파일 첨부</label>
             <input
+              id="previewFile-upload"
               type="file"
-              onChange={(e) => setPreviewFile(e.target.files[0])}
+              onChange={handlePreviewFileChange}
             />
+            {previewFile && (
+              <PreviewFileItem>
+                <span>{previewFile.name}</span>
+                <button onClick={removePreviewFile}>삭제</button>
+              </PreviewFileItem>
+            )}
+            {/* 파일 에러 메시지 표시 */}
+            {previewFileErr && (
+              <div style={{ color: "red", marginTop: "5px" }}>
+                {previewFileErr}
+              </div>
+            )}
           </Preview>
           <Line />
           <KeyWordTag>
@@ -447,7 +647,7 @@ const CoverLetterRegister = () => {
                   type="text"
                   value={keyword}
                   onChange={(e) => handleKeywordChange(index, e.target.value)}
-                  placeholder={` ${index + 1}.'#' 포함없이 입력하세요.`}
+                  placeholder={`'#' 포함없이 입력하세요.`}
                 />
                 <button onClick={() => handleRemoveKeyword(index)}>-</button>
               </div>

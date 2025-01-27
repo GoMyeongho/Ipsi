@@ -3,6 +3,7 @@ package kh.BackendCapstone.service;
 import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.request.PayReqDto;
+import kh.BackendCapstone.dto.response.FilePurchaseStatusResDto;
 import kh.BackendCapstone.dto.response.PayResDto;
 import kh.BackendCapstone.entity.FileBoard;
 import kh.BackendCapstone.entity.Member;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +50,7 @@ public class PayService {
         pay.setFileBoard(fileBoard);
         pay.setMember(member);
         pay.setPrice(fileBoard.getPrice()); // 파일의 가격 정보를 저장
+        pay.setPurchased(false); // 처음에는 구매하지 않음
         pay.setStatus("PENDING"); // 상태는 "PENDING"
         pay = payRepository.save(pay); // DB에 저장
 
@@ -109,6 +113,10 @@ public class PayService {
 
         // 결제 상태를 "COMPLETED"로 업데이트
         pay.setStatus("COMPLETED");
+
+        // purchased 값을 true(로) 설정
+        pay.setPurchased(true);
+
         payRepository.save(pay); // DB에 상태 업데이트
 
         log.info("결제 완료 처리 후: {}", pay);
@@ -118,18 +126,38 @@ public class PayService {
         log.info("paymentMap에서 결제 정보 삭제: {}", orderId);
     }
 
+    // 구매유무 반환
+    public List<FilePurchaseStatusResDto> getPurchasedFileStatusesByMemberId(Long memberId) {
+        List<Pay> payList = payRepository.findByMember_MemberId(memberId);
+        return payList.stream()
+                .map(pay -> new FilePurchaseStatusResDto(
+                        pay.getFileBoard().getFileId(),
+                        pay.isPurchased()
+                ))
+                .collect(Collectors.toList());
+    }
+
     // 내가 구매한 자료 가져오기
-    public List<PayResDto> getPurchasedData(Long memberId, FileCategory fileCategory) {
+    public List<PayResDto> getPurchasedData(Long memberId, FileCategory fileCategory, String status) {
         // fileCategory(를) "PERSONAL_STATEMENT", "STUDENT_RECORD" 파라미터로 받는 방식으로 처리
-        List<Pay> pays = payRepository.findByMember_MemberIdAndFileBoard_FileCategory(memberId, fileCategory);
+        List<Pay> pays = payRepository.findByMember_MemberIdAndFileBoard_FileCategoryAndStatus(memberId, fileCategory, status);
 
         return pays.stream().map(pay -> new PayResDto(
                 pay.getPayId(),
-                pay.getFileBoard().getTitle(),
-                pay.getFileBoard().getUniv().getUnivName(),
-                pay.getFileBoard().getUniv().getUnivDept(),
                 pay.getPrice(),
-                pay.getRegDate()
+                pay.getRegDate(),
+                pay.getStatus(),
+                pay.getFileBoard().getFileId(),
+                pay.getFileBoard().getTitle(),
+                pay.getFileBoard().getMainFile(),
+                pay.getFileBoard().getPreview(),
+                pay.getFileBoard().getKeywords(),
+                pay.getFileBoard().getSummary(),
+                pay.getFileBoard().getRegDate(),
+                pay.getFileBoard().getMember().getName(),
+                pay.getFileBoard().getUniv().getUnivImg(),
+                pay.getFileBoard().getUniv().getUnivName(),
+                pay.getFileBoard().getUniv().getUnivDept()
         )).collect(Collectors.toList());
     }
 
