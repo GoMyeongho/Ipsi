@@ -7,6 +7,7 @@ const MyPageApi = {
   //   id = res.data
   //   return await axios.get(`${Capstone}/auth/login/${id}`);
   // },
+  
   // 자소서/생기부 업로드 API
   saveCoverLetterRegister: async (formData) => {
     const res = await Commons.getTokenByMemberId();
