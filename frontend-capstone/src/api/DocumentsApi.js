@@ -120,7 +120,6 @@ const DocumentsApi = {
     try {
       // 파일 업로드 API 호출
       const response = await axios.post(baseUrl + `/pay/save`, formData);
-      console.log(response);
       return response; // 응답 데이터 반환
     } catch (error) {
       console.error("파일 업로드 오류:", error);

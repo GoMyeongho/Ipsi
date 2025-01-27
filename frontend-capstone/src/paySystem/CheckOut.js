@@ -65,7 +65,6 @@ export function CheckoutPage() {
 
   const handlePayment = async () => {
     const orderId = generateRandomString();
-    // console.log(orderId);
     // 2. 결제 정보를 서버에 저장합니다.
     const formData = new FormData();
     formData.append("fileBoardId", productItem?.fileBoardId); // fileBoardId 전송
@@ -74,6 +73,7 @@ export function CheckoutPage() {
     // 서버에 결제 정보를 저장하는 요청
     const response = await DocumentsApi.getPaySave(formData);
     console.log(response);
+
     try {
       // 1. 결제를 요청하기 전에 fileBoardId를 서버로 보냅니다.
       // 서버에 결제 정보를 저장하기 위한 요청
@@ -124,5 +124,5 @@ export function CheckoutPage() {
     </div>
   );
 }
-
 export default CheckoutPage;
+
