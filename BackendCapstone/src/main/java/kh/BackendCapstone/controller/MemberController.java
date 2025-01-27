@@ -2,6 +2,7 @@ package kh.BackendCapstone.controller;
 
 import kh.BackendCapstone.dto.request.MemberReqDto;
 import kh.BackendCapstone.dto.response.MemberResDto;
+import kh.BackendCapstone.jwt.TokenProvider;
 import kh.BackendCapstone.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,8 @@ import java.util.List;
 public class MemberController {
 	
 	private final MemberService memberService;
-	
+	private final TokenProvider tokenProvider;
+
 	// 전체 회원 조회
 	@GetMapping("/list")
 	public ResponseEntity<List<MemberResDto>> allMember() {
@@ -27,23 +29,38 @@ public class MemberController {
 		log.info("rsp : {}", rsp);
 		return ResponseEntity.ok(rsp);
 	}
-	
+
 	// 회원 이메일 조회
-	@GetMapping("/{email}")
+/*	@GetMapping("/{email}")
 	public ResponseEntity<MemberResDto> findMember(@PathVariable String email) {
 		MemberResDto memberResDto = memberService.findMember(email);
 		log.info("memberResDto : {}", memberResDto);
 		return ResponseEntity.ok(memberResDto);
+	}*/
+	@GetMapping("/nickName")
+	public ResponseEntity<String> getEmailFromToken(@RequestHeader("Authorization") String token) {
+		try {
+			String nickName = memberService.convertTokenToEntity(token).getNickName();
+			return ResponseEntity.ok(nickName);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+		}
 	}
-
-
-
-
 	@PostMapping("/updateUser")
 	public ResponseEntity<Boolean> updateMember(@RequestBody MemberReqDto memberReqDto) {
 		boolean isSuccess = memberService.updateMember(memberReqDto);
 		log.info("수정 성공 여부 : {}", isSuccess);
 		return ResponseEntity.ok(isSuccess);
+	}
+
+	@GetMapping("/memberId")
+	public ResponseEntity<Long> getMemberIdFromToken(@RequestHeader("Authorization") String token) {
+		try {
+			Long memberId = memberService.convertTokenToEntity(token).getMemberId();
+			return ResponseEntity.ok(memberId);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Long.valueOf("Invalid token"));
+		}
 	}
 	
 	@PostMapping("/deleteUser/{email}")

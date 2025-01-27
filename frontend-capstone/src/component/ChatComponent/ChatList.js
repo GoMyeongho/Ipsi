@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { ChatTitle } from "../ChatComponent/ChatMenuBar";
+import { ChatTitle } from "./ChatMenuBar";
 import React, { useContext, useEffect, useState } from "react";
-import AxiosApi from "../../api/AxiosApi";
 import Commons from "../../util/Common";
 import { ChatContext } from "../../context/ChatStore";
+import ChattingApi from "../../api/ChattingApi";
+import axiosApi from "../../api/AxiosApi";
 
 const ChatListBg = styled.div`
     width: 100%;
@@ -34,36 +35,62 @@ export const ChatName = styled.p`
   margin: 0 0 10px 0;
   color: #444;
 `;
-const ChatDate = styled.p`
+/* const ChatDate = styled.p`
   font-size: 1em;
   color: #666;
   margin: 0;
   text-align: right;
-`;
+`; */
 
 const ChatList = ({ setSelectedPage }) => {
     const [chatRooms, setChatRooms] = useState([]);
-    const {setRoomId} = useContext(ChatContext)
+    const {setRoomId} = useContext(ChatContext);
+    const [loggedInUser, setLoggedInUser] = useState(null);
 
-    // 서버로부터 채팅방 목록을 가져오는 API
+/*    // 서버로부터 채팅방 목록을 가져오는 API
     const fetchChatRooms = async() => {
         try {
-            const response = await AxiosApi.chatList();
+            const response = await ChattingApi.chatList();
             console.log(response.data);
             setChatRooms(response.data);
         } catch (e) {
             console.log(e); // 서버와의 통신 실패 예외 처리
         }
+    };*/
+
+    // 토큰에서 memberId를 가져오는 로직
+    const fetchMemberIdFromToken = async () => {
+        try {
+            const response = await Commons.getTokenByMemberId();
+            const memberId = response.data; // 서버에서 반환한 memberId
+            console.log("로그인 한 memberId:", memberId);
+            setLoggedInUser(memberId);
+            fetchChatRoomsForUser(memberId); // memberId로 채팅방 리스트 가져오기
+        } catch (e) {
+            console.error("Failed to fetch memberId from token:", e);
+        }
     };
 
+    // memberId와 관련된 채팅방 목록 가져오기
+    const fetchChatRoomsForUser = async (memberId) => {
+        try {
+            const rooms = await ChattingApi.getMyChatRoom(memberId);
+            console.log("Fetched Chat Rooms for Member:", rooms);
+            setChatRooms(rooms);
+        } catch (error) {
+            console.error("Error fetching chat rooms for user:", error);
+        }
+    };
+
+    // 처음 화면이 나타나는 시점에 서버로부터 정보를 가져옴
     useEffect(() => {
-        fetchChatRooms();
-    }, []); // 처음 화면이 나타나는 시점에 서버로부터 정보를 가져옴
+        fetchMemberIdFromToken();
+    }, []);
 
     // 채팅방 이동
     const enterChatRoom = (roomId) => {
       console.log("Room ID:", roomId);
-      setRoomId(roomId)
+      setRoomId(roomId);
       setSelectedPage("chatting");
     };
 

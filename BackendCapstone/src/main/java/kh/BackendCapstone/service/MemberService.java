@@ -39,7 +39,7 @@ public class MemberService {
 			return null;
 		}
 	}
-	
+
 	// 특정 회원 조회
 	public MemberResDto findMember(String email) {
 		Member member = memberRepository.findByEmail(email)
@@ -93,11 +93,19 @@ public class MemberService {
 		Long id = Long.parseLong(authentication.getName());
 		Member member = memberRepository.findById(id)
 			.orElseThrow(()-> new RuntimeException("존재 하지 않는 memberId 입니다."));
+
+		// 이메일을 반환하여 클라이언트에서 처리하도록 함
+		String email = member.getEmail();
+		String nickName = member.getNickName();
+		Long memberId = member.getMemberId();
+//		String profile = member.getProfile();
+		log.warn("토큰으로부터 얻은 이메일: {}", email);
+		log.warn("토큰으로부터 얻은 닉네임: {}", nickName);
+		log.warn("토큰으로부터 얻은 멤버아이디: {}", memberId);
 		log.warn("토큰으로부터 얻은 Member: {}", member);
 		return member;
 	}
-	
-	
+
 	// Member Entity -> 회원 정보 DTO
 	private MemberResDto convertEntityToDto(Member member) {
 		MemberResDto memberResDto = new MemberResDto();

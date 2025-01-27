@@ -25,6 +25,10 @@ const IconSvg = styled.img`
     filter: ${({ isSelected }) => (isSelected ? "none" : "grayscale(100%)")};
     opacity: ${({ isSelected }) => (isSelected ? "1" : "0.7")};
     cursor: pointer;
+    &:hover {
+      filter: none;
+      opacity: 1;
+    }
 `
 
 const ChatMenuBar = ({setSelectedPage, selectedPage}) => {
