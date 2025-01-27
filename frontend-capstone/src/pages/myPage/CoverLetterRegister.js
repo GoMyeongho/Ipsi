@@ -5,6 +5,11 @@ import MyPageApi from "../../api/MyPageApi";
 const Background = styled.div`
   width: 80%;
   height: 100%;
+
+  @media (max-width:768px) {
+    width: 90%;
+    margin-left: 5%;
+  }
 `;
 
 const ContainerBox = styled.div`

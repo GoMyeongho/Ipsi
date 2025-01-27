@@ -38,6 +38,7 @@ const LogoImage = styled.div`
   @media (max-width: 768px) {
     width: 200px;
     height: 100px;
+    margin-left: 10%;
     background-image: url(https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Flogo%2Flogo.png?alt=media&token=cc98e0e8-541c-4e62-8aa7-fd408e8b32f2);
     background-size: contain; /* 이미지를 컨테이너에 맞게 조정 */
     background-position: center; /* 이미지 중앙 정렬 */
@@ -92,34 +93,70 @@ const MenuBarImage = styled.div`
   }
 `;
 
-// 입시자료 모달 스타일
+// Menu Bar 모달 스타일
 const MenuBarModalBackground = styled.div`
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   display: flex;
+  background: rgba(0, 0, 0, 0.7);
   z-index: 1000;
 `;
 
 const MenuBarModalContent = styled.div`
-  position: fixed; /* 고정 위치 */
-  top: 80px; /* 화면 높이에 비례하여 위치 */
-  left: 200px; /* 화면 너비에 비례하여 위치 */
-  width: 200px;
-  height: 100px;
+  position: fixed;
+  top: 100px;
+  right: 0; /* 오른쪽에 고정 */
+  width: 300px;
+  height: 70%;
   background: white;
   padding: 20px;
-  border-radius: 15px;
+  border-radius: 15px 0 0 15px;
   border: 1px solid silver;
   text-align: center;
   z-index: 1000;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
 
-  /* p 태그 스타일링 */
+  /* 초기 상태: 화면 바깥 */
+  transform: translateX(100%);
+  transition: transform 3s ease; /* 부드러운 애니메이션 */
+
+  /* 모달이 열릴 때 transform 적용 */
+  ${({ isOpen }) =>
+    isOpen &&
+    `
+    transform: translateX(0); /* 화면 안쪽으로 이동 */
+  `}
+
   p {
-    margin-bottom: 10px; /* 항목 사이에 간격 추가 */
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+    margin-Top: 20%; /* 항목 사이에 간격 추가 */
+    cursor: pointer;
+    &:hover {
+      color: blue; /* 호버 시 색상 변경 */
+    }
   }
 `;
 
+const SubMenu = styled.div`
+  overflow: hidden;
+  max-height: ${({ isOpen }) => (isOpen ? "200px" : "0")};
+  transition: max-height 0.3s ease; /* 부드러운 애니메이션 */
+  background-color: #f9f9f9;
+  padding: ${({ isOpen }) => (isOpen ? "10px" : "0")};
+
+  p {
+    margin: 10px 0;
+    cursor: pointer;
+    &:hover {
+      color: blue; /* 호버 시 색상 변경 */
+    }
+  }
+`;
 
 const MobileTopNavBar = () => {
   const navigate = useNavigate();
@@ -129,6 +166,7 @@ const MobileTopNavBar = () => {
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
   const [isAdmin, setAdmin] = useState(false);
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
 
   const [isLoggedIn, setIsLoggedIn] = useState(
     // !!localStorage.getItem("loggedInUserId")
@@ -156,7 +194,7 @@ const MobileTopNavBar = () => {
   const menuBarCloseModal = () => setIsMenuBarModalOpen(false); // 입시자료 모달창 OFF
 
   // 입시자료 클릭 시 모달 닫고 페이지 전환
-  const handleMaterialNavigate = (path) => {
+  const handleMenuBarModalNavigate = (path) => {
     setIsMenuBarModalOpen(false); // 모달 닫기
     navigate(path); // 페이지 전환
   };
@@ -201,6 +239,11 @@ const MobileTopNavBar = () => {
     }
   };
 
+  const toggleSubMenu = () => {
+    setIsSubMenuOpen((prev) => !prev); // 상태를 토글
+  };
+  
+
   return (
     <>
       <Background>
@@ -209,10 +252,10 @@ const MobileTopNavBar = () => {
             <LogoImage onClick={() => navigate("/")} />
           </Logo>
           <Info>
-            <InfoImage />
+            <InfoImage onClick={menuBarOpenModal} />
           </Info>
           <MenuBar>
-            <MenuBarImage onClick={handleImageClick}/>
+            <MenuBarImage onClick={handleImageClick} />
           </MenuBar>
         </ContainerBox>
 
@@ -220,17 +263,23 @@ const MobileTopNavBar = () => {
         {/* 메뉴바 모달창 */}
         {isMenuBarModalOpen && (
           <MenuBarModalBackground onClick={menuBarCloseModal}>
-            <MenuBarModalContent onClick={(e) => e.stopPropagation()}>
-              <p onClick={() => handleMaterialNavigate("/PersonalStatement")}>
-                자기소개서
-              </p>
-              <p onClick={() => handleMaterialNavigate("/StudentRecord")}>
-                생활기록부
-              </p>
+            <MenuBarModalContent
+              isOpen={isMenuBarModalOpen} // 상태값 전달
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p onClick={toggleSubMenu}>입시자료</p>
+              <SubMenu isOpen={isSubMenuOpen}>
+               <p onClick={() => handleMenuBarModalNavigate("/PersonalStatement")}>- 자기소개서</p>
+               <p onClick={() => handleMenuBarModalNavigate("/StudentRecord")}>- 생활기록부</p>
+              </SubMenu>
+              <p onClick={() => {handleMenuBarModalNavigate("/PersonalStatementWrite");}}>자소서 작성</p>
+              <p onClick={() => {handleMenuBarModalNavigate("/post/list/default");}}>게시판</p>
+              <p onClick={() => {handleMenuBarModalNavigate("/");}}>FAQ</p>
+              <p onClick={() => {handleMenuBarModalNavigate("/");}}>이용후기</p>
             </MenuBarModalContent>
           </MenuBarModalBackground>
-        )} 
-        
+        )}
+
         {/* 로그인 모달창 */}
         <ModalLoginPage
           isOpen={isModalOpen}

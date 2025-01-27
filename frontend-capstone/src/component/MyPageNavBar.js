@@ -20,6 +20,10 @@ const Left = styled.div`
   padding-left: 5%;
   display: flex;
   flex-direction: column;
+
+  @media (max-width:768px) {
+    display: none;
+  }
 `;
 
 const LeftTitle = styled.div`
@@ -100,6 +104,10 @@ const SubTitle5 = styled.div`
 
 const Right = styled.div`
   width: 70%;
+
+  @media (max-width: 768px) {
+    width: 85%;
+  }
 `;
 
 const MyPageNavBar = () => {
