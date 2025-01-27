@@ -20,13 +20,26 @@ const AdminApi = {
 				Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
 			},});
 	},
-	activePermission: (permissionId) => {
+	activePermission: (permissionId, univId, isUniv) => {
 		console.log(`권한 부여 : ${permissionId}`);
-		return axios.get(baseUrl + `/admin/permission/active/${permissionId}`, {
+		return axios.get(baseUrl + `/admin/permission/active/${permissionId}/${univId}/${isUniv}`, {
 			headers: {
 				Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
 			},});
 	},
-	
+	getUnivList: () => {
+		console.log("대학 목록 불러오기(대학만)");
+		return axios.get(baseUrl + `/admin/univ/list`, {
+			headers: {
+				Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
+			},});
+	},
+	getDeptList: (univName) => {
+		console.log(`${univName}의 학과 조회`);
+		return axios.get(baseUrl + `/admin/dept/list/${univName}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},})
+	}
 }
 export default AdminApi;

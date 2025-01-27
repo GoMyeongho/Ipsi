@@ -1,12 +1,49 @@
-import { useContext, useEffect } from "react";
-import { Box, Paper, Typography, Stack, CircularProgress } from "@mui/material";
+import {useContext, useEffect, useState} from "react";
+import {Box, Paper, Typography, Stack, CircularProgress, Button, Tooltip} from "@mui/material";
 import { PermissionContext } from "../../../../context/admin/PermissionStore";
 import PermissionApi from "../../../../api/AdminApi";
 import PermissionDetailDesc from "./PermissionDetailDesc";
-import PermissionDetailPdf from "./PermissionDetailPdf"; // Pdf 컴포넌트 예시
+import PermissionDetailPdf from "./PermissionDetailPdf";
+import {useParams} from "react-router-dom";
+import RejectModal from "../../../../component/RejectModal";
+import AdminApi from "../../../../api/AdminApi"; // Pdf 컴포넌트 예시
 
 const PermissionDetailMain = () => {
-	const { setPage, setPermission, permission } = useContext(PermissionContext);
+	const { setPage, setPermission, permission, univ, setUnivNameList} = useContext(PermissionContext);
+	const [rejectModal, setRejectModal] = useState(false);
+	const [message, setMessage] = useState("");
+	const {permissionId} = useParams()
+	
+	const onClickPermission = async (isUniv) => {
+		try{
+			if(univ) {
+				const rsp = await PermissionApi.activePermission(permissionId, univ.univId, isUniv)
+				console.log(rsp)
+				return
+			}
+			setMessage("대학이 설정되지 않았습니다.")
+			setRejectModal(true);
+		} catch (error) {
+			setMessage("권한 부여 도중 오류가 발생 했습니다.")
+			console.log(error);
+			setRejectModal(true);
+		}
+	}
+	
+	useEffect(() => {
+		const fetchUniv = async () => {
+			try{
+				const rsp = await AdminApi.getUnivList();
+				if(rsp.status === 200) {
+					console.log(rsp);
+					setUnivNameList(rsp);
+				}
+			} catch (e) {
+				console.error(e)
+			}
+		}
+		fetchUniv();
+	}, []);
 	
 	useEffect(() => {
 		setPage("auth");
@@ -15,7 +52,7 @@ const PermissionDetailMain = () => {
 	useEffect(() => {
 		const getPermissionDetails = async () => {
 			try {
-				const rsp = await PermissionApi.getPermissionDetails();
+				const rsp = await PermissionApi.getPermissionDetails(permissionId);
 				console.log(rsp);
 				setPermission(rsp.data);
 			} catch (error) {
@@ -50,15 +87,26 @@ const PermissionDetailMain = () => {
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
 					{/* PDF 컴포넌트 */}
 					<Paper elevation={2} sx={{ padding: 2 }}>
-						<PermissionDetailPdf />
+						{/*<PermissionDetailPdf />*/}
+						<Button href={permission.permissionUrl}>파일보기</Button>
 					</Paper>
 					
 					{/* 권한 정보 */}
 					<Paper elevation={2} sx={{ padding: 2 }}>
 						<PermissionDetailDesc />
 					</Paper>
+					{/* 권한 버튼 */}
+					<Paper elevation={2} sx={{ padding: 2 }}>
+						<Tooltip title="해당 대학에 합격했음만 인증합니다.">
+							<Button onClick={() => onClickPermission(false)}>합격</Button>
+						</Tooltip>
+						<Tooltip title="해당 대학에 재학중임을 인증합니다.">
+							<Button onClick={() => onClickPermission(true)}>대학</Button>
+						</Tooltip>
+					</Paper>
 				</Box>
 			</Paper>
+			<RejectModal message={message} open={rejectModal} onClose={() => setRejectModal(false)} />
 		</Box>
 	);
 };

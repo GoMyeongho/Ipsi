@@ -1,5 +1,5 @@
 import {createContext, useState} from "react";
-import App from "../../App";
+
 
 export const PermissionContext = createContext(null);
 
@@ -8,10 +8,12 @@ const PermissionStore = ({children}) => {
 	const [permissionList, setPermissionList] = useState([])
 	const [permissionCategory, setPermissionCategory] = useState("INACTIVE");
 	const [page, setPage] = useState("main");
-	
+	const [univ, setUniv] = useState({})
+	const [univList, setUnivList] = useState([]);
+	const [univNameList, setUnivNameList] = useState([]);
 	return (
 		<PermissionContext.Provider value={{permission, permissionList, setPermission, setPermissionList
-			, permissionCategory, setPermissionCategory, page, setPage}}>
+			, permissionCategory, setPermissionCategory, page, setPage, univ, setUniv, univList, setUnivList, univNameList, setUnivNameList}}>
 			{children}
 		</PermissionContext.Provider>
 	)

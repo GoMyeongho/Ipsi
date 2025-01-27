@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Box } from "@mui/material";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import { TextContext } from "../../../../context/TextStore"; // context 사용
 import TextBoardApi from "../../../../api/TextBoardApi";
 
@@ -12,7 +12,7 @@ const PostListMain = () => {
 	// context에서 상태 가져오기
 	const { size, page, setPage, postList, setPostList, maxPage, setMaxPage, setSearch, setSearchOption } = useContext(TextContext);
 	
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 	const { category, search, searchOption } = useParams(); // URL 파라미터에서 검색어와 검색옵션 가져오기
 	
 	// URL에서 search와 searchOption을 추출하고, context 상태를 업데이트
@@ -29,12 +29,12 @@ const PostListMain = () => {
 	useEffect(() => {
 		const fetchMaxPage = async () => {
 			try {
-				const rsp = search
-					? search === "title"
+				const rsp = searchOption
+					? searchOption === "title"
 						? await TextBoardApi.getAllTextBoardPageByTitle(search, category, size)
-						: search === "nickName"
+						: searchOption === "nickName"
 							? await TextBoardApi.getAllTextBoardPageByNickName(search, category, size)
-								: await TextBoardApi.getAllTextBoardPageByTitleOrContent(search, category, size)
+							: await TextBoardApi.getAllTextBoardPageByTitleOrContent(search, category, size)
 					: await TextBoardApi.getAllTextBoardPage(category, size);
 				setMaxPage(rsp.data);
 			} catch (error) {
@@ -48,13 +48,14 @@ const PostListMain = () => {
 	useEffect(() => {
 		const fetchPostList = async () => {
 			try {
-				const rsp = search
-					? search === "title"
-						? await TextBoardApi.getAllTextBoardListByTitle(search, category, page, size)
-						: search === "nickName"
-							? await TextBoardApi.getAllTextBoardListByNickName(search, category, page, size)
-								: await TextBoardApi.getAllTextBoardListByTitleOrContent(search, category, page, size)
-					: await TextBoardApi.getAllTextBoardList(category, page, size);
+				const rsp = searchOption
+					? searchOption === "title"
+						? await TextBoardApi.getAllTextBoardListByTitle(search, category, page, size, "desc")
+						: searchOption === "nickName"
+							? await TextBoardApi.getAllTextBoardListByNickName(search, category, page, size, "desc")
+							: await TextBoardApi.getAllTextBoardListByTitleOrContent(search, category, page, size, "desc")
+					: await TextBoardApi.getAllTextBoardList(category, page, size, "desc");
+				console.log(rsp);
 				setPostList(rsp.data);
 			} catch (error) {
 				console.error("Error fetching post list:", error);
