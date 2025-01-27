@@ -247,21 +247,26 @@ public class TextBoardService {
 		textBoardResDto.setBoardId(textBoard.getTextId());
 		textBoardResDto.setTitle(textBoard.getTitle());
 		textBoardResDto.setContent(textBoard.getContent());
-		textBoardResDto.setRegDate(textBoard.getRegDate());
-		textBoardResDto.setNickName(textBoard.getMember().getNickName());
 		textBoardResDto.setTextCategory(textBoard.getTextCategory());
+		if(!textBoard.getTextCategory().equals(TextCategory.FAQ)){
+			textBoardResDto.setRegDate(textBoard.getRegDate());
+			textBoardResDto.setNickName(textBoard.getMember().getNickName());
+		}
 		return textBoardResDto;
 	}
 	// TextBoard 객체를 TextBoardListResDto로 바꿔주는 메서드
 	private List<TextBoardListResDto> boardToBoardListResDto(List<TextBoard> textBoardList) {
 		List<TextBoardListResDto> textBoardListResDtoList = new ArrayList<>();
+		log.warn("호출 : {}",textBoardList.size());
 		for (TextBoard textBoard : textBoardList) {
 			TextBoardListResDto textBoardListResDto = new TextBoardListResDto();
 			textBoardListResDto.setBoardId(textBoard.getTextId());
 			textBoardListResDto.setTitle(textBoard.getTitle());
-			textBoardListResDto.setNickName(textBoard.getMember().getNickName());
-			textBoardListResDto.setRegDate(textBoard.getRegDate());
-			textBoardListResDto.setSummary(getSummaryWithEllipsis(textBoard.getContent()));
+			if(!textBoard.getTextCategory().equals(TextCategory.FAQ)){
+				textBoardListResDto.setNickName(textBoard.getMember().getNickName());
+				textBoardListResDto.setRegDate(textBoard.getRegDate());
+				textBoardListResDto.setSummary(getSummaryWithEllipsis(textBoard.getContent()));
+			}
 			textBoardListResDtoList.add(textBoardListResDto);
 		}
 		return textBoardListResDtoList;
@@ -271,14 +276,17 @@ public class TextBoardService {
 		return content.length() > 20 ? content.substring(0, 20) + "..." : content;
 	}
 	
-	private Pageable getPageable(int page, int size, String sort) {
+	private PageRequest getPageable(int page, int size, String sort) {
+		log.warn("페이지 객체 호출");
+		if (sort == null || (!sort.equals("asc") && !sort.equals("desc"))) {
+			log.warn("정렬 기준이 잘못되었습니다. 기본값(내림차순)을 사용합니다. sort : {}", sort);
+			sort = "desc";  // 기본값으로 내림차순을 설정
+		}
+		
 		return switch (sort) {
-			case "asc" -> PageRequest.of(page, size, Sort.by(Sort.Order.asc("text_reg_date"))); // 오름차순 정렬
-			case "desc" -> PageRequest.of(page, size, Sort.by(Sort.Order.desc("text_reg_date"))); // 내림차순 정렬
-			default -> {
-				log.warn("값이 제대로 들어 오지 않았습니다. sort : {}", sort);
-				yield null;
-			}
+			case "asc" -> PageRequest.of(page, size, Sort.by(Sort.Order.asc("regDate"))); // 정렬 기준을 regDate로 수정
+			case "desc" -> PageRequest.of(page, size, Sort.by(Sort.Order.desc("regDate"))); // 정렬 기준을 regDate로 수정
+			default -> PageRequest.of(page, size, Sort.by(Sort.Order.desc("regDate"))); // 기본값으로 내림차순
 		};
 	}
 }

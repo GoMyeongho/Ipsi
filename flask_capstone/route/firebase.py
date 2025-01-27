@@ -53,6 +53,10 @@ def upload_file():
         # 파일 받기
         file = request.files["file"]
         folder_path = request.form["folderPath"]
+        file_name = request.form["fileName"]
+
+        if file_name != "":
+            file.filename = file_name
 
         # Firebase Storage 경로 설정
         firebase_file_path = f"{folder_path}/{file.filename}".replace("\\", "/")

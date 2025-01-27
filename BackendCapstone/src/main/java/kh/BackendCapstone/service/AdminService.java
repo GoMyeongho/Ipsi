@@ -3,8 +3,12 @@ package kh.BackendCapstone.service;
 
 import kh.BackendCapstone.constant.Active;
 import kh.BackendCapstone.dto.response.PermissionResDto;
+import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.Permission;
+import kh.BackendCapstone.entity.Univ;
+import kh.BackendCapstone.repository.MemberRepository;
 import kh.BackendCapstone.repository.PermissionRepository;
+import kh.BackendCapstone.repository.UnivRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminService {
 	private final PermissionRepository permissionRepository;
+	private final UnivRepository univRepository;
+	private final MemberRepository memberRepository;
 	
 	public PermissionResDto getPermission(Long id) {
 		try {
@@ -45,12 +51,20 @@ public class AdminService {
 	
 	
 	@Transactional
-	public boolean activatePermission(Long id) {
+	public boolean activatePermission(Long permissionId, Long univId, boolean isUniv) {
 		try{
-			Permission permission = permissionRepository.findByPermissionId(id)
+			Permission permission = permissionRepository.findByPermissionId(permissionId)
 				.orElseThrow(() -> new RuntimeException("해당 권한 설정이 없습니다."));
+			Univ univ = univRepository.findById(univId)
+				.orElseThrow(() -> new RuntimeException("해당 대학이 존재하지 않습니다."));
 			permission.setActive(Active.ACTIVE);
 			permission.setActiveDate(LocalDateTime.now());
+			permission.setUniv(univ);
+			if (isUniv) {
+				Member member = permission.getMember();
+				member.setUniv(univ);
+				memberRepository.save(member);
+			}
 			log.warn("권한 설정 변경 : {}", permission);
 			return permissionSave(permission);
 		} catch (Exception e) {
@@ -58,10 +72,6 @@ public class AdminService {
 			return false;
 		}
 	}
-	
-	
-	
-	
 	
 	public boolean permissionSave(Permission permission) {
 		try {
@@ -75,6 +85,27 @@ public class AdminService {
 		}
 	}
 	
+	public List<String> getUnivList() {
+		try {
+			List<String> univList = univRepository.findDistinctColumn();
+			log.warn("대학 이름 전체 조회 결과 : {}", univList);
+			return univList;
+		} catch (Exception e) {
+			log.error("전체 대학 조회중 오류 : {}", e.getMessage());
+			return null;
+		}
+	}
+	
+	public List<Univ> getDeptList(String univName) {
+		try {
+			List<Univ> univList = univRepository.findByUnivName(univName);
+			log.warn("학과 조회 결과 : {}", univList);
+			return univList;
+		} catch (Exception e) {
+			log.error("학과 조회중 오류 : {}", e.getMessage());
+			return null;
+		}
+	}
 	
 	public PermissionResDto convertEntityToDto(Permission permission) {
 		PermissionResDto dto = new PermissionResDto();
