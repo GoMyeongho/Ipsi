@@ -19,11 +19,8 @@ public class PsWrite {
 	@JoinColumn(name = "member_id")
 	private Member member;
 	
-	@Column(name = "ps_title")
-	private String title;
-	
-	@Column(name = "ps_content")
-	private String content;
+	@Column(name = "pa_name")
+	private String psName;
 	
 	@Column(name = "ps_reg_date")
 	private LocalDateTime regDate;
