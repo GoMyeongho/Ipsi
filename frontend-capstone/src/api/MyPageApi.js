@@ -2,15 +2,12 @@ import axios from "axios";
 import Commons from "../util/Common";
 
 const baseUrl = Commons.Capstone
-
 const MyPageApi = {
-
-    // memberGetInfo : async ()=>{
+  // memberGetInfo : async ()=>{
   //   const res = await Commons.getTokenByMemberId();
   //   id = res.data
   //   return await axios.get(`${Capstone}/auth/login/${id}`);
   // },
-
   // 자소서/생기부 업로드 API
   saveCoverLetterRegister: async (formData) => {
     const res = await Commons.getTokenByMemberId();
@@ -64,8 +61,8 @@ const MyPageApi = {
     
     try {
       const response = await axios.get(baseUrl + `/pay/purchasedEnumPS`, {
-        params: { 
-          memberId: memberId, 
+        params: {
+          memberId: memberId,
           fileCategory: fileCategory,  // category도 파라미터로 전달
           status: "COMPLETED"
         }
@@ -89,10 +86,10 @@ const MyPageApi = {
     
     try {
       const response = await axios.get(baseUrl + `/pay/purchasedEnumSR`, {
-        params: { 
-          memberId: memberId, 
+        params: {
+          memberId: memberId,
           fileCategory: fileCategory,  // category도 파라미터로 전달
-             status: "COMPLETED"
+          status: "COMPLETED"
         }
       });
       console.log('API 응답:', response);  // 응답 데이터 로깅
@@ -114,8 +111,8 @@ const MyPageApi = {
     
     try {
       const response = await axios.get(baseUrl + `/file/uploadedEnumPS`, {
-        params: { 
-          memberId: memberId, 
+        params: {
+          memberId: memberId,
           fileCategory: fileCategory  // category도 파라미터로 전달
         }
       });
@@ -138,8 +135,8 @@ const MyPageApi = {
     
     try {
       const response = await axios.get(baseUrl + `/file/uploadedEnumSR`, {
-        params: { 
-          memberId: memberId, 
+        params: {
+          memberId: memberId,
           fileCategory: fileCategory  // category도 파라미터로 전달
         }
       });
@@ -150,7 +147,5 @@ const MyPageApi = {
       throw error;
     }
   },
-
 };
-
 export default MyPageApi;
