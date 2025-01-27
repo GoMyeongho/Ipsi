@@ -147,7 +147,7 @@ const MyPageApi = {
       return response;
     } catch (error) {
       console.error('API 호출 중 오류 발생:', error);
-      throw error;
+      throw error;//
     }
   },
 
