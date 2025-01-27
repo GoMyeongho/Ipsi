@@ -37,7 +37,7 @@ public class FileBoard {
 
 	@Column(name = "Keywords")
 	private String Keywords;
-	
+
 	@PrePersist
 	public void prePersist() {
 		regDate = LocalDateTime.now();

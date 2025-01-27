@@ -14,10 +14,25 @@ import java.time.LocalDateTime;
 
 public class PayResDto {
 
+    // pay TB
     private Long payId;
-    private String fileTitle;
-    private String univName;
-    private String univDept;
     private int price;
     private LocalDateTime purchaseDate;
+    private String status;
+
+    // fileBoard TB
+    private Long fileId;
+    private String fileTitle;
+    private String mainFile;
+    private String preview;
+    private String keywords;
+    private String summary;
+    private LocalDateTime regDate;
+    private String memberName;
+
+    // univ TB
+    private String univImg;
+    private String univName;
+    private String univDept;
+
 }

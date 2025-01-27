@@ -166,6 +166,9 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
   const [isFindIdModalOpen, setIsFindIdModalOpen] = useState(false);
   const [isFindPwModalOpen, setIsFindPwModalOpen] = useState(false);
 
+  // 로그인시 MainPage 이동(로그인시 자료구매현황을 확인해서 구매한자료인지 아닌지 파악하기위함)
+  const navigate = useNavigate();
+
   const handleInputChange = (e, setState) => {
     setState(e.target.value);
   };
@@ -182,6 +185,7 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
         Commons.setRefreshToken(res.data.refreshToken);
         setIsLoggedIn(true)
         closeModal();
+        navigate("/");
       } else {
         console.log("잘못된 아이디 또는 비밀번호 입니다.");
         // setModalMsg("잘못된 아이디 또는 비밀번호 입니다.");

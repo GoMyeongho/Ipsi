@@ -76,7 +76,7 @@ function App() {
               <Route path="list/:category/:search?/:searchOption?" element={<PostListMain />} />
               <Route path="detail/:id" element={<PostItemMain />} />
             </Route>
-            <Route path='auth/oauth-response/:token/:expirationTime' element={<OAuth/>}/>
+            <Route path='auth/oauth-response/:token/:expirationTime' element={<OAuth/>}/>            
           </Route>
             {/* 결제 관련 페이지 */}
             <Route path="checkoutPage" element={<CheckoutPage />} />

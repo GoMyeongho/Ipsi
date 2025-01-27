@@ -31,24 +31,26 @@ public class PayController {
     // 결제 완료 처리 메서드 (orderId로 결제 완료 처리)
     @PostMapping("/complete/{orderId}")
     public void completePayment(@PathVariable String orderId) {
-        log.info(orderId);
+//        log.info(orderId);
         payService.completePayment(orderId); // service에서 결제 완료 처리
     }
 
     // 구매한 자소서 내역 확인
     @GetMapping("/purchasedEnumPS")
     public List<PayResDto> getPurchasedPSItems(      @RequestParam Long memberId,
-                                                   @RequestParam("fileCategory") FileCategory fileCategory) {
+                                                   @RequestParam("fileCategory") FileCategory fileCategory,
+                                                     @RequestParam String status) {
 //        log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
-        return payService.getPurchasedData(memberId, fileCategory);
+        return payService.getPurchasedData(memberId, fileCategory, status);
     }
 
     // 구매한 생기부 내역 확인
     @GetMapping("/purchasedEnumSR")
     public List<PayResDto> getPurchasedISRtems(      @RequestParam Long memberId,
-                                                   @RequestParam("fileCategory") FileCategory fileCategory) {
+                                                   @RequestParam("fileCategory") FileCategory fileCategory,
+                                                     @RequestParam String status) {
 //        log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
-        return payService.getPurchasedData(memberId, fileCategory);
+        return payService.getPurchasedData(memberId, fileCategory, status);
     }
 
 }

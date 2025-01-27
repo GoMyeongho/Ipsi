@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DocumentsApi from "../api/DocumentsApi";
 
 const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
@@ -95,6 +95,12 @@ export function CheckoutPage() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const goBack = () => {
+    navigate(-1);  // 이전 페이지로 돌아가기
+  };
+
   return (
     <div className="wrapper w-100">
       <div className="max-w-540 w-100">
@@ -112,6 +118,7 @@ export function CheckoutPage() {
           >
             결제하기
           </button>
+          <button className="btn primary w-100" onClick={goBack}>뒤로가기</button>
         </div>
       </div>
     </div>
