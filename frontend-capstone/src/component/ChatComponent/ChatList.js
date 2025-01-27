@@ -1,11 +1,10 @@
 import styled from "styled-components";
-import { ChatTitle } from "../ChatComponent/ChatMenuBar";
+import { ChatTitle } from "./ChatMenuBar";
 import React, { useContext, useEffect, useState } from "react";
 import Commons from "../../util/Common";
 import { ChatContext } from "../../context/ChatStore";
 import ChattingApi from "../../api/ChattingApi";
 import axiosApi from "../../api/AxiosApi";
-import axios from "axios";
 
 const ChatListBg = styled.div`
     width: 100%;
@@ -48,7 +47,7 @@ const ChatList = ({ setSelectedPage }) => {
     const {setRoomId} = useContext(ChatContext);
     const [loggedInUser, setLoggedInUser] = useState(null);
 
-    // 서버로부터 채팅방 목록을 가져오는 API
+/*    // 서버로부터 채팅방 목록을 가져오는 API
     const fetchChatRooms = async() => {
         try {
             const response = await ChattingApi.chatList();
@@ -57,37 +56,36 @@ const ChatList = ({ setSelectedPage }) => {
         } catch (e) {
             console.log(e); // 서버와의 통신 실패 예외 처리
         }
+    };*/
+
+    // 토큰에서 memberId를 가져오는 로직
+    const fetchMemberIdFromToken = async () => {
+        try {
+            const response = await Commons.getTokenByMemberId();
+            const memberId = response.data; // 서버에서 반환한 memberId
+            console.log("로그인 한 memberId:", memberId);
+            setLoggedInUser(memberId);
+            fetchChatRoomsForUser(memberId); // memberId로 채팅방 리스트 가져오기
+        } catch (e) {
+            console.error("Failed to fetch memberId from token:", e);
+        }
     };
 
-    const checkLoginAndFilterRooms = async () => {
+    // memberId와 관련된 채팅방 목록 가져오기
+    const fetchChatRoomsForUser = async (memberId) => {
         try {
-            const isLoginResponse = await Commons.IsLogin();
-            console.log("isLoginResponse data : {}", isLoginResponse.data);
-            if (isLoginResponse.data && isLoginResponse.data.userID) {
-                setLoggedInUser(isLoginResponse.data.userID); // 현재 로그인한 사용자 아이디 저장
-            } else {
-                setLoggedInUser(null);
-            }
-
-            // 로그인한 사용자가 들어간 채팅방만 필터링
-            if (loggedInUser) {
-                const filteredRooms = chatRooms.filter(room => room.participants.some(p => p.userId === loggedInUser));
-                setChatRooms(filteredRooms);
-            }
-        } catch (e) {
-            console.log("IsLogin failed:", e);
+            const rooms = await ChattingApi.getMyChatRoom(memberId);
+            console.log("Fetched Chat Rooms for Member:", rooms);
+            setChatRooms(rooms);
+        } catch (error) {
+            console.error("Error fetching chat rooms for user:", error);
         }
     };
 
     // 처음 화면이 나타나는 시점에 서버로부터 정보를 가져옴
     useEffect(() => {
-        fetchChatRooms();
+        fetchMemberIdFromToken();
     }, []);
-
-    // 채팅방이 변경될 때마다 로그인 상태와 필터링 적용
-    useEffect(() => {
-        checkLoginAndFilterRooms();
-    }, [chatRooms]);
 
     // 채팅방 이동
     const enterChatRoom = (roomId) => {

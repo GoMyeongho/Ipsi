@@ -21,8 +21,8 @@ public class ChatRoomResDto {
     private String roomId;
     private String name;
     private LocalDateTime regDate;
-    private ChatRoomType roomType = ChatRoomType.PRIVATE; // 기본값 설정
-    private int personCnt; // 참여 가능 인원 필드 추가
+    private ChatRoomType roomType = ChatRoomType.GROUP; // 기본값 설정
+    private Integer personCnt; // 참여 가능 인원 필드 추가
 
     @JsonIgnore // 웹소켓 세션의 직렬화 방지
     private Set<WebSocketSession> sessions = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -33,10 +33,11 @@ public class ChatRoomResDto {
     }
 
     @Builder    // 빌더 패턴 적용
-    public ChatRoomResDto(String roomId, String name, LocalDateTime regDate) {
+    public ChatRoomResDto(String roomId, String name, LocalDateTime regDate, Integer personCnt) {
         this.roomId = roomId;
         this.name = name;
         this.regDate = regDate;
+        this.personCnt = personCnt;
         this.sessions = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 }

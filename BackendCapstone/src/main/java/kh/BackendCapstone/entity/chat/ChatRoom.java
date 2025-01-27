@@ -42,14 +42,14 @@ public class ChatRoom {
     private List<ChatMember> chatMember = new ArrayList<>();
 
     // 채팅방 최대 멤버 수 설정
-    @Column(name = "max_members", nullable = false)
-    private int maxMembers; // 최대 입장 가능 인원
+    @Column(name = "person_cnt", nullable = false)
+    private Integer personCnt; // 최대 입장 가능 인원
 
     // 기본값 설정
     @PrePersist
     public void prePersist() {
         if (this.roomType == null) {
-            this.roomType = ChatRoomType.PRIVATE;
+            this.roomType = ChatRoomType.GROUP;
         }
     }
 }
