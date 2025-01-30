@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import {Title} from "../../pages/categoryEnumPS/PersonalStatementWrite";
-import {useCallback, useRef, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
+import PsWriteApi from "../../api/PsWriteApi";
+import Commons from "../../util/Common";
 
 const WriteFormBg = styled.div`
     width: 70%;
@@ -12,11 +13,11 @@ const FormTitle = styled.input`
     font-size: 1.2em;
     font-weight: bold;
     border: none;
-    //border-bottom: 1px solid #aaa;
     padding: 1vw 0;
     margin: 2vw 0;
     outline: none;
-    white-space: ;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     &:focus {
         border-bottom: 1px solid #6154D4;
     }
@@ -61,6 +62,11 @@ const CharacterCount = styled.span`
     margin: 1vw;
 `;
 
+const NumBox = styled.div`
+    display: flex;
+    gap: 1vw;
+`
+
 export const BtnBox = styled.div`
     display: flex;
     justify-content: flex-end;
@@ -90,8 +96,8 @@ export const BtnBox = styled.div`
 const Pagination = styled.div`
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    margin-bottom: 2vw;
     button {
         width: 40px;
         height: 40px;
@@ -109,18 +115,44 @@ const Pagination = styled.div`
 `;
 
 const WriteForm = () => {
+    const [loggedInUser, setLoggedInUser] = useState(null);
     const [sections, setSections] = useState([{ id: 1, title: "", content: "" },]);
     const [activeSection, setActiveSection] = useState(1);
-    const [formTitle, setFormTitle] = useState("새 자기소개서");
+    const [psName, setPsName] = useState("새 자기소개서");
+/*    const [psTitle, setPsTitle] = useState("");
+    const [psContent, setPsContent] = useState("");
 
+    const [suggestions, setSuggestions] = useState("");
+    const [correctedText, setCorrectedText] = useState('');*/
+
+
+    // 토큰에서 memberId를 가져오는 로직
+    const fetchMemberIdFromToken = async () => {
+        try {
+            const response = await Commons.getTokenByMemberId();
+            const memberId = response.data; // 서버에서 반환한 memberId
+            console.log("로그인 한 memberId:", memberId);
+            setLoggedInUser(memberId);
+        } catch (e) {
+            console.error("Failed to fetch memberId from token:", e);
+        }
+    };
+
+    // 컴포넌트 마운트 시 memberId 가져오기
+    useEffect(() => {
+        fetchMemberIdFromToken();
+    }, []);
+
+    // 항목 추가
     const handleAddSection = () => {
         setSections((prev) => [
             ...prev,
-            { id: prev.length + 1, title: "", content: "" },
+            { id: prev.length + 1, psTitle: "", psContent: "" },
         ]);
         setActiveSection(sections.length + 1); // 새 섹션으로 이동
     };
 
+    // 항목 삭제
     const handleRemoveSection = () => {
         if (sections.length > 1) {
             setSections((prev) => prev.slice(0, -1));
@@ -128,53 +160,92 @@ const WriteForm = () => {
         }
     };
 
+    // 문항 입력
     const handleTitleChange = (id, value) => {
         setSections((prev) =>
             prev.map((section) =>
-                section.id === id ? { ...section, title: value } : section
+                section.id === id ? { ...section, psTitle: value } : section
             )
         );
     };
 
+    // 내용 입력
     const handleContentChange = (id, value) => {
         setSections((prev) =>
             prev.map((section) =>
-                section.id === id ? { ...section, content: value } : section
+                section.id === id ? { ...section, psContent: value } : section
             )
         );
     };
 
+    // 바이트 계산
     const calculateBytes = (text) => {
         const encoder = new TextEncoder(); // UTF-8 기반
         return encoder.encode(text).length;
     };
+
+    // 맞춤법 검사
+/*    const handleSpellCheck = async () => {
+        const result = await PsWriteApi.checkSpelling(content);
+        setCorrectedText(result);
+    };*/
 
     const handleResizeHeight = useCallback((ref) => {
         ref.style.height = "auto";
         ref.style.height = ref.scrollHeight + "px";
     }, []);
 
-    const currentSection = sections.find((section) => section.id === activeSection);
+    const currentSection = sections.find((section) => section.id === activeSection) || { psTitle: "", psContent: "" };
+
+    // 데이터 저장 요청
+    const psSave = async () => {
+        if (!loggedInUser) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("memberId", loggedInUser);
+        formData.append("ps_name", psName);
+
+        sections.forEach((section, index) => {
+            formData.append(`sections[${index}].psTitle`, section.psTitle);
+            formData.append(`sections[${index}].psContent`, section.psContent);
+        });
+
+        console.log("저장할 데이터 : ", [...formData]);
+
+        try {
+            const response = await PsWriteApi.savePS(formData);
+            alert("자기소개서가 저장되었습니다!");
+            console.log(response);
+        } catch (error) {
+            alert("저장에 실패했습니다.");
+            console.error("저장 실패:", error);
+        }
+    };
 
     return (
         <>
             <WriteFormBg>
                 <FormTitle
                     type="text"
-                    value={formTitle}
-                    onChange={(e) => setFormTitle(e.target.value)}
+                    value={psName}
+                    onChange={(e) => setPsName(e.target.value)}
                     placeholder="자기소개서 이름을 입력하세요"
                 />
                 <Pagination>
-                    {sections.map((section) => (
-                        <button
-                            key={section.id}
-                            className={section.id === activeSection ? "active" : ""}
-                            onClick={() => setActiveSection(section.id)}
-                        >
-                            {section.id}
-                        </button>
-                    ))}
+                    <NumBox>
+                        {sections.map((section) => (
+                            <button
+                                key={section.id}
+                                className={section.id === activeSection ? "active" : ""}
+                                onClick={() => setActiveSection(section.id)}
+                            >
+                                {section.id}
+                            </button>
+                        ))}
+                    </NumBox>
                     <BtnBox>
                         <button onClick={handleAddSection}>+</button>
                         <button onClick={handleRemoveSection}>﹣</button>
@@ -184,7 +255,7 @@ const WriteForm = () => {
                     <div>
                         <PsTextArea
                             placeholder="문항을 입력하세요."
-                            value={currentSection.title}
+                            value={currentSection.psTitle || ""}
                             onInput={(e) => handleResizeHeight(e.target)}
                             onChange={(e) =>
                                 handleTitleChange(currentSection.id, e.target.value)
@@ -192,23 +263,24 @@ const WriteForm = () => {
                         />
                         <PsTextArea
                             placeholder="내용을 입력하세요."
-                            value={currentSection.content}
+                            value={currentSection.psContent || ""}
                             onInput={(e) => handleResizeHeight(e.target)}
                             onChange={(e) =>
                                 handleContentChange(currentSection.id, e.target.value)
                             }
                         />
                         <CharacterCount>
-                            글자 수: {currentSection.content.length}자 (공백 제외:{" "}
-                            {currentSection.content.replace(/\s+/g, "").length}자), 바이트:{" "}
-                            {calculateBytes(currentSection.content)} bytes)
+                            글자 수: {currentSection?.psContent?.length || 0}자 (공백 제외:{" "}
+                            {currentSection?.psContent?.replace(/\s+/g, "").length || 0}자), 바이트:{" "}
+                            {calculateBytes(currentSection?.psContent || "")} bytes)
                         </CharacterCount>
+{/*                        <button onClick={handleSpellCheck}>맞춤법 검사</button>
+                        {correctedText && <p>수정된 텍스트: {correctedText}</p>}*/}
                     </div>
                 )}
-
                 <BtnBox>
                     <button className="cancel">불러오기</button>
-                    <button className="submit" type={"submit"}>저장</button>
+                    <button className="submit" type={"submit"} onClick={psSave}>저장</button>
                 </BtnBox>
             </WriteFormBg>
         </>
