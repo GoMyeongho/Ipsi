@@ -1,6 +1,5 @@
 package kh.BackendCapstone.service.chat;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kh.BackendCapstone.dto.chat.ChatMsgDto;
 import kh.BackendCapstone.dto.chat.ChatRoomReqDto;
@@ -223,7 +222,7 @@ public class ChatService {
         }
     }
 
-    //채팅 메세지 데이터베이스 저장하기
+    // 채팅 메세지 DB 저장
     public void saveMsg(String roomId, String nickName, String msg, String profile) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("해당 채팅방이 존재하지 않습니다."));
         Chat chatMsg = new Chat();
@@ -237,7 +236,7 @@ public class ChatService {
         log.warn("DB에 채팅 저장");
     }
 
-    //ChatRoom 엔티티를 dto로 변환
+    // ChatRoom 엔티티 Dto로 변환
     private ChatRoomResDto convertEntityToRoomDto(ChatRoom chatRoom) {
         ChatRoomResDto chatRoomResDto = new ChatRoomResDto();
         chatRoomResDto.setRoomId(chatRoom.getRoomId());
@@ -248,7 +247,7 @@ public class ChatService {
         return chatRoomResDto;
     }
 
-    //Chat 엔티티 dto로 변환
+    // Chat 엔티티 Dto로 변환
     private ChatMsgDto convertEntityToChatDto(Chat chat) {
         ChatMsgDto chatMsgDto = new ChatMsgDto();
         chatMsgDto.setId(chat.getChatId());

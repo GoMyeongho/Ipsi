@@ -2,7 +2,6 @@ import styled from "styled-components";
 import WriteForm from "../../component/PSWriteComponent/WriteForm";
 import BuyPS from "../../component/PSWriteComponent/BuyPS";
 
-
 const Background = styled.div`
   width: 100%;
   height: 100%;
@@ -62,13 +61,9 @@ const PersonalStatementWrite = () => {
   return(
     <>
       <Background>
-{/*        <Top>
-          <Title>자기소개서 작성</Title>
-        </Top>*/}
         <Top>
           <Title>자기소개서 작성</Title>
         </Top>
-        {/*<Line/>*/}
         <Middle>
           <MiddleBox>
             <WriteForm/>
