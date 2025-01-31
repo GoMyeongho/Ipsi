@@ -48,6 +48,7 @@ public class PsWriteService {
             psContents.setPsWrite(psWrite);
             psContents.setPsTitle(contentDto.getPsTitle());
             psContents.setPsContent(contentDto.getPsContent());
+            psContents.setSectionsNum(contentDto.getSectionsNum());
             return psContents;
         }).collect(Collectors.toList());
 
@@ -57,40 +58,6 @@ public class PsWriteService {
         PsWrite savedPsWrite = psWriteRepository.save(psWrite);
 
         // 저장된 데이터 DTO 변환 및 반환
-        return convertToDto(savedPsWrite);
-    }
-
-    @Transactional
-    public PsWriteResDto updatePsWrite(Long psWriteId, PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> contentsReqDtoList) {
-        // 기존 자기소개서 찾기
-        PsWrite psWrite = psWriteRepository.findById(psWriteId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 자기소개서가 존재하지 않습니다."));
-
-        // 자기소개서 이름이 변경되었으면 업데이트
-        if (!psWrite.getPsName().equals(psWriteReqDto.getPsName())) {
-            psWrite.setPsName(psWriteReqDto.getPsName());
-        }
-
-        // 기존 항목들을 업데이트
-        List<PsContents> psContentsList = psContentsRepository.findByPsWrite(psWrite);
-        Map<Long, PsContents> contentMap = psContentsList.stream()
-                .collect(Collectors.toMap(PsContents::getPsContentsId, content -> content));
-
-        for (PsContentsReqDto contentDto : contentsReqDtoList) {
-            PsContents existingContent = contentMap.get(contentDto.getPsContentsId());
-            if (existingContent != null) {
-                // 항목 제목 및 내용을 비교하여 변경된 경우만 업데이트
-                if (!existingContent.getPsTitle().equals(contentDto.getPsTitle())) {
-                    existingContent.setPsTitle(contentDto.getPsTitle());
-                }
-                if (!existingContent.getPsContent().equals(contentDto.getPsContent())) {
-                    existingContent.setPsContent(contentDto.getPsContent());
-                }
-            }
-        }
-
-        // 저장된 데이터 DTO 변환 및 반환
-        PsWrite savedPsWrite = psWriteRepository.save(psWrite);
         return convertToDto(savedPsWrite);
     }
 

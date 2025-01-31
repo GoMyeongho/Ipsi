@@ -122,6 +122,23 @@ const WriteForm = () => {
     const [initialSections, setInitialSections] = useState([]);
     const [initialPsName, setInitialPsName] = useState("새 자기소개서"); // 초기 psName
 
+    // 자기소개서 불러오기
+    const loadPsWrite = async (psWriteId) => {
+        try {
+            const response = await PsWriteApi.loadPsWrite(loggedInUser, psWriteId);
+            setPsName(response.psName);
+            setSections(response.psContents.map((content, index) => ({
+                id: index + 1,
+                psTitle: content.psTitle,
+                psContent: content.psContent,
+            })));
+            setInitialPsName(response.psName);
+            setInitialSections(response.psContents);
+        } catch (e) {
+            console.error("자기소개서 불러오기 실패:", e);
+        }
+    };
+
     // 토큰에서 memberId를 가져오는 로직
     const fetchMemberIdFromToken = async () => {
         try {
@@ -197,6 +214,14 @@ const WriteForm = () => {
         setInitialSections(sections);
     }, []);
 
+    // 자기소개서 불러오기 버튼 클릭 시 호출
+    const handleLoadPsWrite = async () => {
+        const psWriteId = prompt("불러올 자기소개서 ID를 입력하세요:");
+        if (psWriteId) {
+            await loadPsWrite(psWriteId);
+        }
+    };
+
     // 변경 감지 로직
     const getUpdatedSections = () => {
         return sections.filter((section, index) => {
@@ -218,17 +243,9 @@ const WriteForm = () => {
         formData.append("memberId", loggedInUser);
         formData.append("ps_name", psName);
 
-        // 변경된 섹션만 필터링
-        const updatedSections = getUpdatedSections();
-
-        // 변경된 내용만 서버에 전송
-        updatedSections.forEach((section, index) => {
+        sections.forEach((section, index) => {
             formData.append(`sections[${index}].psTitle`, section.psTitle);
             formData.append(`sections[${index}].psContent`, section.psContent);
-
-            // 기존 psContentsId가 없을 경우, 섹션 번호(index) 사용
-            const psContentsId = section.psContentsId || index;  // index를 psContentsId로 사용
-            formData.append(`sections[${index}].psContentsId`, psContentsId);
         });
 
         console.log("저장할 데이터 : ", [...formData]);
@@ -242,25 +259,13 @@ const WriteForm = () => {
             console.error("저장 실패:", error);
         }*/
 
-/*        try {
+        try {
             const updatedSections = getUpdatedSections();
             if (updatedSections.length === 0 && psName === initialPsName) {
                 alert("변경된 내용이 없습니다.");
                 return;
             }
-            const response = await PsWriteApi.savePS(formData);
-            alert("자기소개서가 저장되었습니다!");
-            console.log(response);
-        } catch (error) {
-            alert("저장에 실패했습니다.");
-            console.error("저장 실패:", error);
-        }*/
-        // 변경된 자기소개서 이름이 있을 경우 전송
-        if (psName !== initialPsName) {
-            formData.append("psNameChanged", true); // 이름 변경 여부
-        }
 
-        try {
             const response = await PsWriteApi.savePS(formData);
             alert("자기소개서가 저장되었습니다!");
             console.log(response);
@@ -270,13 +275,11 @@ const WriteForm = () => {
         }
     };
 
-
-
     return (
         <>
             <WriteFormBg>
                 <button>새 자기소개서</button>
-                <button>불러오기</button>
+                <button onClick={handleLoadPsWrite}>불러오기</button>
                 <FormTitle
                     type="text"
                     value={psName}

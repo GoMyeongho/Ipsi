@@ -31,4 +31,8 @@ public class PsContents {
     // 항목 내용
     @Column(name = "ps_content")
     private String psContent;
+
+    // 항목 번호
+    @Column(name = "sections_num")
+    private Integer sectionsNum;
 }

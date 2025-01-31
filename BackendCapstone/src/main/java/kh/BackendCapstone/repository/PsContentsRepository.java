@@ -9,4 +9,5 @@ import java.util.List;
 public interface PsContentsRepository extends JpaRepository<PsContents,Long> {
     // psWrite 기준으로 psContents 목록 조회
     List<PsContents> findByPsWrite(PsWrite psWrite);
+    void deleteByPsWrite(PsWrite psWrite);
 }

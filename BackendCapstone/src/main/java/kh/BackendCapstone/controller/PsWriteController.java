@@ -23,7 +23,7 @@ import java.util.List;
 public class PsWriteController {
     private final PsWriteService psWriteService;
 
-/*    @PostMapping("/save/{memberId}")
+    @PostMapping("/save/{memberId}")
     public ResponseEntity<PsWriteResDto> savePsWrite(@RequestBody PsWriteDto psWriteDto) {
         try {
             // psWriteDto에서 PsWriteReqDto와 List<PsContentsReqDto> 추출
@@ -35,29 +35,6 @@ public class PsWriteController {
             // 서비스 호출
             PsWriteResDto psWriteResDto = psWriteService.savePsWrite(psWriteReqDto, contentsReqDtoList);
             return ResponseEntity.ok(psWriteResDto);
-        } catch (Exception e) {
-            log.error("Failed to save PsWrite", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }*/
-    @PostMapping("/save/{memberId}")
-    public ResponseEntity<PsWriteResDto> savePsWrite(@RequestBody PsWriteDto psWriteDto) {
-        try {
-            PsWriteReqDto psWriteReqDto = psWriteDto.getPsWriteReqDto();
-            List<PsContentsReqDto> contentsReqDtoList = psWriteDto.getPsContentsReqDtoList();
-
-            // 기존 자기소개서가 있으면 업데이트, 없으면 새로 저장
-            if (psWriteReqDto.getPsWriteId() != null) {
-                PsWriteResDto psWriteResDto = psWriteService.updatePsWrite(
-                        psWriteReqDto.getPsWriteId(),
-                        psWriteReqDto,
-                        contentsReqDtoList
-                );
-                return ResponseEntity.ok(psWriteResDto);
-            } else {
-                PsWriteResDto psWriteResDto = psWriteService.savePsWrite(psWriteReqDto, contentsReqDtoList);
-                return ResponseEntity.ok(psWriteResDto);
-            }
         } catch (Exception e) {
             log.error("Failed to save PsWrite", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
