@@ -3,6 +3,7 @@ package kh.BackendCapstone.controller;
 import kh.BackendCapstone.dto.request.PsContentsReqDto;
 import kh.BackendCapstone.dto.request.PsWriteDto;
 import kh.BackendCapstone.dto.request.PsWriteReqDto;
+import kh.BackendCapstone.dto.response.PsContentsResDto;
 import kh.BackendCapstone.dto.response.PsWriteResDto;
 import kh.BackendCapstone.service.PsWriteService;
 import lombok.RequiredArgsConstructor;
@@ -22,42 +23,41 @@ import java.util.List;
 public class PsWriteController {
     private final PsWriteService psWriteService;
 
-/*    public PsWriteController(PsWriteService psWriteService) {
-        this.psWriteService = psWriteService;
-    }*/
-
-    /*// 자기소개서 저장
-    @PostMapping("/save/{memberId}")
-    public ResponseEntity<PsWriteResDto> savePsWrite(
-            @PathVariable Long memberId,
-*//*            @RequestBody PsWriteReqDto psWriteReqDto,
-            @RequestBody List<PsContentsReqDto> psContentsReqDtoList)*//*
-            @RequestBody PsWriteDto psWriteDto) {
-            log.info("Received memberId: " + memberId);  // 로그 추가
-
+/*    @PostMapping("/save/{memberId}")
+    public ResponseEntity<PsWriteResDto> savePsWrite(@RequestBody PsWriteDto psWriteDto) {
         try {
-            PsWriteResDto psWriteResDto = psWriteService.savePsWrite(
-                    memberId,
-                    psWriteDto.getPsWriteReqDto(),
-                    psWriteDto.getPsContentsReqDtoList()
+            // psWriteDto에서 PsWriteReqDto와 List<PsContentsReqDto> 추출
+            PsWriteReqDto psWriteReqDto = psWriteDto.getPsWriteReqDto();
+            List<PsContentsReqDto> contentsReqDtoList = psWriteDto.getPsContentsReqDtoList();
 
-            );
+            log.info("Received request to save PsWrite: {}", psWriteReqDto);
+
+            // 서비스 호출
+            PsWriteResDto psWriteResDto = psWriteService.savePsWrite(psWriteReqDto, contentsReqDtoList);
             return ResponseEntity.ok(psWriteResDto);
         } catch (Exception e) {
-            log.error("컨트롤러_자기소개서 저장 실패", e);
-//            return ResponseEntity.status(500).body(null);
+            log.error("Failed to save PsWrite", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }*/
-
     @PostMapping("/save/{memberId}")
-    public ResponseEntity<PsWriteResDto> savePsWrite(
-            @RequestBody PsWriteReqDto psWriteReqDto,
-            @RequestBody List<PsContentsReqDto> contentsReqDtoList) {
+    public ResponseEntity<PsWriteResDto> savePsWrite(@RequestBody PsWriteDto psWriteDto) {
         try {
-            log.info("Received request to save PsWrite: {}", psWriteReqDto);
-            PsWriteResDto psWriteResDto = psWriteService.savePsWrite(psWriteReqDto, contentsReqDtoList);
-            return ResponseEntity.ok(psWriteResDto);
+            PsWriteReqDto psWriteReqDto = psWriteDto.getPsWriteReqDto();
+            List<PsContentsReqDto> contentsReqDtoList = psWriteDto.getPsContentsReqDtoList();
+
+            // 기존 자기소개서가 있으면 업데이트, 없으면 새로 저장
+            if (psWriteReqDto.getPsWriteId() != null) {
+                PsWriteResDto psWriteResDto = psWriteService.updatePsWrite(
+                        psWriteReqDto.getPsWriteId(),
+                        psWriteReqDto,
+                        contentsReqDtoList
+                );
+                return ResponseEntity.ok(psWriteResDto);
+            } else {
+                PsWriteResDto psWriteResDto = psWriteService.savePsWrite(psWriteReqDto, contentsReqDtoList);
+                return ResponseEntity.ok(psWriteResDto);
+            }
         } catch (Exception e) {
             log.error("Failed to save PsWrite", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

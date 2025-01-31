@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode
 public class PsContentsReqDto {
+    private Long psContentsId;
     // 항목 제목
     private String psTitle;
 

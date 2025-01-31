@@ -1,21 +1,22 @@
 package kh.BackendCapstone.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
+@Entity
+@Table(name = "ps_contents")
 @Getter
 @Setter
 @ToString
-@Entity
-@Table(name = "ps_contents")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PsContents {
     // 자기소개서 항목 id
     @Id
-    @JoinColumn(name = "ps_contents_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ps_contents_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long psContentsId;
 
     // 자기소개서 id

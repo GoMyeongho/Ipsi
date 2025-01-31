@@ -119,12 +119,8 @@ const WriteForm = () => {
     const [sections, setSections] = useState([{ id: 1, title: "", content: "" },]);
     const [activeSection, setActiveSection] = useState(1);
     const [psName, setPsName] = useState("새 자기소개서");
-/*    const [psTitle, setPsTitle] = useState("");
-    const [psContent, setPsContent] = useState("");
-
-    const [suggestions, setSuggestions] = useState("");
-    const [correctedText, setCorrectedText] = useState('');*/
-
+    const [initialSections, setInitialSections] = useState([]);
+    const [initialPsName, setInitialPsName] = useState("새 자기소개서"); // 초기 psName
 
     // 토큰에서 memberId를 가져오는 로직
     const fetchMemberIdFromToken = async () => {
@@ -178,17 +174,16 @@ const WriteForm = () => {
         );
     };
 
+    // 자기소개서 이름 변경
+    const handlePsNameChange = (e) => {
+        setPsName(e.target.value);
+    };
+
     // 바이트 계산
     const calculateBytes = (text) => {
         const encoder = new TextEncoder(); // UTF-8 기반
         return encoder.encode(text).length;
     };
-
-    // 맞춤법 검사
-/*    const handleSpellCheck = async () => {
-        const result = await PsWriteApi.checkSpelling(content);
-        setCorrectedText(result);
-    };*/
 
     const handleResizeHeight = useCallback((ref) => {
         ref.style.height = "auto";
@@ -196,6 +191,21 @@ const WriteForm = () => {
     }, []);
 
     const currentSection = sections.find((section) => section.id === activeSection) || { psTitle: "", psContent: "" };
+
+    // 기존 상태를 유지하는 useEffect
+    useEffect(() => {
+        setInitialSections(sections);
+    }, []);
+
+    // 변경 감지 로직
+    const getUpdatedSections = () => {
+        return sections.filter((section, index) => {
+            const initialSection = initialSections[index];
+            return !initialSection ||
+                section.psTitle !== initialSection.psTitle ||
+                section.psContent !== initialSection.psContent;
+        });
+    };
 
     // 데이터 저장 요청
     const psSave = async () => {
@@ -208,12 +218,47 @@ const WriteForm = () => {
         formData.append("memberId", loggedInUser);
         formData.append("ps_name", psName);
 
-        sections.forEach((section, index) => {
+        // 변경된 섹션만 필터링
+        const updatedSections = getUpdatedSections();
+
+        // 변경된 내용만 서버에 전송
+        updatedSections.forEach((section, index) => {
             formData.append(`sections[${index}].psTitle`, section.psTitle);
             formData.append(`sections[${index}].psContent`, section.psContent);
+
+            // 기존 psContentsId가 없을 경우, 섹션 번호(index) 사용
+            const psContentsId = section.psContentsId || index;  // index를 psContentsId로 사용
+            formData.append(`sections[${index}].psContentsId`, psContentsId);
         });
 
         console.log("저장할 데이터 : ", [...formData]);
+
+/*        try {
+            const response = await PsWriteApi.savePS(formData);
+            alert("자기소개서가 저장되었습니다!");
+            console.log(response);
+        } catch (error) {
+            alert("저장에 실패했습니다.");
+            console.error("저장 실패:", error);
+        }*/
+
+/*        try {
+            const updatedSections = getUpdatedSections();
+            if (updatedSections.length === 0 && psName === initialPsName) {
+                alert("변경된 내용이 없습니다.");
+                return;
+            }
+            const response = await PsWriteApi.savePS(formData);
+            alert("자기소개서가 저장되었습니다!");
+            console.log(response);
+        } catch (error) {
+            alert("저장에 실패했습니다.");
+            console.error("저장 실패:", error);
+        }*/
+        // 변경된 자기소개서 이름이 있을 경우 전송
+        if (psName !== initialPsName) {
+            formData.append("psNameChanged", true); // 이름 변경 여부
+        }
 
         try {
             const response = await PsWriteApi.savePS(formData);
@@ -225,13 +270,18 @@ const WriteForm = () => {
         }
     };
 
+
+
     return (
         <>
             <WriteFormBg>
+                <button>새 자기소개서</button>
+                <button>불러오기</button>
                 <FormTitle
                     type="text"
                     value={psName}
-                    onChange={(e) => setPsName(e.target.value)}
+                    // onChange={(e) => setPsName(e.target.value)}
+                    onChange={handlePsNameChange}  // 이름 변경 핸들러
                     placeholder="자기소개서 이름을 입력하세요"
                 />
                 <Pagination>

@@ -30,52 +30,6 @@ public class PsWriteService {
     private final PsWriteRepository psWriteRepository;
     private final PsContentsRepository psContentsRepository;
 
-    /*// 자기소개서 DB 저장
-    @Transactional
-    public PsWriteResDto savePsWrite(PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> psContentsReqDtoList) {
-        // 작성자 가져오기
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
-
-        // 자기소개서 저장
-        PsWrite psWrite = new PsWrite();
-//        psWrite.setMember(member);
-        psWrite.setPsName(psWriteReqDto.getPsName());
-        psWrite.setRegDate(LocalDateTime.now()); // 현재 시간으로 생성일 설정
-        psWrite = psWriteRepository.save(psWrite); // PsWrite 저장 후 ID 반환
-
-        // 자기소개서 항목 저장
-        List<PsContents> psContentsList = psContentsReqDtoList.stream().map(psContentsReqDto -> {
-            PsContents psContents = new PsContents();
-            psContents.setPsTitle(psContentsReqDto.getPsTitle());
-            psContents.setPsContent(psContentsReqDto.getPsContent());
-            return psContents;
-        }).collect(Collectors.toList());
-
-        psContentsRepository.saveAll(psContentsList);
-
-        // PsWrite 엔티티 Dto로 변환
-        PsWriteResDto psWriteResDto = new PsWriteResDto();
-        psWriteResDto.setPsWriteId(psWrite.getPsWriteId());
-        psWriteResDto.setMemberId(psWrite.getMember().getMemberId());
-        psWriteResDto.setPsName(psWrite.getPsName());
-        psWriteResDto.setRegDate(psWrite.getRegDate());
-
-        // PsContentsResDto 리스트 생성
-        List<PsContentsResDto> psContentsResDtoList = psContentsList.stream().map(psContents -> {
-            PsContentsResDto psContentsResDto = new PsContentsResDto();
-            psContentsResDto.setPsContentsId(psContents.getPsContentsId());
-            psContentsResDto.setPsTitle(psContents.getPsTitle());
-            psContentsResDto.setPsContent(psContents.getPsContent());
-            return psContentsResDto;
-        }).collect(Collectors.toList());
-
-        psWriteResDto.setPsContents(psContentsResDtoList);
-
-        return psWriteResDto;
-    }*/
-
-
     @Transactional
     public PsWriteResDto savePsWrite(PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> contentsReqDtoList) {
         // 작성자 조회
@@ -103,6 +57,40 @@ public class PsWriteService {
         PsWrite savedPsWrite = psWriteRepository.save(psWrite);
 
         // 저장된 데이터 DTO 변환 및 반환
+        return convertToDto(savedPsWrite);
+    }
+
+    @Transactional
+    public PsWriteResDto updatePsWrite(Long psWriteId, PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> contentsReqDtoList) {
+        // 기존 자기소개서 찾기
+        PsWrite psWrite = psWriteRepository.findById(psWriteId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 자기소개서가 존재하지 않습니다."));
+
+        // 자기소개서 이름이 변경되었으면 업데이트
+        if (!psWrite.getPsName().equals(psWriteReqDto.getPsName())) {
+            psWrite.setPsName(psWriteReqDto.getPsName());
+        }
+
+        // 기존 항목들을 업데이트
+        List<PsContents> psContentsList = psContentsRepository.findByPsWrite(psWrite);
+        Map<Long, PsContents> contentMap = psContentsList.stream()
+                .collect(Collectors.toMap(PsContents::getPsContentsId, content -> content));
+
+        for (PsContentsReqDto contentDto : contentsReqDtoList) {
+            PsContents existingContent = contentMap.get(contentDto.getPsContentsId());
+            if (existingContent != null) {
+                // 항목 제목 및 내용을 비교하여 변경된 경우만 업데이트
+                if (!existingContent.getPsTitle().equals(contentDto.getPsTitle())) {
+                    existingContent.setPsTitle(contentDto.getPsTitle());
+                }
+                if (!existingContent.getPsContent().equals(contentDto.getPsContent())) {
+                    existingContent.setPsContent(contentDto.getPsContent());
+                }
+            }
+        }
+
+        // 저장된 데이터 DTO 변환 및 반환
+        PsWrite savedPsWrite = psWriteRepository.save(psWrite);
         return convertToDto(savedPsWrite);
     }
 

@@ -1,24 +1,24 @@
 package kh.BackendCapstone.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "ps_write")
 @Getter
 @Setter
 @ToString
-@Entity
-@Table(name = "ps_write")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PsWrite {
 	// 자기소개서 id
-	@Id
+    @Id
 	@Column(name = "ps_write_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long psWriteId;
 
 	// 작성자
