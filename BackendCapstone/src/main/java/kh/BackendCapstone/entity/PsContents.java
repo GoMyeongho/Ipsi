@@ -16,11 +16,12 @@ public class PsContents {
     // 자기소개서 항목 id
     @Id
     @Column(name = "ps_contents_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long psContentsId;
 
     // 자기소개서 id
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "ps_write_id")
     private PsWrite psWrite;
 

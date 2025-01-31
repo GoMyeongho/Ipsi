@@ -18,4 +18,6 @@ public class PsContentsReqDto {
 
     // 항목 번호
     private Integer sectionsNum;
+    
+    private Long psContentsId;
 }

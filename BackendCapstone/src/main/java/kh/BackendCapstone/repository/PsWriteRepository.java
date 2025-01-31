@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface PsWriteRepository extends JpaRepository<PsWrite,Long> {
     boolean existsByMemberAndPsName(Member member, String psName);
     Optional<PsWrite> findByMember_MemberIdAndPsWriteId(Long memberId, Long psWriteId);
+    Optional<PsWrite> findByPsWriteId(Long psWriteId);
 }

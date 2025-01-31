@@ -10,15 +10,14 @@ import java.util.List;
 @Table(name = "ps_write")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "psContents")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PsWrite {
 	// 자기소개서 id
     @Id
-	@Column(name = "ps_write_id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long psWriteId;
 
 	// 작성자
@@ -27,7 +26,6 @@ public class PsWrite {
 	private Member member;
 
 	// 자기소개서 이름
-	@Column(name = "ps_name")
 	private String psName;
 
 	// 생성일
@@ -35,6 +33,6 @@ public class PsWrite {
 	private LocalDateTime regDate;
 
 	// 자기소개서 항목 리스트
-	@OneToMany(mappedBy = "psWrite", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "psWrite", cascade = CascadeType.ALL, orphanRemoval = false)
 	private List<PsContents> psContents;
 }

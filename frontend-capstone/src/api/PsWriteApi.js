@@ -6,34 +6,35 @@ const Capstone = "http://localhost:8111";
 const PsWriteApi = {
 
     // 자소서 DB 저장
-    savePS: async (formData) => {
+    savePS: async (psWriteId, formData) => {
+        const token = localStorage.getItem("accessToken");
         try {
+            console.log([...formData])
             const memberId = formData.get("memberId");
             if (!memberId) {
                 console.error("memberId가 없습니다.");
                 alert("로그인이 필요합니다.");
                 return;
             }
-
             const psWriteReqDto = {
                 memberId: memberId,
                 psName: formData.get("ps_name"),
             };
-
             const sections = [];
-            const psContentsIdList = [];
-
             for (const [key, value] of formData.entries()) {
                 if (key.includes("sections")) {
+                    console.log(sections);
                     const sectionIndex = key.match(/\d+/)?.[0];
                     if (sectionIndex !== undefined) {
                         if (!sections[sectionIndex]) {
-                            sections[sectionIndex] = { psTitle: "", psContent: "" };
+                            sections[sectionIndex] = { psTitle: "", psContent: "", psContentsId: "" };
                         }
                         if (key.includes("psTitle")) {
                             sections[sectionIndex].psTitle = value;
                         } else if (key.includes("psContent")) {
                             sections[sectionIndex].psContent = value;
+                        } else if (key.includes("id")) {
+                            sections[sectionIndex].psContentsId = value;
                         }
                     }
                 }
@@ -42,24 +43,38 @@ const PsWriteApi = {
             const psContentsReqDtoList = sections.map(section => ({
                 psTitle: section.psTitle,
                 psContent: section.psContent,
-                sectionsNum: section.id,
+                psContentsId: section.psContentsId,
             }));
+            console.log(psContentsReqDtoList);
 
-            const response = await axios.post(Capstone + `/write/save/${memberId}`, {
+            const response = await axios.post(Capstone + `/write/save/${psWriteId}`, {
                 psWriteReqDto: psWriteReqDto,
                 psContentsReqDtoList: psContentsReqDtoList
             }, {
                 headers: {
-                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
                 },
             });
-
             return response.data;
         } catch (error) {
             console.error("API_자기소개서 저장 실패:", error);
             throw error;
         }
     },
+    loadPsWrite : async (psWriteId) => {
+        const token = localStorage.getItem("accessToken");
+        return await axios.get(Capstone + `/write/load/${psWriteId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }})
+    },
+    newPsWrite : async () => {
+        const token = localStorage.getItem("accessToken");
+        return await axios.get(Capstone + `/write/make`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }})
+    }
 };
 
 export default PsWriteApi;

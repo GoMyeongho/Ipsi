@@ -2,6 +2,10 @@ import styled from "styled-components";
 import React, {useCallback, useEffect, useState} from "react";
 import PsWriteApi from "../../api/PsWriteApi";
 import Commons from "../../util/Common";
+import {useNavigate, useParams} from "react-router-dom";
+import psWriteApi from "../../api/PsWriteApi";
+import {useSelector} from "react-redux";
+import RejectModal from "../RejectModal";
 
 const WriteFormBg = styled.div`
     width: 70%;
@@ -121,23 +125,53 @@ const WriteForm = () => {
     const [psName, setPsName] = useState("새 자기소개서");
     const [initialSections, setInitialSections] = useState([]);
     const [initialPsName, setInitialPsName] = useState("새 자기소개서"); // 초기 psName
+    const {id} = useParams();
+    const navigator = useNavigate();
+    const role = useSelector((state) => state.persistent.role)
+    const [reject, setReject] = useState({});
 
     // 자기소개서 불러오기
     const loadPsWrite = async (psWriteId) => {
         try {
-            const response = await PsWriteApi.loadPsWrite(loggedInUser, psWriteId);
-            setPsName(response.psName);
-            setSections(response.psContents.map((content, index) => ({
-                id: index + 1,
-                psTitle: content.psTitle,
-                psContent: content.psContent,
-            })));
-            setInitialPsName(response.psName);
-            setInitialSections(response.psContents);
+            if(!id) {
+                const response = await psWriteApi.newPsWrite(loggedInUser)
+                console.log(response)
+                navigator(`/PersonalStatementWrite/${response.data}`)
+                return
+            }
+            const response = await PsWriteApi.loadPsWrite(psWriteId);
+            if(response) {
+                console.log(response)
+                setPsName(response.data.psName)
+                setSections(response.data.psContents.map((section, index) => ({
+                    id: index + 1,
+                    psTitle: section.psTitle,
+                    psContent: section.psContent,
+                    psContentsId: section.psContentsId,
+                })));
+                setInitialPsName(response.data.psName)
+                setInitialSections(response.data.psContents.map((section, index) => ({
+                    id: index + 1,
+                    psTitle: section.psTitle,
+                    psContent: section.psContent,
+                    psContentsId: section.psContentsId,
+                })));
+            }
         } catch (e) {
+            setReject({value : true, label : "권한이 없거나 해당 자소서의 작성자가 아닙니다."})
             console.error("자기소개서 불러오기 실패:", e);
         }
     };
+    
+    useEffect(() => {
+        loadPsWrite(id);
+    }, [id, role]);
+    // 상태 변경 확인 (렌더링 문제 디버깅)
+    useEffect(() => {
+        if (sections.length > 0 && !sections.find(sec => sec.id === activeSection)) {
+            setActiveSection(sections[0].id); // 첫 번째 항목을 활성화
+        }
+    }, [sections]);
 
     // 토큰에서 memberId를 가져오는 로직
     const fetchMemberIdFromToken = async () => {
@@ -206,9 +240,8 @@ const WriteForm = () => {
         ref.style.height = "auto";
         ref.style.height = ref.scrollHeight + "px";
     }, []);
-
-    const currentSection = sections.find((section) => section.id === activeSection) || { psTitle: "", psContent: "" };
-
+    
+    const currentSection = sections.find((section) => section.id === activeSection) || { title: "", content: "" };
     // 기존 상태를 유지하는 useEffect
     useEffect(() => {
         setInitialSections(sections);
@@ -217,9 +250,7 @@ const WriteForm = () => {
     // 자기소개서 불러오기 버튼 클릭 시 호출
     const handleLoadPsWrite = async () => {
         const psWriteId = prompt("불러올 자기소개서 ID를 입력하세요:");
-        if (psWriteId) {
-            await loadPsWrite(psWriteId);
-        }
+        navigator(`/PersonalStatementWrite/${psWriteId}`)
     };
 
     // 변경 감지 로직
@@ -238,35 +269,22 @@ const WriteForm = () => {
             alert("로그인이 필요합니다.");
             return;
         }
-
         const formData = new FormData();
         formData.append("memberId", loggedInUser);
         formData.append("ps_name", psName);
-
         sections.forEach((section, index) => {
             formData.append(`sections[${index}].psTitle`, section.psTitle);
             formData.append(`sections[${index}].psContent`, section.psContent);
+            formData.append(`sections[${index}].id`, section.psContentsId || 0);
         });
-
-        console.log("저장할 데이터 : ", [...formData]);
-
-/*        try {
-            const response = await PsWriteApi.savePS(formData);
-            alert("자기소개서가 저장되었습니다!");
-            console.log(response);
-        } catch (error) {
-            alert("저장에 실패했습니다.");
-            console.error("저장 실패:", error);
-        }*/
-
+        console.log("저장할 데이터 : ", [...formData])
         try {
             const updatedSections = getUpdatedSections();
             if (updatedSections.length === 0 && psName === initialPsName) {
                 alert("변경된 내용이 없습니다.");
                 return;
             }
-
-            const response = await PsWriteApi.savePS(formData);
+            const response = await PsWriteApi.savePS(id, formData);
             alert("자기소개서가 저장되었습니다!");
             console.log(response);
         } catch (error) {
@@ -336,6 +354,7 @@ const WriteForm = () => {
                     <button className="submit" type={"submit"} onClick={psSave}>저장</button>
                 </BtnBox>
             </WriteFormBg>
+            <RejectModal open={reject.value} message={reject.label} onClose={() => navigator("/")}></RejectModal>
         </>
     );
 };

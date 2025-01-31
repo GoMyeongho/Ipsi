@@ -7,6 +7,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class PsWriteDto {
     private PsWriteReqDto psWriteReqDto;  // 자기소개서 기본 정보
     private List<PsContentsReqDto> psContentsReqDtoList;

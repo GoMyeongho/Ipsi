@@ -157,19 +157,14 @@ const AuthApi = {
           throw error; // 에러 다시 던짐
         }
       },
-	//   IsLogin: async () => {
-		// 		const accessToken = Commons.getAccessToken();
-		// 		return await axiosApi.get(
-		// 		  Commons.Capstone + `/auth/isLogin/${accessToken}`,
-		// 		  {
-		// 			headers: {
-		// 			  "Content-Type": "application/json",
-		// 			  Authorization: "Bearer " + accessToken,
-		// 			},
-		// 		  }
-		// 		);
-		// 	  },
-
+	IsLogin: async () => {
+		const accessToken = Commons.getAccessToken();
+		if(!accessToken) return null;
+		return await axios.get( Commons.Capstone + `/member/role`, {
+			headers: {
+				Authorization: `Bearer ${accessToken}`, // ✅ 헤더에 토큰 추가
+			},});
+		},
 }
 
 
