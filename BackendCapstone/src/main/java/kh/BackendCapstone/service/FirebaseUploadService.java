@@ -37,6 +37,7 @@ public class FirebaseUploadService {
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 		body.add("file", file.getResource());
 		body.add("folderPath", "firebase/" + folderPath);
+		body.add("fileName", "");
 		
 		// HttpEntity로 요청 본문 만들기
 		HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
