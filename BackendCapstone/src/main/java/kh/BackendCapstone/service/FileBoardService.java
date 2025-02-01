@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
-import kh.BackendCapstone.dto.response.PayResDto;
 import kh.BackendCapstone.entity.FileBoard;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.Univ;
 import kh.BackendCapstone.repository.FileBoardRepository;
 import kh.BackendCapstone.repository.MemberRepository;
-import kh.BackendCapstone.repository.PayRepository;
 import kh.BackendCapstone.repository.UnivRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,24 +30,23 @@ public class FileBoardService {
 	private final FirebaseUploadService firebaseUploadService;
 	private final UnivRepository univRepository;
 	private final MemberRepository memberRepository;
-	private final PayRepository payRepository;
 
-	public int getPageSize(int limit, String univName, String univDept, String category) {
+	public int getPageSize(int limit, String univName, String univDept, String category, String keywords) {
 		Pageable pageable = PageRequest.of(0, limit);
 		try{
-			Page<FileBoard> page = selectOption(univName, univDept, pageable, category);
+			Page<FileBoard> page = selectOption(univName, univDept, pageable, category, keywords);
 			return page.getTotalPages();
 		} catch (Exception e) {
 			log.error("대학 : {} , 학과 : {} 에 대한 페이지 검색중 에러 : {}", univName, univDept, e.getMessage());
 			return 0;
 		}
 	}
-	
+
 	// 페이지네이션 및 필터링 처리
-	public List<FileBoardResDto> getContents(int page, int limit, String univName, String univDept, String category) {
+	public List<FileBoardResDto> getContents(int page, int limit, String univName, String univDept, String category, String keywords) {
 		Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("univ.univName").ascending());
 		try {
-			Page<FileBoard> fileBoardPage = selectOption(univName, univDept, pageable, category);
+			Page<FileBoard> fileBoardPage = selectOption(univName, univDept, pageable, category, keywords);
 			List<FileBoardResDto> fileBoardResDtoList = convertEntityToDto(fileBoardPage.getContent());
 			return fileBoardResDtoList;
 		} catch (Exception e) {
@@ -58,9 +55,14 @@ public class FileBoardService {
 		}
 	}
 
-	private Page<FileBoard> selectOption(String univName, String univDept, Pageable pageable, String category) {
-//		log.warn("Query Params -> univName: {}, univDept: {}, category: {}", univName, univDept, category);
+	private Page<FileBoard> selectOption(String univName, String univDept, Pageable pageable, String category, String keywords) {
+		// 키워드가 제공되면 키워드를 기준으로 검색
+		if (keywords != null && !keywords.isEmpty()) {
+			// 키워드를 포함하는 파일을 검색
+			return fileBoardRepository.findAllByKeywordsContainingAndFileCategory(keywords, FileCategory.fromString(category), pageable);
+		}
 
+		// 대학명과 학과명만으로 검색
 		if (univName == null || univName.isEmpty()) {
 			return fileBoardRepository.findAllByFileCategory(FileCategory.fromString(category), pageable);
 		}

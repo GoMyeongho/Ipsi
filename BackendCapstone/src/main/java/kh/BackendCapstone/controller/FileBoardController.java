@@ -1,11 +1,14 @@
 package kh.BackendCapstone.controller;
 
 import kh.BackendCapstone.constant.FileCategory;
+import kh.BackendCapstone.dto.request.ReviewReqDto;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
 import kh.BackendCapstone.dto.response.ContentsItemPageResDto;
 import kh.BackendCapstone.dto.response.FilePurchaseStatusResDto;
+import kh.BackendCapstone.dto.response.ReviewResDto;
 import kh.BackendCapstone.service.FileBoardService;
 import kh.BackendCapstone.service.PayService;
+import kh.BackendCapstone.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -33,25 +36,29 @@ public class FileBoardController {
 	
 	private final FileBoardService fileBoardService;
 	private final PayService payService;
+	private final ReviewService reviewService;
 
+	// 자기소개서 자료 목록 Item
 	@GetMapping("/psList")
 	public ResponseEntity<ContentsItemPageResDto> getPersonalStatementList(
 			@RequestParam int page,
 			@RequestParam int limit,
 			@RequestParam(required = false) String univName,
 			@RequestParam(required = false) String univDept,
-			@RequestParam(required = false) Long memberId // 요청 파라미터로 memberId 받기
+			@RequestParam(required = false) Long memberId, // 요청 파라미터로 memberId 받기
+			@RequestParam(required = false) String keywords // 추가된 파라미터 keyword
 	) {
 		try {
-			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "ps");
-			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "ps");
+			// keyword를 검색에 반영하도록 수정
+			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "ps", keywords);
+			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "ps", keywords);
 
 			List<FilePurchaseStatusResDto> filePurchaseStatus = new ArrayList<>();
 			if (memberId != null && memberId > 0) {
 				try {
 					filePurchaseStatus = payService.getPurchasedFileStatusesByMemberId(memberId);
 				} catch (EntityNotFoundException e) {
-//					log.warn("No purchase information found for memberId: {}", memberId);
+//                log.warn("No purchase information found for memberId: {}", memberId);
 				}
 			}
 
@@ -63,17 +70,19 @@ public class FileBoardController {
 		}
 	}
 
+	// 생활기록부 자료 목록 Item
 	@GetMapping("/srList")
 	public ResponseEntity<ContentsItemPageResDto> getStudentRecordList(
 			@RequestParam int page,
 			@RequestParam int limit,
 			@RequestParam(required = false) String univName,
 			@RequestParam(required = false) String univDept,
-			@RequestParam(required = false) Long memberId // 요청 파라미터로 memberId 받기
+			@RequestParam(required = false) Long memberId, // 요청 파라미터로 memberId 받기
+			@RequestParam(required = false) String keywords // 추가된 파라미터 keyword
 	) {
 		try {
-			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "sr");
-			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "sr");
+			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "sr",keywords);
+			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "sr",keywords);
 
 			List<FilePurchaseStatusResDto> filePurchaseStatus = new ArrayList<>();
 			if (memberId != null && memberId > 0) {
@@ -91,7 +100,6 @@ public class FileBoardController {
 			return ResponseEntity.status(500).body(null);
 		}
 	}
-
 
 	// 업로드한 자소서 내역 확인
 	@GetMapping("/uploadedEnumPS")
@@ -162,6 +170,7 @@ public class FileBoardController {
 		}
 	}
 
+	// Main File, Preview File 다운로드
 	@GetMapping("/download")
 	public ResponseEntity<Resource> downloadFile(
 			@RequestParam("fileUrl") String fileUrl,
@@ -184,7 +193,7 @@ public class FileBoardController {
 		}
 
 		// 디버깅: 실제 파일 이름 출력
-		log.warn("Extracted actual file name from URL: {}", actualFileName);
+//		log.warn("Extracted actual file name from URL: {}", actualFileName);
 
 		// URL 디코딩
 		String decodedFileName = null;
@@ -195,17 +204,17 @@ public class FileBoardController {
 		}
 
 		// 디버깅: 디코딩된 파일 이름 출력
-		log.warn("Decoded file name: {}", decodedFileName);
+//		log.warn("Decoded file name: {}", decodedFileName);
 
 		// 실제 파일 이름만 추출 (이제 경로를 제외한 파일명만 남음)
 		String fileNameOnly = decodedFileName.substring(decodedFileName.lastIndexOf("/") + 1);
 
 		// 디버깅: 파일명만 출력
-		log.warn("Cleaned file name: {}", fileNameOnly);
+//		log.warn("Cleaned file name: {}", fileNameOnly);
 
 		// Content-Disposition 헤더 설정 전에 로그 출력
 		String contentDisposition = "attachment; filename=\"" + fileNameOnly + "\"";
-		log.warn("Setting Content-Disposition header with value: {}", contentDisposition);
+//		log.warn("Setting Content-Disposition header with value: {}", contentDisposition);
 
 		// HTTP 응답 헤더 설정 (파일 다운로드)
 		return ResponseEntity.ok()

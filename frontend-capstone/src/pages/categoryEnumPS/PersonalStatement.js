@@ -19,12 +19,21 @@ const Top = styled.div`
   padding-bottom: 2%;
   display: flex;
   justify-content: space-between;
+
+  @media (max-width:768px) {
+    width: 100%;
+  }
 `;
 
 const Title = styled.div`
   width: 50%;
   font-size: clamp(1rem, 1.3vw, 2.5rem);
   font-weight: bold;
+
+  @media (max-width:768px) {
+    width: 50%;
+    padding-left: 5%;
+  }
 `;
 
 const Search = styled.div`
@@ -74,6 +83,46 @@ const Dropdown = styled.select`
   }
 `;
 
+const DropdownSearchButton = styled.button`
+  width: 40px;
+  aspect-ratio: 1 / 1;
+  min-width: 30px;
+  min-height: 30px;
+  background-color: black;
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  background-image: url(https://firebasestorage.googleapis.com/v0/b/photo-island-eeaa3.firebasestorage.app/o/KH_Comprehensive_Project%2Fsearh.png?alt=media&token=9eed2c07-0961-44c9-a298-c6b984bc680c);
+  background-size: 50% 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+   /* 비활성화 상태에서 hover 및 active 동작 방지 */
+   &:disabled {
+    pointer-events: none;  /* 마우스 이벤트를 막아서 hover 및 active를 비활성화 */
+    opacity: none;  /* 비활성화 상태에서 버튼의 투명도를 낮추어 구분 */
+  }
+`;
+
+const KeywordSerarchInput = styled.input`
+  width: 30%;
+  height: 30px;
+  font-size: large;
+  border: 3px solid #6154D4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const KeywordSearchButton = styled.button`
   width: 40px;
   aspect-ratio: 1 / 1;
@@ -96,6 +145,12 @@ const KeywordSearchButton = styled.button`
   &:active {
     transform: scale(0.95);
   }
+
+   /* 비활성화 상태에서 hover 및 active 동작 방지 */
+   &:disabled {
+    pointer-events: none;  /* 마우스 이벤트를 막아서 hover 및 active를 비활성화 */
+    opacity: none;  /* 비활성화 상태에서 버튼의 투명도를 낮추어 구분 */
+  }
 `;
 
 const Line = styled.div`
@@ -103,6 +158,10 @@ const Line = styled.div`
   height: 2px; /* 라인의 두께 */
   background-color: black; /* 라인의 색상 */
   margin-bottom: 1%;
+
+  @media (max-width:768px) {
+    width: 100%;
+  }
 `;
 
 const Contents = styled.div`
@@ -112,6 +171,10 @@ const Contents = styled.div`
   gap: 20px;
   justify-content: flex-start;
   cursor: pointer; /* 클릭 가능하게 설정 */
+
+  @media (max-width:768px) {
+    width: 100%;
+  }
 `;
 
 const ContentsBox = styled.div`
@@ -209,6 +272,11 @@ const DetailDisplay = styled.div`
   &:hover {
     background-color: #3700b3;
   }
+
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: clamp(0.75rem, 0.8vw, 2.5rem);
+  }
 `;
 
 const PaginationContainer = styled.div`
@@ -249,6 +317,7 @@ const PersonalStatement = () => {
   const [dropDownError, setDropDownError] = useState(null); // DropDown 에러 상태
   const [contentsError, setContentsError] = useState(null); // 자소서 데이터 에러 상태
   const [purchasedFileIds, setPurchasedFileIds] = useState([]); // 해당 유저가 구매한 자료 현황
+  const [keywords, setKeywords] = useState(""); // 키워드 검색 밸류
 
   // 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
@@ -330,6 +399,7 @@ const PersonalStatement = () => {
         limit: itemsPerPage,
         univName: selectedUniv,
         univDept: selectedDept,
+        keywords: keywords,
       };
       // console.log(params);
       const response = await DocumentsApi.getPSContents(
@@ -337,6 +407,7 @@ const PersonalStatement = () => {
         params.limit,
         params.univName,
         params.univDept,
+        params.keywords,
       );
 
       console.log(response);
@@ -381,8 +452,8 @@ const PersonalStatement = () => {
     setSelectedDept(event.target.value); // 학과 선택시 상태 업데이트
   };
 
-  // "검색" 버튼 클릭 핸들러
-  const handleSearch = () => {
+  // "DropDown 검색" 버튼 클릭 핸들러
+  const handleDropdownSearch = () => {
     fetchData();
     let filtered = contentItems;
 
@@ -400,6 +471,15 @@ const PersonalStatement = () => {
     setFilteredItems(filtered);
     setCurrentPage(1); // 검색 시 첫 페이지로 리셋
   };
+ 
+  // "KeyWord 검색" 버튼 클릭 핸들러
+  const handleKeywordSearch = () => {
+    console.log(keywords);
+    if (keywords.trim()) {
+    fetchData();
+    setKeywords("");
+    }
+  }
 
   // 대학명만 고유하게 추출
   const uniqueUnivNames = Object.keys(dropDwonList);
@@ -420,6 +500,10 @@ const PersonalStatement = () => {
     navigate("/PersonalStateMentDetail", { state: { item: selectedData, purchasedFileIds : purchasedFileIds }});
   };
 
+  // 입력시 Dropdown 검색 disabled
+  const handleKeywordChange = (e) => {
+    setKeywords(e.target.value);
+  };
   
 // 이름 가운제 * 변경 관련련
 const replaceMiddleChar = (str) => {
@@ -452,7 +536,7 @@ const replaceMiddleChar = (str) => {
         <Title>자기소개서</Title>
         <Search>
           <DropdownContainer>
-            <Dropdown onChange={handleUnivChange} value={selectedUniv}>
+            <Dropdown onChange={handleUnivChange} value={selectedUniv} disabled={!!keywords} >
               <option value="">대학명</option>
               {uniqueUnivNames.map((univName, index) => (
                 <option key={index} value={univName}>
@@ -478,7 +562,9 @@ const replaceMiddleChar = (str) => {
               )}
             </Dropdown>
           </DropdownContainer>
-          <KeywordSearchButton onClick={handleSearch} />
+          <DropdownSearchButton onClick={handleDropdownSearch} disabled={!!keywords} />
+          <KeywordSerarchInput  placeholder="키워드를 검색하세요" onChange={handleKeywordChange} disabled={!!selectedUniv}/>
+          <KeywordSearchButton onClick={handleKeywordSearch} disabled={!!selectedUniv}/>
         </Search>
       </Top>
       <Line />

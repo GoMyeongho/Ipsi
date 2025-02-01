@@ -81,7 +81,7 @@ const ItemPrice = styled.div`
 
   input {
     text-align: start;
-    width: 30%;
+    width: 70%;
     margin-left: 5%;
     border: none;
 
@@ -576,7 +576,8 @@ const CoverLetterRegister = () => {
                 const inputValue = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 남기기
                 setPrice(inputValue); // 숫자만 상태에 저장
               }}
-              placeholder="가격을 입력하세요."
+              placeholder="가격을 입력하세요. (10만원 미만)"
+              maxLength={6}
             />
           </ItemPrice>
           <Line />
@@ -653,6 +654,7 @@ const CoverLetterRegister = () => {
                   value={keyword}
                   onChange={(e) => handleKeywordChange(index, e.target.value)}
                   placeholder={`'#' 포함없이 입력하세요.`}
+                  maxLength={6}
                 />
                 <button onClick={() => handleRemoveKeyword(index)}>-</button>
               </div>
