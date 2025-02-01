@@ -1,70 +1,108 @@
 import React from "react";
-import { Dialog, DialogContent, DialogActions, Typography, Button } from "@mui/material";
+import styled from "styled-components";
 
 const OptionsModal = ({ open, message, options, onOption, onCancel }) => {
+	if (!open) return null;
+	
 	return (
-		<Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
-			<DialogContent sx={styles.dialogContent}>
-				<Typography variant="h6" sx={styles.messageText}>
+		<ModalOverlay onClick={onCancel}>
+			<ModalContent onClick={(e) => e.stopPropagation()}>
+				<MessageText>
 					{message &&
 						message.split("\n").map((line, index) => (
 							<span key={index}>
-								{line}
+                {line}
 								<br />
-							</span>
+              </span>
 						))}
-				</Typography>
-			</DialogContent>
-			<DialogActions sx={styles.dialogActions}>
-				{options &&
-					options.map((option, index) => (
-						<Button
-							key={index}
-							variant={option.type === "outlined" ? "outlined" : "contained"}
-							color={option.type === "outlined" ? "error" : "primary"}
-							onClick={() => onOption(option.value)}
-							sx={styles.button}
-						>
-							{option.label}
-						</Button>
-					))}
-				<Button variant="outlined" color="error" onClick={onCancel} sx={styles.button}>
-					취소
-				</Button>
-			</DialogActions>
-		</Dialog>
+				</MessageText>
+				<ModalActions>
+					{options &&
+						options.map((option, index) => (
+							<ModalButton
+								key={index}
+								variant={option.type === "outlined" ? "outlined" : "contained"}
+								color={option.type === "outlined" ? "error" : "primary"}
+								onClick={() => onOption(option.value)}
+							>
+								{option.label}
+							</ModalButton>
+						))}
+					<CancelButton onClick={onCancel}>취소</CancelButton>
+				</ModalActions>
+			</ModalContent>
+		</ModalOverlay>
 	);
 };
 
 export default OptionsModal;
 
-// 스타일 객체
-const styles = {
-	dialogContent: {
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
-		padding: "16px 24px",
-	},
-	messageText: {
-		textAlign: "center",
-		width: "100%",
-		marginBottom: "16px", // 메시지와 버튼 사이 간격
-	},
-	dialogActions: {
-		display: "flex",
-		flexDirection: "column", // ✅ 버튼을 세로 정렬
-		alignItems: "center", // ✅ 중앙 정렬
-		justifyContent: "center", // ✅ 버튼을 중앙 정렬
-		gap: "8px", // ✅ 버튼 간격 동일하게 설정
-		width: "100%", // ✅ 버튼이 중앙에 오도록 설정
-		padding: "16px 0",
-	},
-	button: {
-		width: "80%",
-		maxWidth: "200px", // ✅ 버튼 크기 통일
-		marginLeft: "8px",
-		textAlign: "center",
-	},
-};
+// 스타일 정의
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 배경 어두운 색 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+	z-index: 999;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  max-width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+	z-index: 1000;
+`;
+
+const MessageText = styled.div`
+  margin-bottom: 16px;
+  font-size: 1rem;
+  font-weight: bold;
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const ModalButton = styled.button`
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: ${({ variant }) => (variant === "outlined" ? "transparent" : "#3f51b5")};
+  color: ${({ variant }) => (variant === "outlined" ? "#f44336" : "white")};
+  border: ${({ variant }) => (variant === "outlined" ? "1px solid #f44336" : "none")};
+  border-radius: 8px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: ${({ variant }) => (variant === "outlined" ? "#f44336" : "#303f9f")};
+  }
+`;
+
+const CancelButton = styled.button`
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: transparent;
+  color: #f44336;
+  border: 1px solid #f44336;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #f44336;
+    color: white;
+  }
+`;

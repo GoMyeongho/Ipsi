@@ -216,8 +216,6 @@ const CloseButton = styled.button`
 `;
 
 const WriteForm = () => {
-    const [errorMessage, setErrorMessage] = useState("");
-
     const [psWrites, setPsWrites] = useState([]);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [sections, setSections] = useState([{ id: 1, title: "", content: "" },]);

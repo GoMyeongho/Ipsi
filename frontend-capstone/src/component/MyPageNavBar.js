@@ -1,6 +1,9 @@
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useSelector} from "react-redux";
+import RejectModal from "./Modal/RejectModal";
 
 const Background = styled.div`
   width: 100%;
@@ -112,6 +115,13 @@ const Right = styled.div`
 
 const MyPageNavBar = () => {
   const navigate = useNavigate(); // 페이지 전환 훅
+  const role = useSelector(state => state.persistent.role)
+  const [reject, setReject] = useState({});
+  useEffect(() => {
+    if(role === "REST_USER" || role === "" ) {
+      setReject({value: true, label: "해당 기능은 로그인 후 사용 가능 합니다."})
+    }
+  }, [role]);
 
   return (
     <>
@@ -159,6 +169,7 @@ const MyPageNavBar = () => {
             <Outlet />
           </Right>
         </Container>
+        <RejectModal message={reject.label} open={reject.value} onClose={() => navigate("/")}/>
       </Background>
     </>
   );

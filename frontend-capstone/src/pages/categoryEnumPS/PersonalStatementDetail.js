@@ -3,6 +3,10 @@ import styled from "styled-components";
 import { useState, useEffect } from "react";
 import DocumentsApi from "../../api/DocumentsApi";
 import {useDispatch, useSelector} from "react-redux";
+import MemberInfoModal from "../../component/Modal/CursorModal";
+import ConfirmModal from "../../component/Modal/ConfirmModal";
+import {setLoginModalOpen} from "../../context/redux/ModalReducer";
+import CursorModal from "../../component/Modal/CursorModal";
 
 const Background = styled.div`
   width: 100%;
@@ -335,8 +339,11 @@ const PersonalStatementDetail = () => {
   const [inputReview, setInputReview] = useState(""); // 입력 값 상태 관리
   const { item, purchasedFileIds, myUploadedFile, myPurchasedFile } = location.state || {}; // 전달받은 데이터
   const role = useSelector(state => state.persistent.role);
+  const [confirm, setConfirm] = useState({});
+  const [info, setInfo] = useState({});
   const dispatch = useDispatch();
-  console.log(role)
+  
+
 
   // 리뷰 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
@@ -477,6 +484,10 @@ const PersonalStatementDetail = () => {
   };
 
   const handlePurchaseClick = (productData) => {
+    if(role === "REST_USER" || role === "" ) {
+      setConfirm({value: true, label: "해당기능은 로그인 후 가능합니다. \n로그인 하시겠습니까?"})
+      return
+    }
     console.log("선택된 상품:", productData);
     // 결제 로직 추가
     const productItem = {
@@ -529,7 +540,60 @@ const PersonalStatementDetail = () => {
     const middleIndex = Math.floor(len / 2);
     return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1);
   };
-
+  
+  const onChangeComment = (e) => {
+    if(role === "REST_USER" || role === "" ) {
+      setConfirm({value: true, label: "해당기능은 로그인 후 가능합니다. \n로그인 하시겠습니까?"});
+      return
+    }
+    setInputReview(e.target.value)
+  }
+  //item.memberId
+  const options = [
+    {label: "작성 글", value: "text"},
+    {label: "작성 이용후기", value: "review"},
+    // {label: "1대1 채팅하기", value: "chat"}
+    {label: "올린 자소서 보기", value: "ps"},
+    {label: "올린 생기부 보기", value: "sr"}
+  ]
+  
+  const onOption = (value) => {
+    switch (value) {
+      case "text":
+        navigate("#");
+        break;
+      case "review":
+        navigate("#");
+        break;
+      case "ps":
+        navigate("#");
+        break;
+      case "sr":
+        navigate("#");
+        break;
+      case "chat":
+        navigate("#");
+        break;
+      default:
+        setInfo({})
+        break;
+    }
+  }
+  
+  const onClickName = (event) => {
+    // 역할이 "REST_USER" 또는 빈 문자열인 경우 반환
+    if (role === "REST_USER" || role === "") return;
+    
+    // 클릭한 위치를 받아오기
+    const { clientX, clientY } = event;
+    
+    // setInfo 호출 시 클릭한 위치 정보도 포함시키기
+    setInfo({
+      value: true,
+      options: options,
+      position: { x: clientX, y: clientY },  // 클릭한 위치 정보 추가
+    });
+  };
   return (
     <>
       <Background>
@@ -543,7 +607,7 @@ const PersonalStatementDetail = () => {
                 {item.univName} {item.univDept} ({item.fileTitle})
               </DetailBoxTitle>
               <DetailBoxInfo>
-                <span>{replaceMiddleName(item.memberName)}</span> <span>|</span>
+                <span onClick={onClickName} >{replaceMiddleName(item.memberName)}</span> <span>|</span>
                 <span>{titleDate(item.regDate)}</span> <span>|</span>
                 <span>{formattedKeywords}</span>
               </DetailBoxInfo>
@@ -589,7 +653,7 @@ const PersonalStatementDetail = () => {
               <BottomReviewWrite
                 type="text"
                 value={inputReview}
-                onChange={(e) => setInputReview(e.target.value)}
+                onChange={onChangeComment}
                 placeholder="댓글을 입력하세요. (50자 이내)"
                 maxLength={50}
               />
@@ -651,6 +715,10 @@ const PersonalStatementDetail = () => {
             {">>"}
           </PaginationButton>
         </PaginationContainer>
+        <ConfirmModal open={confirm.value} message={confirm.label} onConfirm={() => {
+          dispatch(setLoginModalOpen(true));
+          setConfirm({})}} onCancel={() => setConfirm({})} />
+        <CursorModal open={info.value} message={null} position={info.position} onCancel={() => setInfo({})} onOption={(e) => onOption(e)} options={info.options} />
       </Background>
     </>
   );
