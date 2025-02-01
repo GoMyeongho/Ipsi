@@ -100,6 +100,14 @@ public class PsWriteService {
         Member member = memberService.convertTokenToEntity(token);
         PsWrite psWrite = new PsWrite();
         psWrite.setMember(member);
+        psWrite.setPsName("새 자기소개서");
+        psWrite.setRegDate(LocalDateTime.now());
+        List<PsContents> psContentsList = new ArrayList<>();
+        PsContents psContents = new PsContents();
+        psContents.setPsWrite(psWrite);
+        psContents.setSectionsNum(0);
+        psContentsList.add(psContents);
+        psWrite.setPsContents(psContentsList);
         psWriteRepository.save(psWrite);
         return psWrite.getPsWriteId();
     }

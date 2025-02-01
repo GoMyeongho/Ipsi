@@ -67,8 +67,8 @@ const PostCreateMain = () => {
 	
 	return (
 		<BackGround>
+			<Title>{id ? "글 수정" : "새로운 글 작성"}</Title>
 			<TitleContainer>
-				<Title>게시판</Title>
 				<TextField
 					sx={styles.title}
 					label="제목을 입력하세요"
@@ -170,7 +170,11 @@ const styles = {
 	},
 };
 const Title = styled.div`
+		width: 100%;
     font-size: 24px;
     font-weight: bold;
+		margin-left: 200px;
+		margin-top: 50px;
+		display: flex;
 `;
 export default PostCreateMain;

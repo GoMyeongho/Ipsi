@@ -143,19 +143,22 @@ const WriteForm = () => {
             if(response) {
                 console.log(response)
                 setPsName(response.data.psName)
-                setSections(response.data.psContents.map((section, index) => ({
-                    id: index + 1,
-                    psTitle: section.psTitle,
-                    psContent: section.psContent,
-                    psContentsId: section.psContentsId,
-                })));
                 setInitialPsName(response.data.psName)
-                setInitialSections(response.data.psContents.map((section, index) => ({
-                    id: index + 1,
-                    psTitle: section.psTitle,
-                    psContent: section.psContent,
-                    psContentsId: section.psContentsId,
-                })));
+                if (response.data.psContents.length > 0)
+                {
+                    setSections(response.data.psContents.map((section, index) => ({
+                        id: index + 1,
+                        psTitle: section.psTitle,
+                        psContent: section.psContent,
+                        psContentsId: section.psContentsId,
+                    })));
+                    setInitialSections(response.data.psContents.map((section, index) => ({
+                        id: index + 1,
+                        psTitle: section.psTitle,
+                        psContent: section.psContent,
+                        psContentsId: section.psContentsId,
+                    })));
+                }
             }
         } catch (e) {
             setReject({value : true, label : "권한이 없거나 해당 자소서의 작성자가 아닙니다."})

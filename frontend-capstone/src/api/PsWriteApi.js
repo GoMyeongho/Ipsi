@@ -27,7 +27,7 @@ const PsWriteApi = {
                     const sectionIndex = key.match(/\d+/)?.[0];
                     if (sectionIndex !== undefined) {
                         if (!sections[sectionIndex]) {
-                            sections[sectionIndex] = { psTitle: "", psContent: "", psContentsId: "" };
+                            sections[sectionIndex] = { psTitle: "", psContent: "", psContentsId: "", sectionsNum: sectionIndex };
                         }
                         if (key.includes("psTitle")) {
                             sections[sectionIndex].psTitle = value;
@@ -44,6 +44,7 @@ const PsWriteApi = {
                 psTitle: section.psTitle,
                 psContent: section.psContent,
                 psContentsId: section.psContentsId,
+                sectionsNum: section.sectionsNum,
             }));
             console.log(psContentsReqDtoList);
 
