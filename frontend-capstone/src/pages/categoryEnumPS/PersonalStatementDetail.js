@@ -1,7 +1,19 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import DocumentsApi from "../../api/DocumentsApi";
+import ChattingApi from "../../api/ChattingApi";
+import React, {useContext, useState} from "react";
+import {ChatContext} from "../../context/ChatStore";
+import ChatList from "../../component/ChatComponent/ChatList";
+import OpenChatSearch from "../../component/ChatComponent/OpenChatSearch";
+import ChatBot from "../../component/ChatComponent/ChatBot";
+import Chatting from "../../component/ChatComponent/Chatting";
+import ChatRoomCreate from "../../component/ChatComponent/ChatRoomCreate";
+import openIcon from "../../images/chat.png";
+import closeIcon from "../../images/close.png";
+import ChatMenuBar from "../../component/ChatComponent/ChatMenuBar";
+import {Container, StyledSideMenu} from "../chat/ChatModal";
 import {useDispatch, useSelector} from "react-redux";
 
 const Background = styled.div`
@@ -167,6 +179,22 @@ const BuyButton = styled.button`
     background-color: #3700b3;
   }
 `;
+
+const PrivateChat = styled.button`
+    
+`
+
+const PersonalStatementDetail = ({ setSelectedPage }) => {
+  const [chatRooms, setChatRooms] = useState([]);
+  const {setRoomId} = useContext(ChatContext);
+
+  const [filteredChatRooms, setFilteredChatRooms] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
+
+  const [personCnt, setPersonCnt] = useState([]);
+  const [chatRoomTitle, setChatRoomTitle] = useState([]);
+
+  const [errorMessage, setErrorMessage] = useState("");
 
 const Bottom = styled.div`
   width: 70%;

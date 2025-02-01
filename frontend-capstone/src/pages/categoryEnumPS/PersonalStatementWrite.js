@@ -14,13 +14,13 @@ const Background = styled.div`
 const Top = styled.div`
   width: 80%;
   border-bottom: 1px solid #000;
-/*  padding-top: 3%;
-  padding-bottom: 2%;*/
+  padding-top: 3%;
+  padding-bottom: 2%;
   display: flex;
   justify-content: space-between;
 `;
 
-export const Title = styled.div`
+/*export const Title = styled.div`
   width: 100%;
   //font-size: 1vw;
   font-size: 1rem;
@@ -29,14 +29,20 @@ export const Title = styled.div`
   @media (max-width: 1024px) {
     margin: 3vw 0;
   }
+`;*/
+
+export const Title = styled.div`
+  width: 50%;
+  font-size: clamp(1rem, 1.3vw, 2.5rem);
+  font-weight: bold;
 `;
 
-/*const Line = styled.div`
-  width: 80%; /!* 라인의 너비 *!/
-  height: 1px; /!* 라인의 두께 *!/
-  background-color: black; /!* 라인의 색상 *!/
+const Line = styled.div`
+  width: 80%; /* 라인의 너비 */
+  height: 1px; /* 라인의 두께 */
+  background-color: black; /* 라인의 색상 */
   margin-bottom: 1%;
-`;*/
+`;
 
 const Middle = styled.div`
   width: 70%;
@@ -64,11 +70,13 @@ const PersonalStatementWrite = () => {
         <Top>
           <Title>자기소개서 작성</Title>
         </Top>
+        <Line />
         <Middle>
-          <MiddleBox>
-            <WriteForm/>
-            <BuyPS/>
-          </MiddleBox>
+{/*          <MiddleBox>
+
+          </MiddleBox>*/}
+          <WriteForm/>
+          {/*<BuyPS/>*/}
         </Middle>
       </Background>
     </>

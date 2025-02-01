@@ -1,5 +1,6 @@
 package kh.BackendCapstone.controller;
 
+import kh.BackendCapstone.dto.chat.ChatRoomResDto;
 import kh.BackendCapstone.dto.request.PsContentsReqDto;
 import kh.BackendCapstone.dto.request.PsWriteDto;
 import kh.BackendCapstone.dto.request.PsWriteReqDto;

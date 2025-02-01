@@ -5,14 +5,33 @@ import Commons from "../../util/Common";
 import {useNavigate, useParams} from "react-router-dom";
 import psWriteApi from "../../api/PsWriteApi";
 import {useSelector} from "react-redux";
+import ChattingApi from "../../api/ChattingApi";
+import {ChatName, ChatRoom, ChatUl} from "../ChatComponent/ChatList";
 import RejectModal from "../Modal/RejectModal";
 import OptionsModal from "../Modal/OptionsModal";
 import {Button} from "@mui/material";
 
 const WriteFormBg = styled.div`
+/*    width: 70%;
+    height: 1000px;*/
     width: 70%;
-    height: 1000px;
+    @media (max-width:1600px) {
+        width: 85%
+    }
+    @media (max-width:1400px) {
+        width: 100%
+    }
+    @media (max-width:1200px) {
+        width: 110%
+    }
 `;
+
+const FormContainer = styled.div`
+    margin: 2vw 0;
+    padding: 5%;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
+`
 
 const FormTitle = styled.input`
     width: 100%;
@@ -24,8 +43,9 @@ const FormTitle = styled.input`
     outline: none;
     white-space: nowrap;
     text-overflow: ellipsis;
+    border-bottom: 2px solid #777;
     &:focus {
-        border-bottom: 1px solid #6154D4;
+        border-bottom: 2px solid #6154D4;
     }
 `;
 
@@ -54,9 +74,11 @@ const PsTextArea = styled.textarea`
     &:first-of-type {
         max-height: 120px;
         margin-bottom: 2vw;
+        overflow-y: hidden;
     }
     &:last-of-type {
         min-height: 500px;
+        overflow-y: hidden;
     }
 `;
 
@@ -77,6 +99,43 @@ export const BtnBox = styled.div`
     display: flex;
     justify-content: flex-end;
     gap: 2vw;
+    margin-top: 2vw;
+    button {
+/*        width: 90px;
+        height: 35px;*/
+        width: 105px;
+        aspect-ratio: 21 / 8;
+        border-radius: 10px;
+        border: none;
+        background-color: #FFF;
+        padding: 5px 10px;
+    }
+    .new {
+        border: 2px solid #E0CEFF;
+    }
+    .new:hover {
+        background-color: #E0CEFF;
+    }
+    .import {
+        border: 2px solid #E0CEFF;
+    }
+    .import:hover {
+        background-color: #E0CEFF;
+    }
+    .save {
+        border: 2px solid #6154D4;
+    }
+    .save:hover {
+        background-color: #6154D4;
+        color: #FFF;
+    }
+`;
+
+
+export const SaveBtnBox = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 2vw;
     button {
         width: 60px;
         height: 35px;
@@ -84,16 +143,10 @@ export const BtnBox = styled.div`
         border: none;
         background-color: #FFF;
     }
-    .cancel {
-        border: 2px solid #E0CEFF;
-    }
-    .cancel:hover {
-        background-color: #E0CEFF;
-    }
-    .submit {
+    .save {
         border: 2px solid #6154D4;
     }
-    .submit:hover {
+    .save:hover {
         background-color: #6154D4;
         color: #FFF;
     }
@@ -120,7 +173,52 @@ const Pagination = styled.div`
     }
 `;
 
+const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+    justify-content: center;
+    align-items: center;
+`;
+
+const ModalContent = styled.div`
+    width: 60%;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+`;
+
+const ModalHeader = styled.h2`
+    margin: 0;
+    text-align: center;
+`;
+
+const ModalBody = styled.div`
+    margin-top: 20px;
+    text-align: center;
+`;
+
+const CloseButton = styled.button`
+    background-color: #6154d4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    &:hover {
+    background-color: #503fba;
+    }
+`;
+
 const WriteForm = () => {
+    const [errorMessage, setErrorMessage] = useState("");
+
+    const [psWrites, setPsWrites] = useState([]);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [sections, setSections] = useState([{ id: 1, title: "", content: "" },]);
     const [activeSection, setActiveSection] = useState(1);
@@ -139,6 +237,20 @@ const WriteForm = () => {
         navigator(`/PersonalStatementWrite/${response.data}`)
         
     }
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleLoadPsWrite = () => {
+        openModal();
+    };
 
     // 자기소개서 불러오기
     const loadPsWrite = async (psWriteId) => {
@@ -182,9 +294,11 @@ const WriteForm = () => {
             console.error("자기소개서 불러오기 실패:", e);
         }
     };
+
     useEffect(() => {
         loadPsWrite(id);
     }, [id, role]);
+
     // 상태 변경 확인 (렌더링 문제 디버깅)
     useEffect(() => {
         if (sections.length > 0 && !sections.find(sec => sec.id === activeSection)) {
@@ -199,8 +313,20 @@ const WriteForm = () => {
             const memberId = response.data; // 서버에서 반환한 memberId
             console.log("로그인 한 memberId:", memberId);
             setLoggedInUser(memberId);
+            fetchPsForUser(memberId); // memberId로 채팅방 리스트 가져오기
         } catch (e) {
             console.error("Failed to fetch memberId from token:", e);
+        }
+    };
+
+    // memberId와 관련된 자기소개서 목록 가져오기
+    const fetchPsForUser = async (memberId) => {
+        try {
+            const pswrites = await PsWriteApi.getMyPs(memberId);
+            console.log("Fetched Personal Statement for Member:", pswrites);
+            setPsWrites(pswrites);
+        } catch (error) {
+            console.error("Error Fetching Personal Statement for Member:", error);
         }
     };
 
@@ -259,18 +385,12 @@ const WriteForm = () => {
         ref.style.height = "auto";
         ref.style.height = ref.scrollHeight + "px";
     }, []);
-    
+
     const currentSection = sections.find((section) => section.id === activeSection) || { title: "", content: "" };
     // 기존 상태를 유지하는 useEffect
     useEffect(() => {
         setInitialSections(sections);
     }, []);
-
-    // 자기소개서 불러오기 버튼 클릭 시 호출
-    const handleLoadPsWrite = async () => {
-        const psWriteId = prompt("불러올 자기소개서 ID를 입력하세요:");
-        if(psWriteId) navigator(`/PersonalStatementWrite/${psWriteId}`)
-    };
 
     // 변경 감지 로직
     const getUpdatedSections = () => {
@@ -368,9 +488,84 @@ const WriteForm = () => {
                     </div>
                 )}
                 <BtnBox>
-                    <button className="cancel">불러오기</button>
-                    <button className="submit" type={"submit"} onClick={psSave}>저장</button>
+                    <button className="new" onClick={loadPsWrite}>새 자기소개서</button>
+                    <button className="import" onClick={handleLoadPsWrite}>불러오기</button>
+                    <button className="save" type={"submit"} onClick={psSave}>저장</button>
                 </BtnBox>
+                <ModalOverlay isOpen={isModalOpen}>
+                    <ModalContent>
+                        <ModalHeader>자기소개서 불러오기</ModalHeader>
+                        <ModalBody>
+                            <ChatUl>
+                                {psWrites.map((pswrite) => (
+                                    <ChatRoom
+                                        key={pswrite.psWriteId}
+                                        onClick={() => {
+                                            navigator(`/PersonalStatementWrite/${pswrite.psWriteId}`)
+                                            closeModal();
+                                        }}
+                                    >
+                                        <ChatName>{pswrite.psName}</ChatName>
+                                    </ChatRoom>
+                                ))}
+                            </ChatUl>
+                            <CloseButton onClick={closeModal}>닫기</CloseButton>
+                        </ModalBody>
+                    </ModalContent>
+                </ModalOverlay>
+                <FormContainer>
+                    <FormTitle
+                        type="text"
+                        value={psName}
+                        // onChange={(e) => setPsName(e.target.value)}
+                        onChange={handlePsNameChange}
+                        placeholder="자기소개서 이름을 입력하세요"
+                    />
+                    <Pagination>
+                        <NumBox>
+                            {sections.map((section) => (
+                                <button
+                                    key={section.id}
+                                    className={section.id === activeSection ? "active" : ""}
+                                    onClick={() => setActiveSection(section.id)}
+                                >
+                                    {section.id}
+                                </button>
+                            ))}
+                        </NumBox>
+                        <NumBox>
+                            <button onClick={handleAddSection}>+</button>
+                            <button onClick={handleRemoveSection}>﹣</button>
+                        </NumBox>
+                    </Pagination>
+                    {currentSection && (
+                        <div>
+                            <PsTextArea
+                                placeholder="문항을 입력하세요."
+                                value={currentSection.psTitle || ""}
+                                onInput={(e) => handleResizeHeight(e.target)}
+                                onChange={(e) =>
+                                    handleTitleChange(currentSection.id, e.target.value)
+                                }
+                            />
+                            <PsTextArea
+                                placeholder="내용을 입력하세요."
+                                value={currentSection.psContent || ""}
+                                onInput={(e) => handleResizeHeight(e.target)}
+                                onChange={(e) =>
+                                    handleContentChange(currentSection.id, e.target.value)
+                                }
+                            />
+                            <CharacterCount>
+                                글자 수: {currentSection?.psContent?.length || 0}자 (공백 제외:{" "}
+                                {currentSection?.psContent?.replace(/\s+/g, "").length || 0}자), 바이트:{" "}
+                                {calculateBytes(currentSection?.psContent || "")} bytes)
+                            </CharacterCount>
+                            {/*                        <button onClick={handleSpellCheck}>맞춤법 검사</button>
+                        {correctedText && <p>수정된 텍스트: {correctedText}</p>}*/}
+                        </div>
+                    )}
+                </FormContainer>
             </WriteFormBg>
             <RejectModal open={reject.value} message={reject.label} onClose={() => navigator("/")}/>
             <OptionsModal open={option.value} onCancel={() => navigator("/")} options={option.options} message= "작성하신 자소서 목록"

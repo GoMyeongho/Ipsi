@@ -15,7 +15,8 @@ const ChatNavBar = styled.div`
     width: 100%;
     height: 50px;
     bottom: 0;
-    background-color: #FAFAFA;
+    //background-color: #FAFAFA;
+    background-color: rgba(224, 206, 255, 0.5);
     display: flex;
     align-items: center;
     justify-content: space-evenly;

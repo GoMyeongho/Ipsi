@@ -61,7 +61,9 @@ export const StyledSideMenu = styled.div`
     right: 30px;
     bottom: 50px;
     width: 400px;
-    height: 700px;
+    //height: 700px;
+    aspect-ratio: 4 / 7;
+    background-color: #FFF;
     border-radius: 30px;
     box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.5);
     z-index: ${props => props.isOpen ? "-1000" : "1000"};

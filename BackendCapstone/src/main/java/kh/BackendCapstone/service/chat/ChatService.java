@@ -47,6 +47,7 @@ public class ChatService {
                 .stream()
                 .collect(Collectors.toMap(ChatRoom::getRoomId, this::convertEntityToRoomDto));
     }
+
     public List<ChatRoomResDto> findAllRoom() {
         return new ArrayList<>(chatRooms.values());
     }
@@ -135,17 +136,15 @@ public class ChatService {
                 .orElseThrow(
                         () -> new RuntimeException("해당 채팅방이 존재하지 않습니다.1")
                 );
-        if (room != null) { // 방이 존재하면
-            if (room.isSessionEmpty() && chatMemberRepository.findByChatRoom(chatRoom).isEmpty()) {
-                chatRooms.remove(roomId); // 방 삭제
-                ChatRoom chatRoomEntity = chatRoomRepository.findById(roomId).orElseThrow(
-                        () -> new RuntimeException("해당 채팅방이 존재하지 않습니다.2")
-                );
-                if (chatRoomEntity != null) {
-                    chatRoomRepository.delete(chatRoomEntity);
-                    return true;
-                }
-            }
+
+        // 채팅방에 남아있는 회원 수 확인
+        int memberCount = cntOfRoomMember(roomId);
+
+        // 채팅방에 회원이 없으면 삭제
+        if (memberCount == 0) {
+            chatRooms.remove(roomId); // 메모리에서 제거
+            chatRoomRepository.delete(chatRoom); // DB에서 제거
+            return true;
         }
         return false;
     }
@@ -196,10 +195,14 @@ public class ChatService {
                     () -> new RuntimeException("해당 멤버가 있는 채팅방 없음")
             );
 
+            if (room.isSessionEmpty()) {
+                removeRoom(roomId);
+            }
+
             if (chatMember != null) {
                 chatMemberRepository.delete(chatMember);
                 log.debug("ChatMember 삭제 : member = {}, chatRoom = {}", member.getNickName(), chatRoom.getRoomId());
-//                removeRoom(roomId); // 세션이 남아 있지 않으면 채팅방 삭제
+                removeRoom(roomId); // 세션이 남아 있지 않으면 채팅방 삭제
             }
         }
     }

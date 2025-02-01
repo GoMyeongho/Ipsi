@@ -1,9 +1,11 @@
 package kh.BackendCapstone.service;
 
+
 import kh.BackendCapstone.dto.response.PsWriteListResDto;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.PsContents;
 import kh.BackendCapstone.entity.PsWrite;
+import kh.BackendCapstone.entity.chat.ChatRoom;
 import kh.BackendCapstone.repository.MemberRepository;
 import kh.BackendCapstone.repository.PsContentsRepository;
 import kh.BackendCapstone.repository.PsWriteRepository;
@@ -31,7 +33,7 @@ public class PsWriteService {
     private final PsWriteRepository psWriteRepository;
     private final PsContentsRepository psContentsRepository;
     private final MemberService memberService;
-    
+
     @Transactional
     public PsWriteResDto savePsWrite(PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> contentsReqDtoList, String token) {
         // 작성자 조회
@@ -127,6 +129,17 @@ public class PsWriteService {
         List<PsWrite> psWriteList = psWriteRepository.findByMember(member);
         log.warn("리스트 반환 : {} ", psWriteList);
         return convertListToDto(psWriteList);
+    }
+
+    // 작성한 자기소개서 리스트
+    public List<PsWriteResDto> getPsByMemberId(Long memberId) {
+        // PsWrite 엔티티 리스트를 가져옴
+        List<PsWrite> psWrites = psWriteRepository.findPsWriteByMemberId(memberId);
+
+        // PsWrite 엔티티를 PsWriteResDto로 변환
+        return psWrites.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     // PsWrite 엔티티 PsWriteResDto 변환
