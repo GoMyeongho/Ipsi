@@ -82,7 +82,7 @@ public class PsWriteService {
         psWrite.setPsContents(psContentsList);
         
         // 저장
-        PsWrite savedPsWrite = psWriteRepository.save(psWritef);
+        PsWrite savedPsWrite = psWriteRepository.save(psWrite);
         
         // 저장된 데이터 DTO 변환 및 반환
         return convertToDto(savedPsWrite);

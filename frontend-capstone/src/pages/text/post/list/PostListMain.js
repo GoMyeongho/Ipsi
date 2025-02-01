@@ -97,7 +97,7 @@ const PostListMain = () => {
 				setCurrentPage={setPage}
 			/>
 			{
-				category !== "faq" &&
+				(category !== "faq" || role === "ROLE_ADMIN") &&
 				<ButtonContainer>
 					<div></div>
 					<Tooltip title="글 작성">
