@@ -35,45 +35,54 @@ public class PsWriteService {
     public PsWriteResDto savePsWrite(PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> contentsReqDtoList, String token) {
         // 작성자 조회
         Member member = memberService.convertTokenToEntity(token);
-        if(!member.getMemberId().equals(psWriteReqDto.getMemberId())) return null;
-        PsWrite psWrite = null;
-        if(psWriteReqDto.getPsWriteId() > 0) {
+        if (!member.getMemberId().equals(psWriteReqDto.getMemberId())) return null;
+        
+        PsWrite psWrite;
+        if (psWriteReqDto.getPsWriteId() > 0) {
             psWrite = psWriteRepository.findByPsWriteId(psWriteReqDto.getPsWriteId())
                 .orElseThrow(() -> new RuntimeException("해당 자소서가 없습니다."));
-        }
-        else {
-            // 자기소개서 엔티티 생성
+        } else {
             psWrite = new PsWrite();
             psWrite.setMember(member);
             psWrite.setPsName(psWriteReqDto.getPsName());
             psWrite.setRegDate(LocalDateTime.now());
         }
-        // 항목 리스트 저장
-        PsWrite finalPsWrite = psWrite;
         
+        // 기존 contents 조회
+        List<PsContents> existingContents = psContentsRepository.findByPsWrite(psWrite);
+        
+        // 새로운 contents ID 리스트 생성
+        Set<Long> newContentIds = contentsReqDtoList.stream()
+            .map(PsContentsReqDto::getPsContentsId)
+            .filter(id -> id > 0) // ID가 있는 경우만
+            .collect(Collectors.toSet());
+        
+        // 기존 contents 중 새로운 리스트에 없는 것은 삭제
+        existingContents.stream()
+            .filter(existing -> !newContentIds.contains(existing.getPsContentsId()))
+            .forEach(psContentsRepository::delete);
+        
+        // 새로운 contents 추가 및 업데이트
         List<PsContents> psContentsList = contentsReqDtoList.stream().map(contentDto -> {
-            log.warn(contentDto.toString());
-            boolean isExists = contentDto.getPsContentsId() > 0 && psContentsRepository.findByPsContentsId(contentDto.getPsContentsId())
-                .orElseThrow(() -> new RuntimeException("해당 contents가 없습니다.")).getPsWrite().equals(finalPsWrite);
-            
             PsContents psContents;
-            if (isExists) {
+            if (contentDto.getPsContentsId() > 0) {
                 psContents = psContentsRepository.findByPsContentsId(contentDto.getPsContentsId())
                     .orElseThrow(() -> new RuntimeException("해당 contents가 없습니다."));
             } else {
-                psContents = new PsContents(); // 새로운 객체 생성
+                psContents = new PsContents();
             }
-            psContents.setPsWrite(finalPsWrite);
+            psContents.setPsWrite(psWrite);
             psContents.setPsTitle(contentDto.getPsTitle());
             psContents.setPsContent(contentDto.getPsContent());
             psContents.setSectionsNum(contentDto.getSectionsNum());
             return psContents;
         }).collect(Collectors.toList());
-
+        
         psWrite.setPsContents(psContentsList);
-        log.warn(psWrite.toString());
+        
         // 저장
         PsWrite savedPsWrite = psWriteRepository.save(psWrite);
+        
         // 저장된 데이터 DTO 변환 및 반환
         return convertToDto(savedPsWrite);
     }
