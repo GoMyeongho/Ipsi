@@ -27,4 +27,6 @@ public interface UnivRepository extends JpaRepository<Univ, Long> {
 	
 	@Query("SELECT DISTINCT e.univName FROM Univ e")
 	List<String> findDistinctColumn();
+	
+	Optional<Univ> findByUnivId(Long univId);
 }

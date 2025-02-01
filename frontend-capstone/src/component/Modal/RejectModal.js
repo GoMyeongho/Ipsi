@@ -7,7 +7,12 @@ const RejectModal = ({ open, message, onClose }) => {
 		<Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
 			<CustomDialogContent>
 				<Typography variant="h6" gutterBottom>
-					{message}
+					{message && message.split("\n").map((line, index) => (
+						<span key={index}>
+							{line}
+							<br />
+						</span>
+					))}
 				</Typography>
 			</CustomDialogContent>
 			<DialogActions>

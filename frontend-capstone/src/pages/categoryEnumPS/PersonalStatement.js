@@ -508,7 +508,7 @@ const PersonalStatement = () => {
 // 이름 가운제 * 변경 관련련
 const replaceMiddleChar = (str) => {
   if (!str || typeof str !== "string") {
-    // str이 falsy(null, undefined, 빈 문자열)거나 문자열이 아닌 경우 기본값 반환
+    // str이 falsy(null, undefined, 빈 문자열)s거나 문자열이 아닌 경우 기본값 반환
     console.warn("Invalid input for replaceMiddleChar:", str);
     return ""; // 기본값으로 빈 문자열 반환
   }

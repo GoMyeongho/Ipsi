@@ -2,6 +2,12 @@ import styled from "styled-components";
 import TopNavBar from "../component/TopNavBar";
 import ChatModal from "../pages/chat/ChatModal";
 import MobileTopNavBar from "../component/MobileTopNavBar";
+import {useContext, useEffect} from "react";
+import AuthApi from "../api/AuthApi";
+import {useDispatch, useSelector} from "react-redux";
+import {logout, setAccessToken, setRefreshToken, setRole} from "../context/redux/PersistentReducer";
+
+
 
 const Background = styled.div`
   width: 100%;
@@ -32,15 +38,41 @@ const Mobile = styled.div`
 `;
 
 
-const Layout = ({ isLoggedIn, setIsLoggedIn }) => {
+const Layout = () => {
+  const accessToken = useSelector((state) => state.persistent.accessToken);
+  const refreshToken = useSelector((state) => state.persistent.refreshToken);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    const fetchUserStatus = async () => {
+      try{
+        console.log("유저정보 패치")
+        const rsp = await AuthApi.IsLogin();
+        if(rsp)
+        {
+          console.log(rsp);
+          dispatch(setRole(rsp.data))
+          return
+        }
+        dispatch(logout())
+      } catch (error) {
+        console.log(error);
+        dispatch(logout())
+      }
+    }
+    fetchUserStatus();
+  }, [dispatch, accessToken, refreshToken]);
+  
+  
+  
   return (
     <Background>
       <Header>
         <PC>
-          <TopNavBar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+          <TopNavBar/>
         </PC>
         <Mobile>
-          <MobileTopNavBar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
+          <MobileTopNavBar/>
         </Mobile>
       </Header>
       <ChatModal />

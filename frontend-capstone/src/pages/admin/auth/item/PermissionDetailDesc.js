@@ -3,6 +3,8 @@ import { Box, Paper, Typography, Stack } from "@mui/material";
 import { PermissionContext } from "../../../../context/admin/PermissionStore";
 import styled from "styled-components";
 import AdminApi from "../../../../api/AdminApi";
+import Commons from "../../../../util/Common";
+import {Dropdown} from "../../../../styles/SmallComponents";
 
 const data = [
 	{ label: "이름", id: "name" },
@@ -16,9 +18,9 @@ const data = [
 ];
 
 const PermissionDetailDesc = () => {
-	const { permission, univNameList, setUniv } = useContext(PermissionContext);
+	const { permission, univNameList, setUnivList , setUniv, univList } = useContext(PermissionContext);
 	const [selectedUniv, setSelectedUniv] = useState("");
-	const [deptList, setDeptList] = useState([]);
+	
 	
 	// 대학교 선택 시 학과 목록 가져오기
 	useEffect(() => {
@@ -27,11 +29,11 @@ const PermissionDetailDesc = () => {
 				if (selectedUniv) {
 					const rsp = await AdminApi.getDeptList(selectedUniv);
 					if (rsp.status === 200) {
-						setDeptList(rsp.data); // 학과 목록 저장
-						setUniv(rsp.data); // 컨텍스트 업데이트
+						setUnivList(rsp.data); // 컨텍스트 업데이트
+						
 					}
 				} else {
-					setDeptList([]); // 대학교 선택 해제 시 학과 목록 초기화
+					setUnivList([]); // 대학교 선택 해제 시 학과 목록 초기화
 				}
 			} catch (error) {
 				console.error("학과 목록 가져오기 오류:", error);
@@ -39,11 +41,16 @@ const PermissionDetailDesc = () => {
 		};
 		
 		fetchDeptList();
-	}, [selectedUniv, setUniv]);
+	}, [selectedUniv]);
 	
-	const handleUnivChange = (e) => {
+	const onChangeUniv = (e) => {
 		setSelectedUniv(e.target.value);
+		setUniv(""); // 대학교 선택시 학과 초기화
 	};
+	
+	const onChangeDept = (e) => {
+		setUniv(e.target.value);
+	}
 	
 	return (
 		<Paper elevation={3} sx={{ padding: 3, maxWidth: 400, margin: "auto" }}>
@@ -68,7 +75,7 @@ const PermissionDetailDesc = () => {
 								{item.label}
 							</Typography>
 							{item.id === "univName" ? (
-								<Dropdown onChange={handleUnivChange} value={selectedUniv}>
+								<Dropdown onChange={onChangeUniv} value={selectedUniv}>
 									<option value="">대학교 선택</option>
 									{univNameList.map((univ, index) => (
 										<option key={index} value={univ}>
@@ -77,11 +84,11 @@ const PermissionDetailDesc = () => {
 									))}
 								</Dropdown>
 							) : (
-								<Dropdown disabled={!selectedUniv}>
+								<Dropdown onChange={onChangeDept} disabled={!selectedUniv}>
 									<option value="">학과 선택</option>
-									{deptList.map((dept, index) => (
-										<option key={index} value={dept}>
-											{dept}
+									{univList.map((dept, index) => (
+										<option key={index} value={dept.univId}>
+											{dept.univDept}
 										</option>
 									))}
 								</Dropdown>
@@ -100,7 +107,8 @@ const PermissionDetailDesc = () => {
 							<Typography variant="subtitle1" fontWeight="bold">
 								{item.label}
 							</Typography>
-							<Typography variant="body1">{value}</Typography>
+							{item.id.includes("Date") ? <Typography variant="body1">{value === "정보 없음" ? "정보 없음" : Commons.formatDate(value)}
+							</Typography> : <Typography variant="body1">{value}</Typography>}
 						</Box>
 					);
 				})}
@@ -111,32 +119,4 @@ const PermissionDetailDesc = () => {
 
 export default PermissionDetailDesc;
 
-const Dropdown = styled.select`
-    width: 100%;
-    padding: 10px;
-    text-align: center;
-    border: none;
-    border-radius: 5px;
-    background-color: #fff;
-    font-size: clamp(0.8rem, 1vw, 2.5rem);
-    cursor: pointer;
-    transition: all 0.3s ease;
 
-    &:hover {
-        border-color: #3498db;
-    }
-
-    &:focus {
-        border-color: #3498db;
-        outline: none;
-    }
-
-    option[value=""] {
-        font-weight: bold;
-        font-size: clamp(0.8rem, 1vw, 2.5rem);
-    }
-
-    option {
-        font-size: clamp(0.8rem, 1vw, 2.5rem);
-    }
-`;

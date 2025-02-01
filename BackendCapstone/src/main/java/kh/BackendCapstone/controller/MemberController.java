@@ -20,7 +20,7 @@ import java.util.List;
 public class MemberController {
 	
 	private final MemberService memberService;
-	private final TokenProvider tokenProvider;
+	
 
 	// 전체 회원 조회
 	@GetMapping("/list")
@@ -70,9 +70,10 @@ public class MemberController {
 		return ResponseEntity.ok(isSuccess);
 	}
 	// 받는거
-	@GetMapping("/isRole/{role}")
-	public ResponseEntity<Boolean> isRole(@PathVariable String role, @RequestHeader("Authorization") String token) {
-		boolean isSuccess = memberService.isRole(role, token);
-		return ResponseEntity.ok(isSuccess);
+	@GetMapping("/role")
+	public ResponseEntity<String> isRole(@RequestHeader("Authorization") String token) {
+		log.warn("확인");
+		String role = memberService.getRole(token);
+		return ResponseEntity.ok(role);
 	}
 }

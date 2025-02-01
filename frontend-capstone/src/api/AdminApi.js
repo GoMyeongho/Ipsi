@@ -21,8 +21,8 @@ const AdminApi = {
 			},});
 	},
 	activePermission: (permissionId, univId, isUniv) => {
-		console.log(`권한 부여 : ${permissionId}`);
-		return axios.get(baseUrl + `/admin/permission/active/${permissionId}/${univId}/${isUniv}`, {
+		console.log(`권한 부여 : /admin/permission/active/${permissionId}/${univId}/${isUniv}`);
+		return axios.post(baseUrl + `/admin/permission/active/${permissionId}/${univId}/${isUniv}`, {
 			headers: {
 				Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
 			},});
@@ -40,6 +40,20 @@ const AdminApi = {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},})
+	},
+	getMemberList: (searchOption, searchValue) => {
+		console.log(`${searchOption} 전체 회원 조회 : ${searchValue}`);
+		return axios.get(baseUrl + `/admin/member/${searchOption}/${searchValue}`, {
+			headers: {
+				Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
+			},});
+	},
+	getMemberDetails: (memberId) => {
+		console.log(`${memberId}의 회원 세부 내용 확인`)
+		return axios.get(baseUrl + `/admin/member/details/${memberId}`, {
+			headers: {
+				Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
+			},});
 	}
 }
 export default AdminApi;
