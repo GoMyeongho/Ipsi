@@ -1,19 +1,7 @@
-import {Outlet, useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate} from "react-router-dom";
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import DocumentsApi from "../../api/DocumentsApi";
-import ChattingApi from "../../api/ChattingApi";
-import React, {useContext, useState} from "react";
-import {ChatContext} from "../../context/ChatStore";
-import ChatList from "../../component/ChatComponent/ChatList";
-import OpenChatSearch from "../../component/ChatComponent/OpenChatSearch";
-import ChatBot from "../../component/ChatComponent/ChatBot";
-import Chatting from "../../component/ChatComponent/Chatting";
-import ChatRoomCreate from "../../component/ChatComponent/ChatRoomCreate";
-import openIcon from "../../images/chat.png";
-import closeIcon from "../../images/close.png";
-import ChatMenuBar from "../../component/ChatComponent/ChatMenuBar";
-import {Container, StyledSideMenu} from "../chat/ChatModal";
 import {useDispatch, useSelector} from "react-redux";
 
 const Background = styled.div`
@@ -181,20 +169,8 @@ const BuyButton = styled.button`
 `;
 
 const PrivateChat = styled.button`
-    
+
 `
-
-const PersonalStatementDetail = ({ setSelectedPage }) => {
-  const [chatRooms, setChatRooms] = useState([]);
-  const {setRoomId} = useContext(ChatContext);
-
-  const [filteredChatRooms, setFilteredChatRooms] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
-
-  const [personCnt, setPersonCnt] = useState([]);
-  const [chatRoomTitle, setChatRoomTitle] = useState([]);
-
-  const [errorMessage, setErrorMessage] = useState("");
 
 const Bottom = styled.div`
   width: 70%;
@@ -620,12 +596,12 @@ const PersonalStatementDetail = () => {
               <BottomButton onClick={handleSubmit}>등록</BottomButton>
             </BottomUploadBox>
           
-             {/* 리뷰 리스트 렌더링 */}   
+             {/* 리뷰 리스트 렌더링 */}
              {review && review.length === 0 ? (
               <ReviewListBox>댓글이 없습니다.</ReviewListBox>
             ) : (
               review.map((reviewItem, index) => (
-              <ReviewListBox key={index}> 
+              <ReviewListBox key={index}>
                 <ReviewListTop>
                   <ReviewName>{replaceMiddleName(reviewItem.memberName)}</ReviewName>
                   <ReviewTime>{reviewDateTime(reviewItem.reviewRegDate)}</ReviewTime>
