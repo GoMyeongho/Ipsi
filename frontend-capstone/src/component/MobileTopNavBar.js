@@ -172,22 +172,7 @@ const MobileTopNavBar = () => {
     // !!localStorage.getItem("loggedInUserId")
     !!localStorage.getItem("accessToken") // 토큰 여부로 로그인 상태 결정
   );
-  useEffect(() => {
-    const adminVerify = async () => {
-      try {
-        const rsp = await MemberApi.isAdmin();
-        console.log(rsp);
-        if (rsp) {
-          setAdmin(rsp.data);
-        } else {
-          //실패시 보여줄 부분
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    adminVerify();
-  }, [isAdmin]);
+  
 
   // MenuBar
   const menuBarOpenModal = () => setIsMenuBarModalOpen(true); // 입시자료 모달창 ON

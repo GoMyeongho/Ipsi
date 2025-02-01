@@ -85,8 +85,8 @@ const PageComponent = ({ maxPage, currentPage, setCurrentPage }) => {
 			
 			{/* 다음 페이지로 가는 버튼 */}
 			<IconButton
-				onClick={handleNextPageClick}
-				disabled={currentPage === maxPage - 1}
+				onClick={handleNextPageRangeClick}
+				disabled={currentPage >= maxPage - 1}
 				sx={{
 					width: 30, // 크기 조정
 					height: 30, // 크기 조정

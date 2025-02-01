@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// 초기 상태: localStorage에서 값 불러오기
 const initialState = {
 	accessToken: localStorage.getItem("accessToken") || "",
 	refreshToken: localStorage.getItem("refreshToken") || "",

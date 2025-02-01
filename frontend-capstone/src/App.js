@@ -31,6 +31,7 @@ import PermissionDetailMain from "./pages/admin/auth/item/PermissionDetailMain";
 import { CheckoutPage } from './paySystem/CheckOut';
 import Store from "./context/Store"
 import {Provider} from "react-redux";
+import PostCreateMain from "./pages/text/write/create/PostCreateMain";
 
 
 
@@ -74,6 +75,7 @@ function App() {
               <Route path="post" element={<TextStore><PostLayout /></TextStore>}>
                 <Route path="list/:category/:search?/:searchOption?" element={<PostListMain />} />
                 <Route path="detail/:id" element={<PostItemMain />} />
+                <Route path="create/:category/:id?" element={<PostCreateMain />} />
               </Route>
               <Route path='auth/oauth-response/:token/:expirationTime' element={<OAuth/>}/>
             </Route>

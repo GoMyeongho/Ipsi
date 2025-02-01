@@ -1,12 +1,13 @@
 import {configureStore} from "@reduxjs/toolkit";
 import PersistentReducer from "./redux/PersistentReducer";
+import ModalReducer from "./redux/ModalReducer";
 
 
 
 const Store = configureStore({
 	reducer: {
-		persistent: PersistentReducer // localStorage 연동
-		// volatile: reducerWithoutLocalStorage, // 메모리에서만 관리
+		persistent: PersistentReducer, // localStorage 연동
+		modal: ModalReducer,
 	},
 	
 });

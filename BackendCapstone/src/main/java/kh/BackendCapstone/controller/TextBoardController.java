@@ -33,6 +33,13 @@ public class TextBoardController {
 		log.warn("글번호 {} 의 글 내용 조회 : {}", boardId, rsp);
 		return ResponseEntity.ok(rsp);
 	}
+	// 글 수정을 위한 조회
+	@GetMapping("/load/id/{boardId}")
+	public ResponseEntity<TextBoardResDto> loadBoardById(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") String token) {
+		TextBoardResDto rsp = textBoardService.findByBoardId(boardId);
+		log.warn("글번호 {} 의 글 내용 불러오기 : {}", boardId, rsp);
+		return ResponseEntity.ok(rsp);
+	}
 	
 	// 카테고리별 전체 글 조회
 	@GetMapping("/page/{category}")

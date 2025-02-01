@@ -1,9 +1,11 @@
-import React, { useContext } from 'react';
+import React, {useContext, useState} from 'react';
 import { styled } from 'styled-components';
-import { TextField, Select, MenuItem, InputLabel, FormControl, Button } from '@mui/material';
+import {TextField, Select, MenuItem, InputLabel, FormControl, Button, IconButton} from '@mui/material';
 import { Search } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import { TextContext } from "../../../../context/TextStore";
+import {Dropdown} from "../../../../styles/SmallComponents";
+import RejectModal from "../../../../component/RejectModal";
 
 // 전체 컨테이너 스타일링
 const HeaderContainer = styled.div`
@@ -29,82 +31,113 @@ const SearchContainer = styled.div`
     padding: 5px 15px;
     border-radius: 50px;
     margin-right: 20px;
-    min-width: 250px;
+    min-width: 200px;
+		width: 60%;
+		flex-grow: 1;
 `;
 
 // 검색 아이콘
 const SearchIcon = styled(Search)`
     color: #757575;
-    margin-right: 10px;
 `;
 
 // 오른쪽 컨테이너
 const RightContainer = styled.div`
     display: flex;
     align-items: center;
+    min-width: 500px;
+		width: 60%;
 `;
 
-// 드롭다운 스타일링
 const DropdownContainer = styled.div`
-    display: flex;
-    align-items: center;
-    background-color: #f5f5f5;
-    border-radius: 20px;
-    padding: 5px 15px;
-`;
+	display: flex;
+	width: 15%;
+`
 
 const PostListHeader = () => {
-	const { searchQuery, setSearchQuery, sortOption, setSortOption } = useContext(TextContext);
+	const { searchQuery, setSearchQuery, searchOption, setSearchOption, sortOption, setSortOption, setPage } = useContext(TextContext);
 	const navigate = useNavigate();
-	
+	const [reject, setReject] = useState(false);
+	const [error, setError] = useState("");
+	const {category} = useParams()
 	// 검색어 변경
 	const onSearchChange = (event) => {
 		setSearchQuery(event.target.value);
 	};
-	
 	// 검색 버튼 클릭
 	const onSearchClick = () => {
-		navigate(`/list/${searchQuery}/${sortOption}`);
+		if (searchOption === null || searchOption === "") {
+			setError("검색 조건이 선택되지 않았습니다.")
+			setReject(true);
+			return
+		}
+		if (searchQuery === null || searchQuery === "") {
+			setError("검색창에 아무값도 없습니다.")
+			setReject(true);
+			return;
+		}
+		navigate(`/post/list/${category}/${searchQuery}/${searchOption}`);
 	};
 	
 	// 정렬 옵션 변경
 	const onSortChange = (event) => {
 		setSortOption(event.target.value);
+		setPage(0);
 	};
+	
+	const onChangeSearchOption = (event) => {
+		setSearchOption(event.target.value);
+	}
+	
+	const sortOptions = [
+		{value: 'desc', label: '최신순'},
+		{value: 'asc', label: '오래된순'},
+	]
+	const searchOptions = [
+		{value: "title", label: "제목"},
+		{value: "nickName", label: "작성자"},
+		{value: "titleAndContent", label: "제목 + 내용"},
+	]
 	
 	return (
 		<HeaderContainer>
 			<Title>게시판</Title>
 			<RightContainer>
+				{/* 드롭다운 */}
+				<DropdownContainer>
+					<Dropdown value={searchOption} onChange={onChangeSearchOption}>
+						<option value={""}>검색 범위</option>
+						{searchOptions.map((search, index) => (
+							<option key={index} value={search.value}>
+								{search.label}
+							</option>
+						))}
+					</Dropdown>
+				</DropdownContainer>
 				{/* 검색 입력 */}
 				<SearchContainer>
-					<SearchIcon />
 					<TextField
 						placeholder="검색어 입력"
 						variant="standard"
-						InputProps={{ disableUnderline: true }}
 						value={searchQuery}
 						onChange={onSearchChange}
-						fullWidth
+						sx = {{flexGrow: 1}}
 					/>
-					<Button onClick={onSearchClick}>검색</Button>
+					<IconButton onClick={onSearchClick}><SearchIcon/></IconButton>
 				</SearchContainer>
-				
 				{/* 드롭다운 */}
 				<DropdownContainer>
-					<FormControl fullWidth variant="standard">
-						<InputLabel>정렬 옵션</InputLabel>
-						<Select
-							value={sortOption}
-							onChange={onSortChange}
-							label="정렬 옵션"
-						>
-							<MenuItem value="desc">최신순</MenuItem>
-							<MenuItem value="asc">오래된순</MenuItem>
-						</Select>
-					</FormControl>
+					<Dropdown value={sortOption} onChange={onSortChange}>
+						<option value="">정렬 순서</option>
+						{sortOptions.map((sort, index) => (
+							<option key={index} value={sort.value}>
+								{sort.label}
+							</option>
+						))}
+					</Dropdown>
 				</DropdownContainer>
 			</RightContainer>
+			<RejectModal open={reject} message={error} onClose={() => setReject(false)}></RejectModal>
 		</HeaderContainer>
 	);
 };

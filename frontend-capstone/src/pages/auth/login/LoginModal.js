@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import styled from "styled-components";
 import AuthApi from "../../../api/AuthApi";
 import SignupModal from "../signup/SingupModal";
@@ -6,6 +6,10 @@ import FindPw from "../findPw/FIndPw";
 import FindIdByPhone from "../findId/FindIdByPhone";
 import { useNavigate } from "react-router-dom";
 import Commons from "../../../util/Common";
+import {useDispatch} from "react-redux";
+import {setAccessToken, setRefreshToken} from "../../../context/redux/PersistentReducer";
+import RejectModal from "../../../component/RejectModal";
+
 
 // 도메인 및 API URL 설정
 
@@ -150,8 +154,8 @@ const SignupTextButton = styled.button`
   }
 `;
 
-const LoginModal = ({ closeModal, setIsLoggedIn }) => {
-
+const LoginModal = ({ closeModal }) => {
+  const dispatch = useDispatch();
   const onSnsSignInButtonClickHandler =(type) =>{
     window.location.href = SNS_SIGN_IN_URL(type);
   };
@@ -165,7 +169,8 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isFindIdModalOpen, setIsFindIdModalOpen] = useState(false);
   const [isFindPwModalOpen, setIsFindPwModalOpen] = useState(false);
-
+  const [reject, setReject] = useState({});
+  
   // 로그인시 MainPage 이동(로그인시 자료구매현황을 확인해서 구매한자료인지 아닌지 파악하기위함)
   const navigate = useNavigate();
 
@@ -181,25 +186,21 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
       if (res.data.grantType === "Bearer") {
         console.log("accessToken : " + res.data.accessToken);
         console.log("refreshToken : " + res.data.refreshToken);
-        Commons.setAccessToken(res.data.accessToken);
-        Commons.setRefreshToken(res.data.refreshToken);
-        setIsLoggedIn(true)
+        dispatch(setAccessToken(res.data.accessToken));
+        dispatch(setRefreshToken(res.data.refreshToken));
         closeModal();
-        navigate("/");
       } else {
         console.log("잘못된 아이디 또는 비밀번호 입니다.");
-        // setModalMsg("잘못된 아이디 또는 비밀번호 입니다.");
+        setReject({message : "ID와 PW가 다릅니다.", active: true});
       }
     } catch (err) {
       console.log("로그인 에러 : " + err);
       if (err.response && err.response.status === 405) {
         console.log("로그인 실패: 405 Unauthorized");
-        // setModalOpen(true);
-        // setModalMsg("잘못된 아이디 또는 비밀번호 입니다.");
+        setReject({message : "로그인에 실패하였습니다.", active: true});
       } else {
         console.log("로그인 에러 : " + err);
-        // setModalOpen(true);
-        // setModalMsg("서버와의 연결이 끊어졌습니다!");
+        setReject({message : "서버와의 통신에 실패했습니다.", active: true});
       }
     }
   };
@@ -227,6 +228,8 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
   const closeFindPwModal = () => {
     setIsFindPwModalOpen(false);
   };
+  
+  
 
 
 
@@ -274,6 +277,7 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
       {isSignupModalOpen && <SignupModal closeModal={closeSignupModal} />}
       {isFindIdModalOpen && <FindIdByPhone closeModal={closeFindIdModal} />}
       {isFindPwModalOpen && <FindPw closeModal={closeFindPwModal} />}
+      <RejectModal open={reject.active} message={reject.message} onClose={() => setReject("")}></RejectModal>
     </>
   );
 };

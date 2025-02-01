@@ -17,7 +17,7 @@ const PermissionDetailMain = () => {
 	const onClickPermission = async (isUniv) => {
 		try{
 			if(univ) {
-				const rsp = await PermissionApi.activePermission(permissionId, univ.univId, isUniv)
+				const rsp = await PermissionApi.activePermission(permissionId, univ, isUniv)
 				console.log(rsp)
 				return
 			}
@@ -36,7 +36,7 @@ const PermissionDetailMain = () => {
 				const rsp = await AdminApi.getUnivList();
 				if(rsp.status === 200) {
 					console.log(rsp);
-					setUnivNameList(rsp);
+					setUnivNameList(rsp.data);
 				}
 			} catch (e) {
 				console.error(e)
@@ -79,29 +79,29 @@ const PermissionDetailMain = () => {
 	}
 	
 	return (
-		<Box sx={{ padding: 3, backgroundColor: "#f5f5f5" }}>
-			<Paper elevation={3} sx={{ padding: 3, maxWidth: 1200, margin: "auto" }}>
+		<Box sx={{ padding: 3, backgroundColor: "#f5f5f5", width: "100%"}}>
+			<Paper elevation={3} sx={{ padding: 3, width: "100%", margin: "auto" }}>
 				<Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
 					권한 관리
 				</Typography>
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
 					{/* PDF 컴포넌트 */}
-					<Paper elevation={2} sx={{ padding: 2 }}>
+					<Paper elevation={2} sx={{ padding: 2, width: "100%", margin: "auto" }}>
 						{/*<PermissionDetailPdf />*/}
 						<Button href={permission.permissionUrl}>파일보기</Button>
 					</Paper>
 					
 					{/* 권한 정보 */}
-					<Paper elevation={2} sx={{ padding: 2 }}>
+					<Paper elevation={2} sx={{ padding: 2, width: "100%", margin: "auto" }}>
 						<PermissionDetailDesc />
 					</Paper>
 					{/* 권한 버튼 */}
-					<Paper elevation={2} sx={{ padding: 2 }}>
+					<Paper elevation={2} sx={{ padding: 2,  width: "100%", margin: "auto", display: "flex", justifyContent: "space-evenly" }}>
 						<Tooltip title="해당 대학에 합격했음만 인증합니다.">
-							<Button onClick={() => onClickPermission(false)}>합격</Button>
+							<Button variant="outlined" onClick={() => onClickPermission(false)}>합격</Button>
 						</Tooltip>
 						<Tooltip title="해당 대학에 재학중임을 인증합니다.">
-							<Button onClick={() => onClickPermission(true)}>대학</Button>
+							<Button variant="outlined" onClick={() => onClickPermission(true)}>대학</Button>
 						</Tooltip>
 					</Paper>
 				</Box>

@@ -1,29 +1,37 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Box } from "@mui/material";
-import {  useNavigate, useParams } from "react-router-dom";
+import React, {useEffect, useContext, useState} from "react";
+import {Box, IconButton, Tooltip} from "@mui/material";
+import {  useNavigate , useParams } from "react-router-dom";
+import CreateIcon from '@mui/icons-material/Create';
 import { TextContext } from "../../../../context/TextStore"; // context 사용
 import TextBoardApi from "../../../../api/TextBoardApi";
 
 import PageComponent from "../../../../component/PageComponent";
 import TextListComponent from "../../../../component/TextListCompomnent";
 import PostListHeader from "./PostListHeader";
+import styled from "styled-components";
+import {useDispatch, useSelector} from "react-redux";
+import RejectModal from "../../../../component/RejectModal";
+import ConfirmModal from "../../../../component/ConfirmModal";
+import {setLoginModalOpen} from "../../../../context/redux/ModalReducer";
 
 const PostListMain = () => {
 	// context에서 상태 가져오기
-	const { size, page, setPage, postList, setPostList, maxPage, setMaxPage, setSearch, setSearchOption } = useContext(TextContext);
-	
-	// const navigate = useNavigate();
+	const { size, page, setPage, postList, setPostList, maxPage, setMaxPage, setSearchQuery, setSearchOption } = useContext(TextContext);
+	const navigator = useNavigate();
 	const { category, search, searchOption } = useParams(); // URL 파라미터에서 검색어와 검색옵션 가져오기
-	
+	const role = useSelector(state => state.persistent.role);
+	const [confirm, setConfirm] = useState({});
+	const dispatch = useDispatch();
+
 	// URL에서 search와 searchOption을 추출하고, context 상태를 업데이트
 	useEffect(() => {
 		if (search) {
-			setSearch(search); // 상태 업데이트
+			setSearchQuery(search); // 상태 업데이트
 		}
 		if (searchOption) {
 			setSearchOption(searchOption); // 상태 업데이트
 		}
-	}, [search, searchOption, setSearch, setSearchOption]);
+	}, [search, searchOption]);
 	
 	// 페이지와 검색어에 따라 MaxPage 요청
 	useEffect(() => {
@@ -64,7 +72,18 @@ const PostListMain = () => {
 		fetchPostList();
 	}, [page, size, search, category, setPostList]);
 	
-	
+	const onClickCreate = () => {
+		if(role !== null && role !== "REST_USER") {
+			navigator(`/post/create/${category}`)// 글작성 페이지로 이동
+		}
+		else {
+			setConfirm({value : true, label : "로그인 후에 가능한 서비스 입니다.\n로그인 하시겠습니까?"
+				, onConfirm: () => {
+				dispatch(setLoginModalOpen(true));
+				setConfirm({})
+			}});
+		}
+	}
 	
 	return (
 		<Box sx={styles.container}>
@@ -75,6 +94,18 @@ const PostListMain = () => {
 				currentPage={page}
 				setCurrentPage={setPage}
 			/>
+			{
+				category !== "faq" &&
+				<ButtonContainer>
+					<div></div>
+					<Tooltip title="글 작성">
+						<IconButton onClick={onClickCreate}>
+							<CreateIcon/>
+						</IconButton>
+					</Tooltip>
+				</ButtonContainer>
+			}
+			<ConfirmModal onConfirm={confirm.onConfirm} message={confirm.label} open={confirm.value} onCancel={() => setConfirm({})}/>
 		</Box>
 	);
 };
@@ -85,7 +116,17 @@ const styles = {
 		flexDirection: "column",
 		alignItems: "center",
 		padding: "20px",
+		position: "relative",
 	},
 };
+
+const ButtonContainer = styled.div`
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	width: 100%;
+	margin-right: 30px;
+`
+
 
 export default PostListMain;

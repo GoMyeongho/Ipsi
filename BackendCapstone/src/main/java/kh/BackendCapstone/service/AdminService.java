@@ -2,15 +2,24 @@ package kh.BackendCapstone.service;
 
 
 import kh.BackendCapstone.constant.Active;
+import kh.BackendCapstone.constant.Authority;
+import kh.BackendCapstone.constant.TextCategory;
+import kh.BackendCapstone.dto.request.AdminMemberReqDto;
+import kh.BackendCapstone.dto.response.AdminMemberResDto;
 import kh.BackendCapstone.dto.response.PermissionResDto;
+import kh.BackendCapstone.dto.response.TextBoardListResDto;
+import kh.BackendCapstone.dto.response.TextBoardResDto;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.Permission;
+import kh.BackendCapstone.entity.TextBoard;
 import kh.BackendCapstone.entity.Univ;
 import kh.BackendCapstone.repository.MemberRepository;
 import kh.BackendCapstone.repository.PermissionRepository;
+import kh.BackendCapstone.repository.TextBoardRepository;
 import kh.BackendCapstone.repository.UnivRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,6 +34,8 @@ public class AdminService {
 	private final PermissionRepository permissionRepository;
 	private final UnivRepository univRepository;
 	private final MemberRepository memberRepository;
+	private final TextBoardRepository textBoardRepository;
+	private final TextBoardService textBoardService;
 	
 	public PermissionResDto getPermission(Long id) {
 		try {
@@ -37,7 +48,6 @@ public class AdminService {
 			return null;
 		}
 	}
-	
 	public List<PermissionResDto> getPermissionList(String active) {
 		try{
 			List<Permission> permissionList = permissionRepository.findAllByActive(Active.fromString(active));
@@ -48,8 +58,6 @@ public class AdminService {
 			return null;
 		}
 	}
-	
-	
 	@Transactional
 	public boolean activatePermission(Long permissionId, Long univId, boolean isUniv) {
 		try{
@@ -72,7 +80,6 @@ public class AdminService {
 			return false;
 		}
 	}
-	
 	public boolean permissionSave(Permission permission) {
 		try {
 			Permission savedPermission = permissionRepository.save(permission);
@@ -95,7 +102,6 @@ public class AdminService {
 			return null;
 		}
 	}
-	
 	public List<Univ> getDeptList(String univName) {
 		try {
 			List<Univ> univList = univRepository.findByUnivName(univName);
@@ -105,6 +111,48 @@ public class AdminService {
 			log.error("학과 조회중 오류 : {}", e.getMessage());
 			return null;
 		}
+	}
+	
+	public List<Member> getMemberList(String searchOption , String searchValue ) {
+		List<Member> memberList = switch (searchOption) {
+			case "univName" -> memberRepository.findAllByUniv_UnivName(searchValue);
+			case "Authority" -> memberRepository.findAllByAuthority(Authority.fromString(searchValue));
+			default -> memberRepository.findAll();
+		};
+		log.warn("회원 정보 전체 검색 {}-{}, 결과 {}개 : {}",searchOption,searchValue,memberList.size(),memberList);
+		return memberList;
+	}
+	public AdminMemberResDto getMemberById(Long id) {
+		Member member = memberRepository.findByMemberId(id)
+			.orElseThrow(() -> new RuntimeException("해당하는 유저가 존재하지 않습니다."));
+		log.warn("id를 통해 검색 : {}", member);
+		return convertMemberToDto(member);
+	}
+	@Transactional
+	public boolean editMember(AdminMemberReqDto dto) {
+		Member member = memberRepository.findByMemberId(dto.getMemberId())
+			.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+		if(dto.getUnivId()!=null) {
+			member.setUniv(univRepository.findByUnivId(dto.getUnivId())
+				.orElseThrow(() -> new RuntimeException("해당 대학이 존재하지 않습니다.")));
+		}
+		if(dto.getAuthority()!=null) {
+			member.setAuthority(dto.getAuthority());
+		}
+		log.warn("수정하려는 회원 : {}", member);
+		memberRepository.save(member);
+		return true;
+	}
+	
+	public List<TextBoardListResDto> getInActiveTextBoardList(String category, int page) {
+		PageRequest pageable = PageRequest.of(page, 10);
+		List<TextBoard> textBoardList = textBoardRepository.findByActiveAndTextCategory(Active.INACTIVE, TextCategory.fromString(category), pageable).getContent();
+		log.warn("비활성 찾기 : {} - {}", textBoardList.size(), textBoardList);
+		return textBoardService.boardToBoardListResDto(textBoardList);
+	}
+	public int getInActiveTextBoardPage(String category) {
+		PageRequest pageable = PageRequest.of(0, 10);
+		return textBoardRepository.findByActiveAndTextCategory(Active.INACTIVE, TextCategory.fromString(category), pageable).getTotalPages();
 	}
 	
 	public PermissionResDto convertEntityToDto(Permission permission) {
@@ -122,8 +170,6 @@ public class AdminService {
 		dto.setActiveDate(permission.getActiveDate());
 		return dto;
 	}
-	
-	
 	public List<PermissionResDto> convertEntityToDtoList(List<Permission> permissionList) {
 		List<PermissionResDto> dtoList = new ArrayList<>();
 		for (Permission permission : permissionList) {
@@ -141,4 +187,18 @@ public class AdminService {
 		}
 		return dtoList;
 	}
+	
+	private AdminMemberResDto convertMemberToDto(Member member) {
+		AdminMemberResDto dto = new AdminMemberResDto();
+		dto.setAuthority(member.getAuthority());
+		dto.setId(member.getMemberId());
+		dto.setName(member.getName());
+		dto.setPhone(member.getPhone());
+		dto.setEmail(member.getEmail());
+		dto.setUnivDept(member.getUniv().getUnivDept());
+		dto.setUnivName(member.getUniv().getUnivName());
+		return dto;
+	}
+	
+	
 }

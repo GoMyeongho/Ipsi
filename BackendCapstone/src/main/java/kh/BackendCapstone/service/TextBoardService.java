@@ -29,6 +29,7 @@ import java.util.List;
 public class TextBoardService {
 	private final TextBoardRepository textBoardRepository;
 	private final MemberRepository memberRepository;
+	private final MemberService memberService;
 	
 	// 게시글 등록
 	@Transactional // 일련의 과정중에 오류가 하나라도 생기면 롤백됨
@@ -61,6 +62,18 @@ public class TextBoardService {
 			return null;
 		}
 	}
+	public TextBoardResDto loadByBoardId (Long id, String token) {
+		try {
+			TextBoard textBoard = textBoardRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
+			Member member = memberService.convertTokenToEntity(token);
+			return (member.equals(textBoard.getMember())) ? boardToBoardResDto(textBoard) : null;
+		} catch (Exception e) {
+			log.error("게시글 불러오기 중 오류 : {}",e.getMessage());
+			return null;
+		}
+	}
+	
 	// 카테고리별 게시글 전체 조회
 	public List<TextBoardListResDto> findBoardAllByCategory(String category, int page, int size, String sort) {
 		Pageable pageable = getPageable(page,size,sort);
@@ -255,7 +268,7 @@ public class TextBoardService {
 		return textBoardResDto;
 	}
 	// TextBoard 객체를 TextBoardListResDto로 바꿔주는 메서드
-	private List<TextBoardListResDto> boardToBoardListResDto(List<TextBoard> textBoardList) {
+	public List<TextBoardListResDto> boardToBoardListResDto(List<TextBoard> textBoardList) {
 		List<TextBoardListResDto> textBoardListResDtoList = new ArrayList<>();
 		log.warn("호출 : {}",textBoardList.size());
 		for (TextBoard textBoard : textBoardList) {
@@ -276,7 +289,7 @@ public class TextBoardService {
 		return content.length() > 20 ? content.substring(0, 20) + "..." : content;
 	}
 	
-	private PageRequest getPageable(int page, int size, String sort) {
+	public PageRequest getPageable(int page, int size, String sort) {
 		log.warn("페이지 객체 호출");
 		if (sort == null || (!sort.equals("asc") && !sort.equals("desc"))) {
 			log.warn("정렬 기준이 잘못되었습니다. 기본값(내림차순)을 사용합니다. sort : {}", sort);
