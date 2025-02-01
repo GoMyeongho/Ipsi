@@ -131,17 +131,6 @@ public class PsWriteService {
         return convertListToDto(psWriteList);
     }
 
-    // 작성한 자기소개서 리스트
-    public List<PsWriteResDto> getPsByMemberId(Long memberId) {
-        // PsWrite 엔티티 리스트를 가져옴
-        List<PsWrite> psWrites = psWriteRepository.findPsWriteByMemberId(memberId);
-
-        // PsWrite 엔티티를 PsWriteResDto로 변환
-        return psWrites.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
     // PsWrite 엔티티 PsWriteResDto 변환
     private PsWriteResDto convertToDto(PsWrite psWrite) {
         List<PsContentsResDto> contentsResDtos = psWrite.getPsContents().stream()
