@@ -5,9 +5,11 @@ import Commons from "../../util/Common";
 import {useNavigate, useParams} from "react-router-dom";
 import psWriteApi from "../../api/PsWriteApi";
 import {useSelector} from "react-redux";
-import RejectModal from "../RejectModal";
 import ChattingApi from "../../api/ChattingApi";
 import {ChatName, ChatRoom, ChatUl} from "../ChatComponent/ChatList";
+import RejectModal from "../Modal/RejectModal";
+import OptionsModal from "../Modal/OptionsModal";
+import {Button} from "@mui/material";
 
 const WriteFormBg = styled.div`
 /*    width: 70%;
@@ -227,6 +229,14 @@ const WriteForm = () => {
     const navigator = useNavigate();
     const role = useSelector((state) => state.persistent.role)
     const [reject, setReject] = useState({});
+    const [option, setOption] = useState({});
+    
+    const createPsWrite = async () => {
+        const response = await PsWriteApi.newPsWrite();
+        console.log(response);
+        navigator(`/PersonalStatementWrite/${response.data}`)
+        
+    }
 
     const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
 
@@ -245,29 +255,17 @@ const WriteForm = () => {
     // 자기소개서 불러오기
     const loadPsWrite = async (psWriteId) => {
         try {
-/*            if(!id) {
-                const response = await psWriteApi.newPsWrite(loggedInUser)
-                console.log(response)
-                navigator(`/PersonalStatementWrite/${response.data}`)
-                return
-            }*/
-            if (!psWriteId) {
-                // 기존 자기소개서 중 조건에 맞는 것이 있는지 확인
-                const existingPs = psWrites.find(ps =>
-                    ps.psName === '새 자기소개서' &&
-                    ps.psContents.every(content => !content.psTitle && !content.psContent)
-                );
-
-                if (existingPs) {
-                    // 조건에 맞는 자기소개서가 존재하면 해당 자기소개서 로드
-                    navigator(`/PersonalStatementWrite/${existingPs.psWriteId}`);
-                    return;
+            setOption({})
+            if(!id) {
+                const response = await PsWriteApi.getPsList();
+                console.log(response);
+                if(response.data.length > 0){
+                    setOption({value: true, options:(response.data.length < 11) ? [...response.data.map((option, index) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'})),{label: "+" , value: 0 , type: 'outlined'}]
+                           : response.data.map((option) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'}))})
+                    return
                 } else {
-                    // 없으면 새로운 자기소개서 생성
-                    const response = await PsWriteApi.newPsWrite(loggedInUser);
-                    console.log(response);
-                    navigator(`/PersonalStatementWrite/${response.data}`);
-                    return;
+                    await createPsWrite();
+                    return
                 }
             }
             const response = await PsWriteApi.loadPsWrite(psWriteId);
@@ -437,6 +435,58 @@ const WriteForm = () => {
     return (
         <>
             <WriteFormBg>
+                <Button onClick={() => navigator("/PersonalStatementWrite")}>자소서 목록 보기</Button>
+                <FormTitle
+                    type="text"
+                    value={psName}
+                    // onChange={(e) => setPsName(e.target.value)}
+                    onChange={handlePsNameChange}  // 이름 변경 핸들러
+                    placeholder="자기소개서 이름을 입력하세요"
+                />
+                <Pagination>
+                    <NumBox>
+                        {sections.map((section) => (
+                            <button
+                                key={section.id}
+                                className={section.id === activeSection ? "active" : ""}
+                                onClick={() => setActiveSection(section.id)}
+                            >
+                                {section.id}
+                            </button>
+                        ))}
+                    </NumBox>
+                    <BtnBox>
+                        <button onClick={handleAddSection}>+</button>
+                        <button onClick={handleRemoveSection}>﹣</button>
+                    </BtnBox>
+                </Pagination>
+                {currentSection && (
+                    <div>
+                        <PsTextArea
+                            placeholder="문항을 입력하세요."
+                            value={currentSection.psTitle || ""}
+                            onInput={(e) => handleResizeHeight(e.target)}
+                            onChange={(e) =>
+                                handleTitleChange(currentSection.id, e.target.value)
+                            }
+                        />
+                        <PsTextArea
+                            placeholder="내용을 입력하세요."
+                            value={currentSection.psContent || ""}
+                            onInput={(e) => handleResizeHeight(e.target)}
+                            onChange={(e) =>
+                                handleContentChange(currentSection.id, e.target.value)
+                            }
+                        />
+                        <CharacterCount>
+                            글자 수: {currentSection?.psContent?.length || 0}자 (공백 제외:{" "}
+                            {currentSection?.psContent?.replace(/\s+/g, "").length || 0}자), 바이트:{" "}
+                            {calculateBytes(currentSection?.psContent || "")} bytes)
+                        </CharacterCount>
+{/*                        <button onClick={handleSpellCheck}>맞춤법 검사</button>
+                        {correctedText && <p>수정된 텍스트: {correctedText}</p>}*/}
+                    </div>
+                )}
                 <BtnBox>
                     <button className="new" onClick={loadPsWrite}>새 자기소개서</button>
                     <button className="import" onClick={handleLoadPsWrite}>불러오기</button>
@@ -517,7 +567,9 @@ const WriteForm = () => {
                     )}
                 </FormContainer>
             </WriteFormBg>
-            <RejectModal open={reject.value} message={reject.label} onClose={() => navigator("/")}></RejectModal>
+            <RejectModal open={reject.value} message={reject.label} onClose={() => navigator("/")}/>
+            <OptionsModal open={option.value} onCancel={() => navigator("/")} options={option.options} message= "작성하신 자소서 목록"
+                          onOption={(event) => (event > 0) ? navigator(`/PersonalStatementWrite/${event}`) : createPsWrite()}/>
         </>
     );
 };

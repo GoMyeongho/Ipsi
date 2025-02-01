@@ -195,14 +195,14 @@ const MemberModal = ({ isOpen, closeModal, handleModalLinkClick, isAdmin }) => {
               나의 계정정보
               {/* CheckLogin을 사용하여 인증 후 정보수정 페이지로 바로 이동 */}
               <p>회원정보수정</p>
-              <p onClick={() => navigate("")}>게시글</p>
-              <p onClick={() => navigate("")}>업로드 권한 확인</p>
+              <p onClick={() => {navigate(""); closeModal();}}>게시글</p>
+              <p onClick={() => {navigate(""); closeModal();}}>업로드 권한 확인</p>
             </SubTitle1>
 
             <SubTitle2>
               나의 구매목록
-              <p onClick={() => navigate("/myPageNavBar/purchasedEnumPS")}>구매한 자기소개서</p>
-              <p onClick={() => navigate("/myPageNavBar/purchasedEnumSR")}>구매한 생활기록부</p>
+              <p onClick={() => {navigate("/myPageNavBar/purchasedEnumPS"); closeModal();}}>구매한 자기소개서</p>
+              <p onClick={() => {navigate("/myPageNavBar/purchasedEnumSR"); closeModal();}}>구매한 생활기록부</p>
             </SubTitle2>
 
             <SubTitle3>
@@ -213,17 +213,17 @@ const MemberModal = ({ isOpen, closeModal, handleModalLinkClick, isAdmin }) => {
             
             <SubTitle4>
               자료 업로드
-              <p onClick={() => navigate("/myPageNavBar/coverLetterRegister")}>자소서/생기부</p>
+              <p onClick={() => {navigate("/myPageNavBar/coverLetterRegister"); closeModal();}}>자소서/생기부</p>
             </SubTitle4>
 
             <SubTitle5>
               내가 업로드한 파일
-              <p onClick={() => navigate("/myPageNavBar/UploadedEnumPS")}>자기소개서</p>
-              <p onClick={() => navigate("/myPageNavBar/UploadedEnumSR")}>생활기록부</p>
+              <p onClick={() => {navigate("/myPageNavBar/UploadedEnumPS"); closeModal();}}>자기소개서</p>
+              <p onClick={() => {navigate("/myPageNavBar/UploadedEnumSR"); closeModal();}}>생활기록부</p>
             </SubTitle5>
           {isAdmin && (
             <ModalTextLink
-              onClick={() => {navigate("/admin");closeModal();}}>
+              onClick={() => {navigate("/admin"); closeModal();}}>
               관리자 페이지
             </ModalTextLink>
           )}

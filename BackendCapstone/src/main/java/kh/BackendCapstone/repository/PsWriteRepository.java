@@ -17,7 +17,5 @@ public interface PsWriteRepository extends JpaRepository<PsWrite,Long> {
 
     Optional<PsWrite> findByPsWriteId(Long psWriteId);
 
-    // 로그인한 회원이 작성한 자기소개서 목록 조회
-    @Query("SELECT cr FROM PsWrite cr WHERE cr.member.memberId = :memberId")
-    List<PsWrite> findPsWriteByMemberId(@Param("memberId") Long memberId);
+    List<PsWrite> findByMember(Member member);
 }

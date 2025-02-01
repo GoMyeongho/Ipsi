@@ -1,6 +1,7 @@
 package kh.BackendCapstone.service;
 
-import kh.BackendCapstone.dto.chat.ChatRoomResDto;
+
+import kh.BackendCapstone.dto.response.PsWriteListResDto;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.PsContents;
 import kh.BackendCapstone.entity.PsWrite;
@@ -43,6 +44,7 @@ public class PsWriteService {
         if (psWriteReqDto.getPsWriteId() > 0) {
             psWrite = psWriteRepository.findByPsWriteId(psWriteReqDto.getPsWriteId())
                 .orElseThrow(() -> new RuntimeException("해당 자소서가 없습니다."));
+            psWrite.setPsName(psWriteReqDto.getPsName());
         } else {
             psWrite = new PsWrite();
             psWrite.setMember(member);
@@ -122,6 +124,12 @@ public class PsWriteService {
         psWriteRepository.save(psWrite);
         return psWrite.getPsWriteId();
     }
+    public List<PsWriteListResDto> getPsWriteList(String token) {
+        Member member = memberService.convertTokenToEntity(token);
+        List<PsWrite> psWriteList = psWriteRepository.findByMember(member);
+        log.warn("리스트 반환 : {} ", psWriteList);
+        return convertListToDto(psWriteList);
+    }
 
     // 작성한 자기소개서 리스트
     public List<PsWriteResDto> getPsByMemberId(Long memberId) {
@@ -147,5 +155,16 @@ public class PsWriteService {
                 .regDate(psWrite.getRegDate())
                 .psContents(contentsResDtos)
                 .build();
+    }
+    private List<PsWriteListResDto> convertListToDto(List<PsWrite> psWriteList) {
+        List<PsWriteListResDto> psWriteListResDtoList = new ArrayList<>();
+        for (PsWrite psWrite : psWriteList) {
+            PsWriteListResDto psWriteListResDto = new PsWriteListResDto();
+            psWriteListResDto.setPsWriteId(psWrite.getPsWriteId());
+            psWriteListResDto.setPsName(psWrite.getPsName());
+            psWriteListResDto.setRegDate(psWrite.getRegDate());
+            psWriteListResDtoList.add(psWriteListResDto);
+        }
+        return psWriteListResDtoList;
     }
 }

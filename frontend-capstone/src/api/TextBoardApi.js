@@ -1,9 +1,10 @@
 import axios from "axios";
 import Commons from "../util/Common";
 
+
 const baseUrl = Commons.Capstone
 
-const token = Commons.getAccessToken();
+const token = localStorage.getItem("accessToken");
 
 const TextBoardApi = {
 	// 카테고리별 모든 글을 가져오는 api ( 페이지네이션 포함)
@@ -57,12 +58,11 @@ const TextBoardApi = {
 	},
 	
 	// 글 작성을 위한 api
-	createTextBoard : async (title, content, category, email) => {
+	createTextBoard : async (title, content, category) => {
 		const req = {
 			title: title,
 			content: content,
 			textCategory: category,
-			email: email,
 		}
 		console.log(`글 작성을 위한 api : ${JSON.stringify(req)}`)
 		return await axios.post(baseUrl + "/board/create", (req), {
@@ -73,15 +73,15 @@ const TextBoardApi = {
 	},
 	
 	// 글 수정을 위한 api
-	updateTextBoard : async (title, content, category, email, boardId) => {
+	updateTextBoard : async (title, content, category, boardId) => {
 		const req = {
 			title: title,
 			content: content,
 			textCategory: category,
-			email: email,
+			textId: boardId,
 		}
 		console.log(`글번호 : ${boardId}를 위한 글 수정을 위한 api : ${JSON.stringify(req)}`)
-		return await axios.post(baseUrl + `/board/update/${boardId}`, req, {
+		return await axios.post(baseUrl + `/board/update`, req, {
 			headers: {
 				Authorization: `Bearer ${token}`
 			}
@@ -91,7 +91,7 @@ const TextBoardApi = {
 	// 글 삭제를 위한 api
 	deleteTextBoard: async (boardId) => {
 		console.log(`글번호 : ${boardId}를 위한 글 삭제을 위한 api`)
-		return await  axios.post(baseUrl + `/board/delete/${boardId}/`, {}, {
+		return await  axios.delete(baseUrl + `/board/delete/${boardId}/`, {
 			headers: {
 				Authorization: `Bearer ${token}`
 			}
@@ -103,10 +103,17 @@ const TextBoardApi = {
 		return await  axios.get(baseUrl + `/board/find/id/${boardId}`,
 		)
 	},
-	
 	detailTextBoardForEdit : async (boardId) => {
-		console.log(`\`글번호 : ${boardId}를 위한 글 수정을 위해 받아오는 api 요청자`)
+		console.log(`글번호 : ${boardId}를 위한 글 수정을 위해 받아오는 api 요청자`)
 		return await  axios.get(baseUrl + `/board/load/id/${boardId}`, {
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		})
+	},
+	isAuthor: async (boardId) => {
+		console.log(`글번호 : ${boardId}의 작성자인지 확인하는 메서드`)
+		return await axios.get(baseUrl + `/board/isAuthor/${boardId}`,{
 			headers: {
 				Authorization: `Bearer ${token}`
 			}

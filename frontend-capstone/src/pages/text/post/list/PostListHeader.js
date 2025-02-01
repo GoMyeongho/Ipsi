@@ -5,7 +5,7 @@ import { Search } from '@mui/icons-material';
 import {useNavigate, useParams} from 'react-router-dom';
 import { TextContext } from "../../../../context/TextStore";
 import {Dropdown} from "../../../../styles/SmallComponents";
-import RejectModal from "../../../../component/RejectModal";
+import RejectModal from "../../../../component/Modal/RejectModal";
 
 // 전체 컨테이너 스타일링
 const HeaderContainer = styled.div`
@@ -51,8 +51,13 @@ const RightContainer = styled.div`
 
 const DropdownContainer = styled.div`
 	display: flex;
-	width: 15%;
+	width: 20%;
 `
+export const categoryTitle =[
+	{value: "faq", label: "FAQ"},
+	{value: "default", label: "게시판"},
+	{value: "review", label: "이용후기"},
+]
 
 const PostListHeader = () => {
 	const { searchQuery, setSearchQuery, searchOption, setSearchOption, sortOption, setSortOption, setPage } = useContext(TextContext);
@@ -93,15 +98,19 @@ const PostListHeader = () => {
 		{value: 'desc', label: '최신순'},
 		{value: 'asc', label: '오래된순'},
 	]
-	const searchOptions = [
+	const searchOptions = (category !== "faq") ? [
 		{value: "title", label: "제목"},
 		{value: "nickName", label: "작성자"},
 		{value: "titleAndContent", label: "제목 + 내용"},
+	] : [
+		{value: "title", label: "제목"},
+		{value: "titleAndContent", label: "제목 + 내용"},
 	]
+	
 	
 	return (
 		<HeaderContainer>
-			<Title>게시판</Title>
+			<Title>{categoryTitle.find(title => title.value === category)?.label || "기본 제목"}</Title>
 			<RightContainer>
 				{/* 드롭다운 */}
 				<DropdownContainer>

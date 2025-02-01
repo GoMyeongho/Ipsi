@@ -13,7 +13,7 @@ import {
   setSignupModalOpen,
   setIsMaterialModalOpen
 } from "../context/redux/ModalReducer";
-import RejectModal from "./RejectModal";
+import RejectModal from "./Modal/RejectModal";
 
 
 const Background = styled.div`

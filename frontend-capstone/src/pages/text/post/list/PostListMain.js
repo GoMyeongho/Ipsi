@@ -4,14 +4,12 @@ import {  useNavigate , useParams } from "react-router-dom";
 import CreateIcon from '@mui/icons-material/Create';
 import { TextContext } from "../../../../context/TextStore"; // context 사용
 import TextBoardApi from "../../../../api/TextBoardApi";
-
 import PageComponent from "../../../../component/PageComponent";
 import TextListComponent from "../../../../component/TextListCompomnent";
 import PostListHeader from "./PostListHeader";
 import styled from "styled-components";
 import {useDispatch, useSelector} from "react-redux";
-import RejectModal from "../../../../component/RejectModal";
-import ConfirmModal from "../../../../component/ConfirmModal";
+import ConfirmModal from "../../../../component/Modal/ConfirmModal";
 import {setLoginModalOpen} from "../../../../context/redux/ModalReducer";
 
 const PostListMain = () => {
@@ -50,6 +48,7 @@ const PostListMain = () => {
 			}
 		};
 		fetchMaxPage();
+		
 	}, [size, search, category, setMaxPage]);
 
 // 페이지와 검색어에 따라 게시글 목록 요청
@@ -70,6 +69,9 @@ const PostListMain = () => {
 			}
 		};
 		fetchPostList();
+		return(
+			setPostList(null)
+		)
 	}, [page, size, search, category, setPostList]);
 	
 	const onClickCreate = () => {
@@ -95,7 +97,7 @@ const PostListMain = () => {
 				setCurrentPage={setPage}
 			/>
 			{
-				category !== "faq" &&
+				(category !== "faq" || role === "ROLE_ADMIN") &&
 				<ButtonContainer>
 					<div></div>
 					<Tooltip title="글 작성">

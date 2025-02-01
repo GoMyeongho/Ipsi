@@ -36,7 +36,7 @@ public class FileBoard {
 	private LocalDateTime regDate; // 게시글 등록 일자
 
 	@Column(name = "Keywords")
-	private String Keywords;
+	private String keywords;
 
 	@PrePersist
 	public void prePersist() {

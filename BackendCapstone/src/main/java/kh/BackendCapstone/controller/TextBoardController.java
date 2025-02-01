@@ -21,8 +21,8 @@ public class TextBoardController {
 	
 	// 글 작성
 	@PostMapping("/create")
-	public ResponseEntity<Boolean> createBoard(@RequestBody TextBoardReqDto textBoardReqDto) {
-		boolean isSuccess =  textBoardService.saveBoard(textBoardReqDto);
+	public ResponseEntity<Long> createBoard(@RequestBody TextBoardReqDto textBoardReqDto, @RequestHeader("Authorization") String token) {
+		Long isSuccess =  textBoardService.createBoard(textBoardReqDto, token);
 		log.warn("작성 글 생성({}) : {}", isSuccess, textBoardReqDto);
 		return ResponseEntity.ok(isSuccess);
 	}
@@ -36,7 +36,7 @@ public class TextBoardController {
 	// 글 수정을 위한 조회
 	@GetMapping("/load/id/{boardId}")
 	public ResponseEntity<TextBoardResDto> loadBoardById(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") String token) {
-		TextBoardResDto rsp = textBoardService.findByBoardId(boardId);
+		TextBoardResDto rsp = textBoardService.loadByBoardId(boardId, token);
 		log.warn("글번호 {} 의 글 내용 불러오기 : {}", boardId, rsp);
 		return ResponseEntity.ok(rsp);
 	}
@@ -49,7 +49,7 @@ public class TextBoardController {
 		return ResponseEntity.ok(pageCount);
 	}
 	@GetMapping("/find/{category}")
-	public ResponseEntity<List<TextBoardListResDto>> findBoardAll(@PathVariable String category, @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+	public ResponseEntity<List<TextBoardListResDto>> findBoardAll(@PathVariable String category, @RequestParam int page, @RequestParam int size, @RequestParam(defaultValue = "desc") String sort) {
 		List<TextBoardListResDto> rsp = textBoardService.findBoardAllByCategory(category, page, size, sort);
 		log.warn("카테고리 : {} 전체 글 {}개의 내용 조회 : {}",category, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
@@ -64,7 +64,7 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/title/{category}/{title}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByTitle(@PathVariable String category, @PathVariable String title,
-	                                                              @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+	                                                              @RequestParam int page, @RequestParam int size, @RequestParam(defaultValue = "desc") String sort) {
 		List<TextBoardListResDto> rsp = textBoardService.findBoardByTitle(category, title, page, size, sort);
 		log.warn("카테고리 : {} 글 제목 : {} ,로 검색한 {}개의 내용 조회 : {}", category, title, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
@@ -79,7 +79,7 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/nickName/{category}/{nickName}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByNickName(@PathVariable String category, @PathVariable String nickName,
-	                                                                  @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+	                                                                  @RequestParam int page, @RequestParam int size, @RequestParam(defaultValue = "desc") String sort) {
 		List<TextBoardListResDto> rsp = textBoardService.findBoardByNickName(category, nickName, page, size, sort);
 		log.warn("카테고리 : {} 글 작성자 : {} ,로 검색한 {}개의 내용 조회 : {}", category, nickName, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
@@ -94,7 +94,7 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/titleOrContent/{category}/{keyword}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByTitleOrContent(@PathVariable String category, @PathVariable String keyword,
-	                                                                       @RequestParam int size, @RequestParam int page, @RequestParam String sort) {
+	                                                                       @RequestParam int size, @RequestParam int page, @RequestParam(defaultValue = "desc") String sort) {
 		List<TextBoardListResDto> rsp = textBoardService.findBoardByTitleAndContent(category ,keyword, size, page, sort);
 		log.warn("카테고리 : {} 제목과 내용 검색 : {}, 페이지당 {} 인 페이지 {} 의 검색된 개수 : {} 결과 : {}", category, keyword, size, page, rsp.size(),rsp);
 		return ResponseEntity.ok(rsp);
@@ -109,23 +109,29 @@ public class TextBoardController {
 	}
 	@GetMapping("/find/member/{category}/{email}")
 	public ResponseEntity<List<TextBoardListResDto>> findBoardByMember(@PathVariable String category, @PathVariable String email,
-	                                                                     @RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+	                                                                     @RequestParam int page, @RequestParam int size, @RequestParam(defaultValue = "desc") String sort) {
 		List<TextBoardListResDto> rsp = textBoardService.findBoardByMember(category, email, page, size, sort);
 		log.warn("카테고리 : {} 글 회원 : {} ,로 검색한 {}개의 내용 조회 : {}", category, email, rsp.size(), rsp);
 		return ResponseEntity.ok(rsp);
 	}
 	
-	@PostMapping("/update/{boardId}")
-	public ResponseEntity<Boolean> updateBoard(@RequestBody TextBoardReqDto textBoardReqDto, @PathVariable Long boardId) {
-		boolean isSuccess = textBoardService.updateBoard(textBoardReqDto, boardId);
-		log.warn("글번호 : {} 에대한 글 수정 {} 항목 : {}", boardId, isSuccess, textBoardReqDto);
+	@PostMapping("/update")
+	public ResponseEntity<Boolean> updateBoard(@RequestBody TextBoardReqDto textBoardReqDto, @RequestHeader("Authorization") String token) {
+		boolean isSuccess = textBoardService.updateBoard(textBoardReqDto, token);
+		log.warn("글 수정 {} 항목 : {}", isSuccess, textBoardReqDto);
 		return ResponseEntity.ok(isSuccess);
 	}
-	@PostMapping("/delete/{boardId}/{email}")
-	public ResponseEntity<Boolean> deleteBoard(@PathVariable("boardId") Long boardId, @PathVariable String email) {
-		boolean isSuccess = textBoardService.deleteBoard(email,boardId);
-		log.warn("email : {}의 글번호 : {} 삭제 요청 : {}", email, boardId, isSuccess);
+	@DeleteMapping("/delete/{boardId}")
+	public ResponseEntity<Boolean> deleteBoard(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") String token) {
+		boolean isSuccess = textBoardService.deleteBoard(boardId, token);
+		log.warn("글번호 : {} 삭제 요청 : {}", boardId, isSuccess);
 		return ResponseEntity.ok(isSuccess);
 	}
 	
+	@GetMapping("/isAuthor/{boardId}")
+	public ResponseEntity<String> isAuthor(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") String token) {
+		String isSuccess = textBoardService.isAuthor(boardId, token);
+		log.warn("글번호{} 의 작성자인지 여부 : {} ", boardId, isSuccess);
+		return ResponseEntity.ok(isSuccess);
+	}
 }
