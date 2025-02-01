@@ -21,7 +21,7 @@ const PostCreateMain = () => {
 	
 	useEffect(() => {
 		const fetchPost = async () => {
-			if (role === null || role === "REST_USER") {
+			if (role === null || role === "REST_USER" || role === "") {
 				setReject({ value: true, label: "로그인 하지 않으면 사용할 수 없습니다." });
 			}
 			if (category === "faq" && role !== "ROLE_ADMIN") {

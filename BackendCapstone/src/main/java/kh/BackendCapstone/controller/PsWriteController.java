@@ -4,6 +4,7 @@ import kh.BackendCapstone.dto.request.PsContentsReqDto;
 import kh.BackendCapstone.dto.request.PsWriteDto;
 import kh.BackendCapstone.dto.request.PsWriteReqDto;
 import kh.BackendCapstone.dto.response.PsContentsResDto;
+import kh.BackendCapstone.dto.response.PsWriteListResDto;
 import kh.BackendCapstone.dto.response.PsWriteResDto;
 import kh.BackendCapstone.service.PsWriteService;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,9 @@ public class PsWriteController {
     public ResponseEntity<Long> makePsWrite(@RequestHeader("Authorization") String token) {
         Long psWriteId = psWriteService.newPsWrite(token);
         return ResponseEntity.ok(psWriteId);
+    }
+    @GetMapping("/list/get")
+    public ResponseEntity<List<PsWriteListResDto>> getPsWriteList(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(psWriteService.getPsWriteList(token));
     }
 }

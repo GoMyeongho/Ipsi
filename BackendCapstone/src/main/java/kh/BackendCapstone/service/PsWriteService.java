@@ -1,5 +1,6 @@
 package kh.BackendCapstone.service;
 
+import kh.BackendCapstone.dto.response.PsWriteListResDto;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.PsContents;
 import kh.BackendCapstone.entity.PsWrite;
@@ -121,6 +122,12 @@ public class PsWriteService {
         psWriteRepository.save(psWrite);
         return psWrite.getPsWriteId();
     }
+    public List<PsWriteListResDto> getPsWriteList(String token) {
+        Member member = memberService.convertTokenToEntity(token);
+        List<PsWrite> psWriteList = psWriteRepository.findByMember(member);
+        log.warn("리스트 반환 : {} ", psWriteList);
+        return convertListToDto(psWriteList);
+    }
 
     // PsWrite 엔티티 PsWriteResDto 변환
     private PsWriteResDto convertToDto(PsWrite psWrite) {
@@ -135,5 +142,16 @@ public class PsWriteService {
                 .regDate(psWrite.getRegDate())
                 .psContents(contentsResDtos)
                 .build();
+    }
+    private List<PsWriteListResDto> convertListToDto(List<PsWrite> psWriteList) {
+        List<PsWriteListResDto> psWriteListResDtoList = new ArrayList<>();
+        for (PsWrite psWrite : psWriteList) {
+            PsWriteListResDto psWriteListResDto = new PsWriteListResDto();
+            psWriteListResDto.setPsWriteId(psWrite.getPsWriteId());
+            psWriteListResDto.setPsName(psWrite.getPsName());
+            psWriteListResDto.setRegDate(psWrite.getRegDate());
+            psWriteListResDtoList.add(psWriteListResDto);
+        }
+        return psWriteListResDtoList;
     }
 }

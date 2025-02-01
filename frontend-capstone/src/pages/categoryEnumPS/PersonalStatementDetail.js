@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import DocumentsApi from "../../api/DocumentsApi";
+import {useDispatch, useSelector} from "react-redux";
 
 const Background = styled.div`
   width: 100%;
@@ -329,6 +330,9 @@ const PersonalStatementDetail = () => {
   const [review, setReview] = useState([]); // 댓글
   const [inputReview, setInputReview] = useState(""); // 입력 값 상태 관리
   const { item, purchasedFileIds, myUploadedFile, myPurchasedFile } = location.state || {}; // 전달받은 데이터
+  const role = useSelector(state => state.persistent.role);
+  const dispatch = useDispatch();
+  console.log(role)
 
   // 리뷰 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
@@ -487,18 +491,20 @@ const PersonalStatementDetail = () => {
   };
 
     // keywords가 배열인지 확인하고, 배열이 아닐 경우 대체 방법 처리
-    const formattedKeywords = Array.isArray(item.keywords)
+  const formattedKeywords = Array.isArray(item?.keywords)
     ? item.keywords
-        .map((keyword) => keyword.replace(/[\[\]"\s,]/g, "")) // [ ] " , 공백을 제거
-        .join("  ") // 공백 사이에 두 개의 공백을 넣음
-    : item.keywords.replace(/[\[\]"\s,]/g, ""); // 문자열일 경우에도 처리
-
+      .map((keyword) => (typeof keyword === "string" ? keyword.replace(/[\[\]"\s,]/g, "") : ""))
+      .join("  ")
+    : typeof item?.keywords === "string"
+      ? item.keywords.replace(/[\[\]"\s,]/g, "")
+      : "";
+  
   // 날짜만 추출하는 로직
   const titleDate = (dateTime) => {
-    return dateTime ? dateTime.split("T")[0] : "";
+    return dateTime ? dateTime.split("T")[0] : ""; // dateTime이 null이면 빈 문자열 반환
   };
   const reviewDateTime = (dateTime) => {
-    return dateTime ? dateTime.split("T").join(" ") : "";
+    return dateTime ? dateTime.split("T").join(" ").split(".")[0] : ""; // 점(.) 뒤의 값을 제거
   };
 
   // 자릿수만 포맷팅하는 함수
@@ -513,17 +519,11 @@ const PersonalStatementDetail = () => {
 
   // 이름 가운제 * 변경 관련련
   const replaceMiddleName = (str) => {
-    if (!str || typeof str !== "string") {
-      // str이 falsy(null, undefined, 빈 문자열)거나 문자열이 아닌 경우 기본값 반환
-      console.warn("Invalid input for replaceMiddleName:", str);
-      return ""; // 기본값으로 빈 문자열 반환
-    }
-    
+    if (!str || typeof str !== "string") return ""; // null이면 빈 문자열 반환
     const len = str.length;
-    if (len === 0) return str; // 빈 문자열일 경우 원본 반환
-
-    const middleIndex = Math.floor(len / 2); // 가운데 글자 인덱스
-    return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1); // 가운데 글자를 '*'로 변경
+    if (len === 0) return str;
+    const middleIndex = Math.floor(len / 2);
+    return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1);
   };
 
   return (

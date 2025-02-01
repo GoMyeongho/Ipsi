@@ -75,6 +75,13 @@ const PsWriteApi = {
             headers: {
                 Authorization: `Bearer ${token}`
             }})
+    },
+    getPsList : async () => {
+        const token = localStorage.getItem("accessToken");
+        return await axios.get(Capstone + `/write/list/get`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }})
     }
 };
 
