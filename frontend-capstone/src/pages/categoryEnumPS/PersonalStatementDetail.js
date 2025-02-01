@@ -1,6 +1,18 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import styled from "styled-components";
 import DocumentsApi from "../../api/DocumentsApi";
+import ChattingApi from "../../api/ChattingApi";
+import React, {useContext, useState} from "react";
+import {ChatContext} from "../../context/ChatStore";
+import ChatList from "../../component/ChatComponent/ChatList";
+import OpenChatSearch from "../../component/ChatComponent/OpenChatSearch";
+import ChatBot from "../../component/ChatComponent/ChatBot";
+import Chatting from "../../component/ChatComponent/Chatting";
+import ChatRoomCreate from "../../component/ChatComponent/ChatRoomCreate";
+import openIcon from "../../images/chat.png";
+import closeIcon from "../../images/close.png";
+import ChatMenuBar from "../../component/ChatComponent/ChatMenuBar";
+import {Container, StyledSideMenu} from "../chat/ChatModal";
 
 const Background = styled.div`
   width: 100%;
@@ -141,7 +153,26 @@ const BuyButton = styled.button`
   }
 `;
 
-const PersonalStatementDetail = () => {
+
+
+
+
+const PrivateChat = styled.button`
+    
+`
+
+const PersonalStatementDetail = ({ setSelectedPage }) => {
+  const [chatRooms, setChatRooms] = useState([]);
+  const {setRoomId} = useContext(ChatContext);
+
+  const [filteredChatRooms, setFilteredChatRooms] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
+
+  const [personCnt, setPersonCnt] = useState([]);
+  const [chatRoomTitle, setChatRoomTitle] = useState([]);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
   const location = useLocation();
   const { item, purchasedFileIds, myUploadedFile, myPurchasedFile } = location.state || {}; // 전달받은 데이터

@@ -1,5 +1,6 @@
 package kh.BackendCapstone.controller;
 
+import kh.BackendCapstone.dto.chat.ChatRoomResDto;
 import kh.BackendCapstone.dto.request.PsContentsReqDto;
 import kh.BackendCapstone.dto.request.PsWriteDto;
 import kh.BackendCapstone.dto.request.PsWriteReqDto;
@@ -50,5 +51,15 @@ public class PsWriteController {
     public ResponseEntity<Long> makePsWrite(@RequestHeader("Authorization") String token) {
         Long psWriteId = psWriteService.newPsWrite(token);
         return ResponseEntity.ok(psWriteId);
+    }
+
+    // 작성한 자기소개서 리스트
+    @GetMapping("/myPs/{memberId}")
+    public ResponseEntity<List<PsWriteResDto>> getPsByMemberId(@PathVariable Long memberId) {
+        log.info("Requested memberId : {}", memberId);
+        // Service 호출하여 참여 중인 채팅방 리스트 반환
+        List<PsWriteResDto> psWrites = psWriteService.getPsByMemberId(memberId);
+
+        return ResponseEntity.ok(psWrites);
     }
 }

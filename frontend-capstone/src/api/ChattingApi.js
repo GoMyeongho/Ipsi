@@ -73,7 +73,11 @@ const ChattingApi = {
       console.error("Error fetching chat rooms:", error);
       throw new Error("Failed to fetch chat rooms.");
     }
-  }
+  },
+
+  delRoom: async (roomId) => {
+    return await axios.delete(Capstone + `/chat/delRoom/${roomId}`)
+  },
 }
 
 export default ChattingApi;

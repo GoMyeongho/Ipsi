@@ -47,6 +47,8 @@ const MessagesContainer = styled.div`
     display: flex;
     flex-direction: column;
     //height: calc(100% - 165px);
+    width: 100%;
+    height: calc(100% - 148px);
     overflow-y: auto;
     transition: height 0.2s ease;
     padding: 10px;
@@ -122,16 +124,44 @@ const MsgInput = styled.textarea`
 const MsgInputBox = styled.div`
     width: 110%;
     padding: 10px;
-    margin-bottom: 2vw;
+    //margin-bottom: 2vw;
     border-radius: 10px;
     background-color: #EEE;
     display: flex;
     justify-content: space-between;
+    margin: 13px 0;
 `
 const ExitMsg = styled.p`
     font-size: 1.1em;
     text-align: center;
 `
+
+const DateSeparator = styled.div`
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    margin: 15px 0;
+    font-weight: bold;
+`;
+const ChattingBottom = styled.div`
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+`;
+const ChatInput = styled.textarea`
+    flex: 1;
+    padding: 10px;
+    resize: none;
+`;
+
+const ChatButton = styled.button`
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+`;
 
 function formatLocalDateTime(localDateTime) {
     if (localDateTime) {
@@ -143,6 +173,11 @@ function formatLocalDateTime(localDateTime) {
         return new Date().toLocaleString(); // 만약 null일 경우, 현재 시간 반환
     }
 }
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+};
 
 const Chatting = ({ setSelectedPage }) => {
     const [isOverlayOpen, setIsOverlayOpen] = useState(false); // Overlay 상태 관리
@@ -351,26 +386,35 @@ const Chatting = ({ setSelectedPage }) => {
     return (
         <ChattingRoomBg>
             <ChattingTitle>
-                <ChattingIcon src={backIcon} alt="Back" onClick={onClickExit}/>
+                <ChattingIcon src={backIcon} alt="Back" onClick={onClickExit} />
                 {roomName}
-                <ChattingIcon src={exitIcon} alt="Exit" onClick={ExitChatRoom}/>
+                <ChattingIcon src={exitIcon} alt="Exit" onClick={ExitChatRoom} />
             </ChattingTitle>
             <MessagesContainer ref={ChatContainerRef}>
-                {chatList?.map((chat, index) => (
-                    <MessageBox key={index} isSender={chat.sender === sender}>
-                        <Sender isSender={chat.sender === sender}>
-                            {chat.sender}
-                        </Sender>
-                        <MsgTime isSender={chat.sender === sender}>
-                            <Message isSender={chat.sender === sender}>
-                                {chat.msg}
-                            </Message>
-                            <SentTime>
-                                {chat.regDate ? formatLocalDateTime(chat.regDate) : new Date().toLocaleString()}
-                            </SentTime>
-                        </MsgTime>
-                    </MessageBox>
-                ))}
+                {chatList?.map((chat, index) => {
+                    const currentDate = new Date(chat.regDate).toISOString().split("T")[0]; // YYYY-MM-DD 형식
+                    const prevDate = index > 0 ? new Date(chatList[index - 1].regDate).toISOString().split("T")[0] : null;
+                    const showDate = currentDate !== prevDate; // 이전 메시지와 날짜가 다르면 표시
+
+                    return (
+                        <React.Fragment key={index}>
+                            {showDate && <DateSeparator>{formatDate(chat.regDate)}</DateSeparator>}
+                            <MessageBox isSender={chat.sender === sender}>
+                                <Sender isSender={chat.sender === sender}>
+                                    {chat.sender}
+                                </Sender>
+                                <MsgTime isSender={chat.sender === sender}>
+                                    <Message isSender={chat.sender === sender}>
+                                        {chat.msg}
+                                    </Message>
+                                    <SentTime>
+                                        {chat.regDate ? formatLocalDateTime(chat.regDate) : new Date().toLocaleString()}
+                                    </SentTime>
+                                </MsgTime>
+                            </MessageBox>
+                        </React.Fragment>
+                    );
+                })}
             </MessagesContainer>
             <MsgInputBox>
                 <MsgInput

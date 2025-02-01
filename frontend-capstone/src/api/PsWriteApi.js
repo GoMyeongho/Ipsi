@@ -75,7 +75,18 @@ const PsWriteApi = {
             headers: {
                 Authorization: `Bearer ${token}`
             }})
-    }
+    },
+
+    getMyPs: async (memberId) => {
+        try {
+            const response = await axios.get(Capstone + `/write/myPs/${memberId}`);
+            // 성공 시 데이터 반환
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching chat rooms:", error);
+            throw new Error("Failed to fetch chat rooms.");
+        }
+    },
 };
 
 export default PsWriteApi;

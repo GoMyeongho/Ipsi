@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // 페이지 이동을 위한 훅
 import styled from "styled-components";
 
-const ModalOverlay = styled.div`
+export const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -12,7 +12,7 @@ const ModalOverlay = styled.div`
   z-index: 9999;
 `;
 
-const ModalContentPC = styled.div`
+export const ModalContentPC = styled.div`
   position: fixed;
   top: 100px;
   right: 40px;
@@ -32,7 +32,7 @@ const ModalContentPC = styled.div`
   gap: 20px;
 `;
 
-const ModalContentMobile = styled.div`
+export const ModalContentMobile = styled.div`
   position: fixed;
   top: 100px;
   right: 0; /* 오른쪽에 고정 */

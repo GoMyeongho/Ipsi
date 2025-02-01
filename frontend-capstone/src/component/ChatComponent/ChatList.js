@@ -9,7 +9,8 @@ import axiosApi from "../../api/AxiosApi";
 const ChatListBg = styled.div`
     width: 100%;
     height: 100%;
-    background-color: palegoldenrod;
+    //background-color: palegoldenrod;
+    background: #FFF;
     padding: 0 30px;
 `
 export const ChatUl = styled.ul`
@@ -35,28 +36,11 @@ export const ChatName = styled.p`
   margin: 0 0 10px 0;
   color: #444;
 `;
-/* const ChatDate = styled.p`
-  font-size: 1em;
-  color: #666;
-  margin: 0;
-  text-align: right;
-`; */
 
 const ChatList = ({ setSelectedPage }) => {
     const [chatRooms, setChatRooms] = useState([]);
     const {setRoomId} = useContext(ChatContext);
     const [loggedInUser, setLoggedInUser] = useState(null);
-
-/*    // 서버로부터 채팅방 목록을 가져오는 API
-    const fetchChatRooms = async() => {
-        try {
-            const response = await ChattingApi.chatList();
-            console.log(response.data);
-            setChatRooms(response.data);
-        } catch (e) {
-            console.log(e); // 서버와의 통신 실패 예외 처리
-        }
-    };*/
 
     // 토큰에서 memberId를 가져오는 로직
     const fetchMemberIdFromToken = async () => {
@@ -78,7 +62,7 @@ const ChatList = ({ setSelectedPage }) => {
             console.log("Fetched Chat Rooms for Member:", rooms);
             setChatRooms(rooms);
         } catch (error) {
-            console.error("Error fetching chat rooms for user:", error);
+            console.error("Error Fetching Chat Rooms for Member:", error);
         }
     };
 
@@ -89,9 +73,9 @@ const ChatList = ({ setSelectedPage }) => {
 
     // 채팅방 이동
     const enterChatRoom = (roomId) => {
-      console.log("Room ID:", roomId);
-      setRoomId(roomId);
-      setSelectedPage("chatting");
+        console.log("Room ID:", roomId);
+        setRoomId(roomId);
+        setSelectedPage("chatting");
     };
 
     return (
