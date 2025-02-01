@@ -253,7 +253,7 @@ const WriteForm = () => {
     // 자기소개서 불러오기 버튼 클릭 시 호출
     const handleLoadPsWrite = async () => {
         const psWriteId = prompt("불러올 자기소개서 ID를 입력하세요:");
-        navigator(`/PersonalStatementWrite/${psWriteId}`)
+        if(psWriteId) navigator(`/PersonalStatementWrite/${psWriteId}`)
     };
 
     // 변경 감지 로직

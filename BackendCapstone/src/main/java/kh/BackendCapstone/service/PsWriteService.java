@@ -41,6 +41,7 @@ public class PsWriteService {
         if (psWriteReqDto.getPsWriteId() > 0) {
             psWrite = psWriteRepository.findByPsWriteId(psWriteReqDto.getPsWriteId())
                 .orElseThrow(() -> new RuntimeException("해당 자소서가 없습니다."));
+            psWrite.setPsName(psWriteReqDto.getPsName());
         } else {
             psWrite = new PsWrite();
             psWrite.setMember(member);
@@ -81,7 +82,7 @@ public class PsWriteService {
         psWrite.setPsContents(psContentsList);
         
         // 저장
-        PsWrite savedPsWrite = psWriteRepository.save(psWrite);
+        PsWrite savedPsWrite = psWriteRepository.save(psWritef);
         
         // 저장된 데이터 DTO 변환 및 반환
         return convertToDto(savedPsWrite);
