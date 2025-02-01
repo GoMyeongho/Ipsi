@@ -17,6 +17,7 @@ const DocumentsApi = {
     limit = 18,
     univName = "",
     univDept = "",
+    keywords = "",
     fileCategory = "ps",
   ) => {
     try {
@@ -42,6 +43,7 @@ const DocumentsApi = {
           limit, // 페이지당 항목 수
           univName, // 대학명 (선택 시 필터)
           univDept, // 학과명 (선택 시 필터)
+          keywords,
           fileCategory, // 파일 카테고리 (sr 또는 ps)
           memberId, // memberId 추가
         },
@@ -66,7 +68,8 @@ const DocumentsApi = {
     limit = 18,
     univName = "",
     univDept = "",
-    fileCategory = "ps",
+    keywords = "",
+    fileCategory = "sr",
   ) => {
     try {
       // 로그인 상태 확인
@@ -92,6 +95,7 @@ const DocumentsApi = {
           univName, // 대학명 (선택 시 필터)
           univDept, // 학과명 (선택 시 필터)
           fileCategory, // 파일 카테고리 (sr 또는 ps)
+          keywords,
           memberId, // memberId 추가
         },
       });
@@ -105,6 +109,48 @@ const DocumentsApi = {
       };
     } catch (error) {
       console.error("내용 목록을 가져오는 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+// Detail화면 댓글 목록 가져오기 (페이지네이션 추가)
+getReview: async (fileBoardId, page = 0, size = 5) => {
+  try {
+    // 댓글을 가져오기 위한 GET 요청
+    const response = await axios.get(baseUrl + `/review/readReview`, {
+      params: {
+        fileBoardId, // 아이템의 fileBoardId를 쿼리 파라미터로 전송
+        page,         // 페이지 번호 추가
+        size,         // 페이지 크기 추가
+      },
+    });
+
+    // 응답 데이터 반환 (댓글 목록 등)
+    return response; // 예: { content: [...], totalPages: 3, currentPage: 0 }
+
+  } catch (error) {
+    console.error("댓글을 가져오는 중 오류 발생:", error);
+    throw error; // 오류를 throw하여 상위 컴포넌트에서 처리하도록 함
+  }
+},
+
+  // Detail화면 댓글 등록
+  postReview: async (reviewData) => {
+    const res = await Commons.getTokenByMemberId();
+    if (!res || !res.data) {
+      console.error('memberId가 없습니다.');
+      return;
+    }
+    const memberId = res.data;
+    
+    // reviewData에 memberId를 추가
+    const reviewWithMemberIdData= { ...reviewData, memberId: memberId };
+    console.log(reviewWithMemberIdData);
+    try {
+      const response = await axios.post(baseUrl + `/review/inputReview`, reviewWithMemberIdData);
+      return response;
+    } catch (error) {
+      console.error("댓글 저장 중 오류 발생:", error);
       throw error;
     }
   },

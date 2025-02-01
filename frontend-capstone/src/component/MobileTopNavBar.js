@@ -16,6 +16,7 @@ const ContainerBox = styled.div`
   @media (max-width: 768px) {
     width: 100%;
     height: 100px;
+    background-color: white;
     position: fixed;
     display: flex;
     flex-direction: row;
