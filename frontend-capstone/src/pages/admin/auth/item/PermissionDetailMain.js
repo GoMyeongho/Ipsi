@@ -5,7 +5,7 @@ import PermissionApi from "../../../../api/AdminApi";
 import PermissionDetailDesc from "./PermissionDetailDesc";
 import PermissionDetailPdf from "./PermissionDetailPdf";
 import {useParams} from "react-router-dom";
-import RejectModal from "../../../../component/RejectModal";
+import RejectModal from "../../../../component/Modal/RejectModal";
 import AdminApi from "../../../../api/AdminApi"; // Pdf 컴포넌트 예시
 
 const PermissionDetailMain = () => {

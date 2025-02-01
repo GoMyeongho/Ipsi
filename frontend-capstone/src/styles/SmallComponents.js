@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const Dropdown = styled.select`
     width: 100%;
-		min-width: 100px;
+		min-width: 80px;
     padding: 10px;
     text-align: center;
     border: none;

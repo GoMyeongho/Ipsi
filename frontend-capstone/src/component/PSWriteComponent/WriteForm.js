@@ -5,7 +5,7 @@ import Commons from "../../util/Common";
 import {useNavigate, useParams} from "react-router-dom";
 import psWriteApi from "../../api/PsWriteApi";
 import {useSelector} from "react-redux";
-import RejectModal from "../RejectModal";
+import RejectModal from "../Modal/RejectModal";
 
 const WriteFormBg = styled.div`
     width: 70%;

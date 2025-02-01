@@ -1,14 +1,15 @@
 import { BackGround } from "../../../../styles/GlobalStyle";
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
 import styled from "styled-components";
-import RejectModal from "../../../../component/RejectModal";
+import RejectModal from "../../../../component/Modal/RejectModal";
 import CreateIcon from "@mui/icons-material/Create";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import TextBoardApi from "../../../../api/TextBoardApi";
-import ConfirmModal from "../../../../component/ConfirmModal";
+import ConfirmModal from "../../../../component/Modal/ConfirmModal";
+import {categoryTitle} from "../../post/list/PostListHeader";
 
 const PostCreateMain = () => {
 	const { id, category } = useParams();
@@ -37,7 +38,7 @@ const PostCreateMain = () => {
 			}
 		};
 		fetchPost();
-	}, [id]);
+	}, [id, role]);
 	
 	const onChangeTitle = (e) => {
 		setResponse({ ...response, title: e.target.value });
@@ -49,25 +50,31 @@ const PostCreateMain = () => {
 		const { title, content, email } = response;
 		if (id) {
 			const rsp = await TextBoardApi.updateTextBoard(title, content, category, email, id);
+			console.log(rsp);
 			setConfirm({
 				value: true,
-				label: rsp.data ? "글 작성에 성공 했습니다.\n계속 작성 하시겠습니까?" : "글 작성에 실패 했습니다.\n계속 작성 하시겠습니까?",
+				label: rsp.data ? "글 수정에 성공 했습니다.\n계속 작성 하시겠습니까?" : "글 작성에 실패 했습니다.\n계속 작성 하시겠습니까?",
 			});
 		} else {
 			const rsp = await TextBoardApi.createTextBoard(title, content, category, email);
 			setConfirm({
 				value: true,
 				label: rsp.data ? "글 작성에 성공 했습니다.\n계속 작성 하시겠습니까?" : "글 작성에 실패 했습니다.\n계속 작성 하시겠습니까?",
+				onConfirm: (rsp.data) ? () => {
+					navigator(`/post/create/${category}/${rsp.data}`);
+					setConfirm({})
+				} : null,
 			});
 		}
 	};
 	const onClickCancel = () => {
-		setConfirm({ value: true, label: "작성을 취소 하시겠습니까?" });
+		setConfirm({ value: true, label: "취소버튼이 눌렸습니다. 작성을 계속 하시겠습니까?" });
 	};
 	
 	return (
 		<BackGround>
-			<Title>{id ? "글 수정" : "새로운 글 작성"}</Title>
+			<Title>{id ? `${categoryTitle.find(title => title.value === category)?.label || "기본 제목"} 글 수정`
+				: `새로운 ${categoryTitle.find(title => title.value === category)?.label || "기본 제목"} 글 작성`}</Title>
 			<TitleContainer>
 				<TextField
 					sx={styles.title}
@@ -105,8 +112,8 @@ const PostCreateMain = () => {
 			<ConfirmModal
 				open={confirm.value}
 				message={confirm.label}
-				onCancel={() => setConfirm({})}
-				onConfirm={() => navigator(`/post/list/${category}`)}
+				onConfirm={confirm.onConfirm ? confirm.onConfirm : () => setConfirm({})}
+				onCancel={() => navigator(`/post/list/${category}`)}
 			/>
 		</BackGround>
 	);
@@ -173,7 +180,7 @@ const Title = styled.div`
 		width: 100%;
     font-size: 24px;
     font-weight: bold;
-		margin-left: 200px;
+		margin-left: 100px;
 		margin-top: 50px;
 		display: flex;
 `;

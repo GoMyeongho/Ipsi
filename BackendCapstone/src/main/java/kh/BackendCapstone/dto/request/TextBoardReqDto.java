@@ -12,5 +12,5 @@ public class TextBoardReqDto {
 	private String title;
 	private String content;
 	private String textCategory;
-	private String email;
+	private Long textId;
 }

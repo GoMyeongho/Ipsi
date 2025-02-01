@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Commons from "../../../util/Common";
 import {useDispatch} from "react-redux";
 import {setAccessToken, setRefreshToken} from "../../../context/redux/PersistentReducer";
-import RejectModal from "../../../component/RejectModal";
+import RejectModal from "../../../component/Modal/RejectModal";
 
 
 // 도메인 및 API URL 설정

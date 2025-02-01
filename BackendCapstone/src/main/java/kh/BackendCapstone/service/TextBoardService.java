@@ -33,11 +33,26 @@ public class TextBoardService {
 	
 	// 게시글 등록
 	@Transactional // 일련의 과정중에 오류가 하나라도 생기면 롤백됨
-	public boolean saveBoard(TextBoardReqDto textBoardReqDto) {
+	public boolean saveBoard(TextBoardReqDto textBoardReqDto, String token) {
 		try {
-			Member member = memberRepository.findByEmail(textBoardReqDto.getEmail())
-				.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
-
+			Member member = memberService.convertTokenToEntity(token);
+			TextBoard textBoard = textBoardRepository.findByTextId(textBoardReqDto.getTextId())
+				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
+			textBoard.setTitle(textBoardReqDto.getTitle());
+			textBoard.setContent(textBoardReqDto.getContent());
+			textBoard.setMember(member);
+			textBoardRepository.save(textBoard);
+			return true;
+		} catch (Exception e) {
+			log.error("게시글 수정 실패 : {}",e.getMessage());
+			return false;
+		}
+	}
+	@Transactional // 일련의 과정중에 오류가 하나라도 생기면 롤백됨
+	public Long createBoard(TextBoardReqDto textBoardReqDto, String token) {
+		try {
+			Member member = memberService.convertTokenToEntity(token);
+			if(member == null) {return null;}
 			TextBoard textBoard = new TextBoard();
 			textBoard.setActive(Active.ACTIVE);
 			textBoard.setTitle(textBoardReqDto.getTitle());
@@ -45,16 +60,16 @@ public class TextBoardService {
 			textBoard.setTextCategory(TextCategory.fromString(textBoardReqDto.getTextCategory()));
 			textBoard.setMember(member);
 			textBoardRepository.save(textBoard);
-			return true;
+			return textBoard.getTextId();
 		} catch (Exception e) {
 			log.error("게시글 등록 실패 : {}",e.getMessage());
-			return false;
+			return null;
 		}
 	}
 	// 게시글 상세 조회
 	public TextBoardResDto findByBoardId (Long id) {
 		try {
-			TextBoard textBoard = textBoardRepository.findById(id)
+			TextBoard textBoard = textBoardRepository.findByTextId(id)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
 			return boardToBoardResDto(textBoard);
 		} catch (Exception e) {
@@ -64,7 +79,7 @@ public class TextBoardService {
 	}
 	public TextBoardResDto loadByBoardId (Long id, String token) {
 		try {
-			TextBoard textBoard = textBoardRepository.findById(id)
+			TextBoard textBoard = textBoardRepository.findByTextId(id)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
 			Member member = memberService.convertTokenToEntity(token);
 			return (member.equals(textBoard.getMember())) ? boardToBoardResDto(textBoard) : null;
@@ -218,11 +233,12 @@ public class TextBoardService {
 	
 	// 게시글 수정
 	@Transactional
-	public boolean updateBoard(TextBoardReqDto textBoardReqDto, Long textId) {
+	public boolean updateBoard(TextBoardReqDto textBoardReqDto, String token) {
 		try{
-			TextBoard textBoard = textBoardRepository.findById(textId)
+			TextBoard textBoard = textBoardRepository.findByTextId(textBoardReqDto.getTextId())
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			if(textBoardReqDto.getEmail().equals(textBoard.getMember().getEmail())) {
+			Member member = memberService.convertTokenToEntity(token);
+			if(member.equals(textBoard.getMember())) {
 				textBoard.setTitle(textBoardReqDto.getTitle());
 				textBoard.setContent(textBoardReqDto.getContent());
 				textBoardRepository.save(textBoard);
@@ -237,11 +253,12 @@ public class TextBoardService {
 	}
 	
 	// 게시글 삭제 = Active 를 INACTIVE 로 설정
-	public boolean deleteBoard(String email, Long id) {
+	public boolean deleteBoard(Long id, String token) {
 		try {
-			TextBoard board = textBoardRepository.findById(id)
+			TextBoard board = textBoardRepository.findByTextId(id)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			if(email.equals(board.getMember().getEmail())) {
+			Member member = memberService.convertTokenToEntity(token);
+			if(member.equals(board.getMember())) {
 				board.setActive(Active.INACTIVE);
 				textBoardRepository.save(board);
 				return true;
@@ -251,6 +268,20 @@ public class TextBoardService {
 		} catch (Exception e) {
 			log.error("게시글 삭제중 오류가 생겼습니다 : {}",e.getMessage());
 			return false;
+		}
+	}
+	public String isAuthor(Long id, String token) {
+		try {
+			TextBoard board = textBoardRepository.findByTextId(id)
+				.orElseThrow(() -> new RuntimeException("해당 게시글이 없습니다."));
+			Member member = memberService.convertTokenToEntity(token);
+			if (board.getMember().equals(member)) {
+				return "post/create/" + board.getTextCategory() + "/" + board.getTextId();
+			}
+			return null;
+		} catch (Exception e) {
+			log.error("작성자인지 확인중 오류가 생겼습니다 : {}",e.getMessage());
+			return null;
 		}
 	}
 	
