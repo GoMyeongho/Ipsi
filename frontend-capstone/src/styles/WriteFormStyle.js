@@ -11,8 +11,8 @@ import RejectModal from "../Modal/RejectModal";
 import OptionsModal from "../Modal/OptionsModal";
 
 const WriteFormBg = styled.div`
-/*    width: 70%;
-    height: 1000px;*/
+    /*    width: 70%;
+        height: 1000px;*/
     width: 70%;
     @media (max-width:1600px) {
         width: 85%
@@ -99,10 +99,9 @@ export const BtnBox = styled.div`
     justify-content: flex-end;
     gap: 2vw;
     margin-top: 2vw;
-    @media (max-width:800px) { justify-content: center; }
     button {
-/*        width: 90px;
-        height: 35px;*/
+        /*        width: 90px;
+                height: 35px;*/
         width: 105px;
         aspect-ratio: 21 / 8;
         border-radius: 10px;
@@ -110,18 +109,18 @@ export const BtnBox = styled.div`
         background-color: #FFF;
         padding: 5px 10px;
     }
-    .new, .import {
+    .new {
         border: 2px solid #E0CEFF;
     }
-    .new:hover, .import:hover {
+    .new:hover {
         background-color: #E0CEFF;
     }
-/*    .import {
+    .import {
         border: 2px solid #E0CEFF;
     }
     .import:hover {
         background-color: #E0CEFF;
-    }*/
+    }
     .save, .del {
         border: 2px solid #6154D4;
     }
@@ -183,7 +182,7 @@ const ModalOverlay = styled.div`
     display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    z-index: 1000;
 `;
 
 const ModalContent = styled.div`
@@ -194,18 +193,6 @@ const ModalContent = styled.div`
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     max-height: 70%;
     overflow-y: scroll;
-    &.delModal {
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 30%;
-        justify-content: center;
-        @media (min-width:1600px) { width: 20%; }
-        @media (max-width:1200px) { width: 35%; }
-        @media (max-width:1000px) { width: 50%; }
-        @media (max-width:700px) { width: 60%; }
-    }
 `;
 
 const ModalHeader = styled.h2`
@@ -226,7 +213,7 @@ const CloseButton = styled.button`
     border-radius: 5px;
     cursor: pointer;
     &:hover {
-    background-color: #503fba;
+        background-color: #503fba;
     }
 `;
 
@@ -242,20 +229,12 @@ const WriteForm = () => {
     const [initialPsName, setInitialPsName] = useState("새 자기소개서"); // 초기 psName
     const {id} = useParams();
     const navigator = useNavigate();
-    const navigate = useNavigate();
     const role = useSelector((state) => state.persistent.role)
     const [reject, setReject] = useState({});
     const [currentPsWriteId, setCurrentPsWriteId] = useState(null); // ✅ 현재 자기소개서 ID
 
     const [option, setOption] = useState({});
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-    const [isAlertModalOpen, setIsAlertModalOpen] = useState(false); // State for modal visibility
-    const [alertMessage, setAlertMessage] = useState(""); // 모달에 표시할 메시지
 
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [deleteId, setDeleteId] = useState(null);
-
-    // 새 자기소개서 생성
     const createPsWrite = async () => {
         const response = await PsWriteApi.newPsWrite();
         console.log(response);
@@ -263,21 +242,14 @@ const WriteForm = () => {
 
     }
 
+    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+
     const openModal = () => {
         setIsModalOpen(true);
     };
 
-    const openAlertModal = (message) => {
-        setAlertMessage(message); // 모달에 표시할 메시지를 설정
-        setIsAlertModalOpen(true);
-    };
-
     const closeModal = () => {
         setIsModalOpen(false);
-    };
-
-    const closeAlertModal = () => {
-        setIsAlertModalOpen(false);
     };
 
     const handleLoadPsWrite = () => {
@@ -293,7 +265,7 @@ const WriteForm = () => {
                 console.log(response);
                 if(response.data.length > 0){
                     setOption({value: true, options:(response.data.length < 11) ? [...response.data.map((option, index) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'})),{label: "+" , value: 0 , type: 'outlined'}]
-                           : response.data.map((option) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'}))})
+                            : response.data.map((option) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'}))})
                     return
                 } else {
                     await createPsWrite();
@@ -327,7 +299,6 @@ const WriteForm = () => {
         }
     };
 
-    // 처음 화면이 나타나는 시점에 서버로부터 정보를 가져옴
     useEffect(() => {
         loadPsWrite(id);
     }, [id, role]);
@@ -425,7 +396,7 @@ const WriteForm = () => {
         setInitialSections(sections);
     }, []);
 
-    // 항목 제목과 내용 변경 감지
+    // 변경 감지 로직
     const getUpdatedSections = () => {
         return sections.filter((section, index) => {
             const initialSection = initialSections[index];
@@ -438,8 +409,7 @@ const WriteForm = () => {
     // 데이터 저장 요청
     const psSave = async () => {
         if (!loggedInUser) {
-            // alert("로그인이 필요합니다.");
-            openAlertModal("로그인이 필요합니다.");
+            alert("로그인이 필요합니다.");
             return;
         }
         const formData = new FormData();
@@ -454,102 +424,40 @@ const WriteForm = () => {
         try {
             const updatedSections = getUpdatedSections();
             if (updatedSections.length === 0 && psName === initialPsName) {
-                // alert("변경된 내용이 없습니다.");
-                openAlertModal("변경된 내용이 없습니다.");
+                alert("변경된 내용이 없습니다.");
                 return;
             }
             const response = await PsWriteApi.savePS(id, formData);
-            // alert("자기소개서가 저장되었습니다!");
-            openAlertModal("자기소개서가 저장되었습니다.");
+            alert("자기소개서가 저장되었습니다!");
             console.log(response);
         } catch (error) {
-            // alert("저장에 실패했습니다.");
-            openAlertModal("자기소개서 저장에 실패했습니다.");
+            alert("저장에 실패했습니다.");
             console.error("저장 실패:", error);
         }
     };
 
-    // 삭제 버튼 클릭 시 실행
-    const handleDeleteClick = (id) => {
-        setDeleteId(id); // 삭제할 ID 저장
-        setIsModalOpen(true); // 모달 표시
-    };
-/*
-    // 실제 삭제 로직
-    const psDel = (psWriteId) => {
-        PsWriteApi.delPs(psWriteId)
-            .then(() => {
-                setPsWrites(psWrites.filter((ps) => ps.id !== psWriteId));
-                alert('삭제되었습니다.');
-                navigate("/PersonalStatementWrite");
-            })
-            .catch((error) => {
-                console.error('삭제 실패:', error);
-                alert('삭제에 실패했습니다.');
-            });
-    };
-
-    // 모달에서 "확인" 클릭 시 실행
-    const confirmDelete = () => {
-        if (deleteId !== null) {
-            psDel(deleteId);
-        }
-        setShowConfirmModal(false);
-        setDeleteId(null);
-    };*/
-
-    // 삭제 확인
-    const confirmDelete = async () => {
+    // 자기소개서 삭제
+    const psDel = async (psWriteId) => {
         try {
-            await PsWriteApi.delPs(deleteId);
-
-            // 삭제된 항목 제외한 자기소개서 목록 업데이트
-            const updatedPsWrites = psWrites.filter((ps) => ps.id !== deleteId);
-            setPsWrites(updatedPsWrites);
-
-            // 남은 항목 중 첫 번째 항목으로 이동
-            if (updatedPsWrites.length > 0) {
-                const firstPs = updatedPsWrites[0];
-                setActiveSection(firstPs.id);
-                navigate(`/PersonalStatementWrite/${firstPs.id}`);
-            } else {
-                // 남은 항목이 없으면 기본 경로로 이동
-                navigate("/PersonalStatementWrite");
-            }
+            await PsWriteApi.delPs(psWriteId);
+            setPsWrites(psWrites.filter(ps => ps.id !== psWriteId)); // 리스트에서 삭제
+            console.log("자기소개서 삭제 성공")
         } catch (error) {
             setErrorMessage("삭제 중 오류가 발생했습니다.");
-        } finally {
-            setIsModalOpen(false);
+            console.error(error);
         }
-    };
-
-
-    // 모달에서 "취소" 클릭 시 실행
-    const cancelDelete = () => {
-        setIsModalOpen(false);
-        setDeleteId(null);
-    };
+    }
 
     return (
         <>
             <WriteFormBg>
                 <BtnBox>
-                    <button className="new" onClick={createPsWrite}>새 자기소개서</button>
+                    <button className="new" onClick={loadPsWrite}>새 자기소개서</button>
                     <button className="import" onClick={() => navigator("/PersonalStatementWrite")}>불러오기</button>
-                    <button className="del" onClick={() => handleDeleteClick(id)}>삭제</button>
+                    <button className="del" onClick={() => psDel(id)}>삭제</button>
                     <button className="save" type={"submit"} onClick={psSave}>저장</button>
                 </BtnBox>
-                {isModalOpen && (
-                    <ModalOverlay isOpen={isModalOpen} onClick={closeModal}>
-                        <ModalContent className="delModal">
-                            <p>해당 자기소개서를 정말 삭제하시겠습니까?</p>
-                            <BtnBox>
-                                <button className="new" onClick={cancelDelete}>취소</button>
-                                <button className="save" onClick={confirmDelete}>확인</button>
-                            </BtnBox>
-                        </ModalContent>
-                    </ModalOverlay>
-                )}
+                {/*<Button onClick={() => navigator("/PersonalStatementWrite")}>자소서 목록 보기</Button>*/}
                 <FormContainer>
                     <FormTitle
                         type="text"
@@ -600,14 +508,6 @@ const WriteForm = () => {
                         </div>
                     )}
                 </FormContainer>
-                <ModalOverlay isOpen={isAlertModalOpen} onClick={closeAlertModal}>
-                    <ModalContent className="delModal">
-                        <ModalBody>
-                            <p>{alertMessage}</p>
-                        </ModalBody>
-                        <BtnBox><button className="save" onClick={closeAlertModal}>닫기</button></BtnBox>
-                    </ModalContent>
-                </ModalOverlay>
             </WriteFormBg>
             <RejectModal open={reject.value} message={reject.label} onClose={() => navigator("/")}/>
             <OptionsModal open={option.value} onCancel={() => navigator("/")} options={option.options} message= "자기소개서 목록"

@@ -77,12 +77,27 @@ const PsWriteApi = {
             }})
     },
 
+/*    getMyPs: async (memberId) => {
+        try {
+            const response = await axios.get(Capstone + `/write/myPs/${memberId}`);
+            // 성공 시 데이터 반환
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching chat rooms:", error);
+            throw new Error("Failed to fetch chat rooms.");
+        }
+    },*/
+
     getPsList : async () => {
         const token = localStorage.getItem("accessToken");
         return await axios.get(Capstone + `/write/list/get`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }})
+    },
+
+    delPs: async (psWriteId) => {
+        return await axios.delete(Capstone + `/write/del/${psWriteId}`)
     }
 };
 

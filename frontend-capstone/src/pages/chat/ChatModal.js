@@ -32,7 +32,7 @@ export const Container = styled.div`
 const ChatIconBox = styled.div`
     position: fixed;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 990;
     bottom: 30px;
     right: 30px;
 `

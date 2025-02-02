@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,5 +35,7 @@ public class PsWrite {
 
 	// 자기소개서 항목 리스트
 	@OneToMany(mappedBy = "psWrite", cascade = CascadeType.ALL, orphanRemoval = false)
-	private List<PsContents> psContents;
+	private List<PsContents> psContents = new ArrayList<>();
+
+
 }
