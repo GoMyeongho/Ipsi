@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
@@ -129,6 +130,19 @@ public class PsWriteService {
         List<PsWrite> psWriteList = psWriteRepository.findByMember(member);
         log.warn("리스트 반환 : {} ", psWriteList);
         return convertListToDto(psWriteList);
+    }
+
+    // 자기소개서 삭제
+    public boolean deletePs(Long psWriteId) {
+        try {
+            PsWrite psWrite = psWriteRepository.findById(psWriteId)
+                    .orElseThrow(()->new RuntimeException("해당 자소서가 없습니다."));
+            psWriteRepository.delete(psWrite);
+            return true;
+        } catch (Exception e) {
+            log.error("자기소개서 삭제 실패 : {}", e.getMessage());
+            return false;
+        }
     }
 
     // PsWrite 엔티티 PsWriteResDto 변환

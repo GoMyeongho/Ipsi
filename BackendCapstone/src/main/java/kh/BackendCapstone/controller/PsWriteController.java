@@ -53,8 +53,26 @@ public class PsWriteController {
         Long psWriteId = psWriteService.newPsWrite(token);
         return ResponseEntity.ok(psWriteId);
     }
+
+/*    // 작성한 자기소개서 리스트
+    @GetMapping("/myPs/{memberId}")
+    public ResponseEntity<List<PsWriteResDto>> getPsByMemberId(@PathVariable Long memberId) {
+        log.info("Requested memberId : {}", memberId);
+        // Service 호출하여 참여 중인 채팅방 리스트 반환
+        List<PsWriteResDto> psWrites = psWriteService.getPsByMemberId(memberId);
+
+        return ResponseEntity.ok(psWrites);
+    }*/
+
     @GetMapping("/list/get")
     public ResponseEntity<List<PsWriteListResDto>> getPsWriteList(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(psWriteService.getPsWriteList(token));
+    }
+
+    // 자기소개서 삭제
+    @DeleteMapping("del/{psWriteId}")
+    public ResponseEntity<Boolean> deleteBoard(@PathVariable Long psWriteId) {
+        boolean isSuccess = psWriteService.deletePs(psWriteId);
+        return ResponseEntity.ok(isSuccess);
     }
 }
