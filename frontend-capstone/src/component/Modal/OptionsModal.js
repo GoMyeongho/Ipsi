@@ -108,20 +108,20 @@ const ModalActions = styled.div`
 	flex-direction: column;
 	gap: 10px;
 `;
-
+// 이부분에 "create에 해당하는 조건 넣기
 const ModalButton = styled.button`
 	padding: 10px 20px;
 	font-size: 1rem;
 	font-weight: bold;
 	cursor: pointer;
-	background-color: ${({ variant }) => (variant === "outlined" ? "transparent" : "#3f51b5")};
-	color: ${({ variant }) => (variant === "outlined" ? "#f44336" : "white")};
-	border: ${({ variant }) => (variant === "outlined" ? "1px solid #f44336" : "none")};
+	background-color: ${({ variant }) => (variant === "outlined" ?  "transparent" : variant === "create" ? "create에 해당하는 값" : "#3f51b5")};
+	color: ${({ variant }) => (variant === "outlined" ? "#f44336" : variant === "create" ? "create에 해당하는 값" :  "white")};
+	border: ${({ variant }) => (variant === "outlined" ? "1px solid #f44336" : variant === "create" ? "create에 해당하는 값" :  "none")};
 	border-radius: 8px;
 	transition: background-color 0.3s;
 	
 	&:hover {
-	background-color: ${({ variant }) => (variant === "outlined" ? "#f44336" : "#303f9f")};
+	background-color: ${({ variant }) => (variant === "outlined" ? "#f44336" : variant === "create" ? "create에 해당하는 값" :  "#303f9f")};
 	}
 `;
 

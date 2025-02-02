@@ -288,11 +288,17 @@ const WriteForm = () => {
     const loadPsWrite = async (psWriteId) => {
         try {
             setOption({})
+            if(role === "REST_USER" || role ==="") {
+                setReject({value : true, label : "로그인 되어있지 않습니다."})
+                return;
+            }
             if(!id) {
                 const response = await PsWriteApi.getPsList();
                 console.log(response);
                 if(response.data.length > 0){
-                    setOption({value: true, options:(response.data.length < 11) ? [...response.data.map((option, index) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'})),{label: "+" , value: 0 , type: 'outlined'}]
+                    setOption({value: true, options:(response.data.length < 11) ? [...response.data.map((option, index) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'}))
+                          // 밑의 부분이 + 버튼 부분 label은 버튼에 적힐 글, value는 새로운 자소서 만들기 위한 트리거, type은 보여줄 형식
+                              ,{label: "+" , value: 0 , type: 'create'}]
                            : response.data.map((option) => ({label: option.psName + Commons.formatDate(option.regDate), value: option.psWriteId, type: 'contained'}))})
                     return
                 } else {
@@ -506,6 +512,8 @@ const WriteForm = () => {
             // 삭제된 항목 제외한 자기소개서 목록 업데이트
             const updatedPsWrites = psWrites.filter((ps) => ps.id !== deleteId);
             setPsWrites(updatedPsWrites);
+            setSections([{ id: 1, title: "", content: "" },])
+            setPsName("")
 
             // 남은 항목 중 첫 번째 항목으로 이동
             if (updatedPsWrites.length > 0) {
