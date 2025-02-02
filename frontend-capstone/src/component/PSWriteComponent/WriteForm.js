@@ -288,6 +288,8 @@ const WriteForm = () => {
     const loadPsWrite = async (psWriteId) => {
         try {
             setOption({})
+            setSections([{ id: 1, title: "", content: "" },])
+            setPsName("")
             if(role === "REST_USER" || role ==="") {
                 setReject({value : true, label : "로그인 되어있지 않습니다."})
                 return;
@@ -512,8 +514,7 @@ const WriteForm = () => {
             // 삭제된 항목 제외한 자기소개서 목록 업데이트
             const updatedPsWrites = psWrites.filter((ps) => ps.id !== deleteId);
             setPsWrites(updatedPsWrites);
-            setSections([{ id: 1, title: "", content: "" },])
-            setPsName("")
+            
 
             // 남은 항목 중 첫 번째 항목으로 이동
             if (updatedPsWrites.length > 0) {
