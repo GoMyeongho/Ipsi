@@ -206,7 +206,6 @@ const TopNavBar = () => {
             isOpen={isModalOpen}
             closeModal={closeModal}
             handleModalLinkClick={handleModalLinkClick}
-            setIsLoggedIn={dispatch(setRole)}
             isAdmin={role === "ROLE_ADMIN"}
           />
         ) : (

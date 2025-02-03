@@ -6,6 +6,9 @@ import ModalLoginPage from "../pages/auth/login/ModalLoginPage";
 import MemberModal from "../pages/member/MemberMoal";
 import LoginModal from "../pages/auth/login/LoginModal";
 import SignupModal from "../pages/auth/signup/SingupModal";
+import {useDispatch, useSelector} from "react-redux";
+import {logout} from "../context/redux/PersistentReducer";
+import {setLoginModalOpen, setModalOpen, setSignupModalOpen} from "../context/redux/ModalReducer";
 
 const Background = styled.div`
   width: 100%;
@@ -163,19 +166,14 @@ const SubMenu = styled.div`
 const MobileTopNavBar = () => {
   const navigate = useNavigate();
 
-  const [isModalOpen, setModalOpen] = useState(false);
+  const isModalOpen = useSelector(state => state.modal.isModalOpen);
   const [isMenuBarModalOpen, setIsMenuBarModalOpen] = useState(false);
-  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
-  const [isSignupModalOpen, setSignupModalOpen] = useState(false);
-  const [isAdmin, setAdmin] = useState(false);
+  const isLoginModalOpen = useSelector(state => state.modal.isLoginModalOpen);
+  const isSignupModalOpen = useSelector(state => state.modal.isSignupModalOpen);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    // !!localStorage.getItem("loggedInUserId")
-    !!localStorage.getItem("accessToken") // 토큰 여부로 로그인 상태 결정
-  );
+  const role = useSelector((state) => state.persistent.role);
+  const dispatch = useDispatch();
   
-
   // MenuBar
   const menuBarOpenModal = () => setIsMenuBarModalOpen(true); // 입시자료 모달창 ON
   const menuBarCloseModal = () => setIsMenuBarModalOpen(false); // 입시자료 모달창 OFF
@@ -187,42 +185,36 @@ const MobileTopNavBar = () => {
   };
 
   const handleImageClick = () => {
-    const token = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!token); // 토큰이 있으면 로그인 상태 true
-    setModalOpen(true); // 모달 열기
+    dispatch(setModalOpen(true)); // 모달 열기
   };
 
   const closeModal = () => {
-    setModalOpen(false);
+    dispatch(setModalOpen(false));
   };
 
   const closeLoginModal = () => {
-    setLoginModalOpen(false);
+    dispatch(setLoginModalOpen(false));
   };
 
   const closeSignupModal = () => {
-    setSignupModalOpen(false);
+    dispatch(setSignupModalOpen(false));
   };
 
   const handleModalLinkClick = (action) => {
     if (action === "login") {
-      setModalOpen(false);
-      setLoginModalOpen(true);
+      dispatch(setModalOpen(false));
+      dispatch(setLoginModalOpen(true));
     } else if (action === "signup") {
-      setModalOpen(false);
-      setSignupModalOpen(true);
+      dispatch(setModalOpen(false));
+      dispatch(setSignupModalOpen(true));
     } else if (action === "logout") {
-      setIsLoggedIn(false); // 로그인 상태 false
-      localStorage.clear(); // 로컬스토리지 삭제
-
-      localStorage.removeItem("accessToken"); // 토큰 삭제
-
-      setModalOpen(false); // 모달 닫기
+      dispatch(logout());
+      dispatch(setModalOpen(false)); // 모달 닫기
       navigate("/");
       alert("로그아웃 되었습니다.");
     } else if (action === "member") {
       navigate("/Member"); // 마이페이지 이동
-      setModalOpen(false); // 모달 닫기
+      dispatch(setModalOpen(false)); // 모달 닫기
     }
   };
 
@@ -274,13 +266,12 @@ const MobileTopNavBar = () => {
           handleModalLinkClick={handleModalLinkClick}
         />
 
-        {isLoggedIn ? (
+        {(role !== "REST_USER" && role !== "") ? (
           <MemberModal
             isOpen={isModalOpen}
             closeModal={closeModal}
             handleModalLinkClick={handleModalLinkClick}
-            setIsLoggedIn={setIsLoggedIn}
-            isAdmin={isAdmin}
+            isAdmin={role === "ROLE_ADMIN"}
           />
         ) : (
           <ModalLoginPage
@@ -293,7 +284,6 @@ const MobileTopNavBar = () => {
         {isLoginModalOpen && (
           <LoginModal
             closeModal={closeLoginModal}
-            setIsLoggedIn={setIsLoggedIn}
           />
         )}
         {isSignupModalOpen && <SignupModal closeModal={closeSignupModal} />}

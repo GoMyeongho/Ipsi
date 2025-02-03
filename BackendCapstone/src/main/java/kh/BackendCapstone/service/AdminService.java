@@ -114,9 +114,10 @@ public class AdminService {
 	}
 	
 	public List<Member> getMemberList(String searchOption , String searchValue ) {
-		List<Member> memberList = switch (searchOption) {
-			case "univName" -> memberRepository.findAllByUniv_UnivName(searchValue);
-			case "Authority" -> memberRepository.findAllByAuthority(Authority.fromString(searchValue));
+		log.warn("검색 : {}-{}", searchOption, searchValue);
+		List<Member> memberList = switch (searchOption.toLowerCase()) {
+			case "univname" -> memberRepository.findAllByUniv_UnivNameContaining(searchValue);
+			case "authority" -> memberRepository.findAllByAuthority(Authority.fromString(searchValue));
 			default -> memberRepository.findAll();
 		};
 		log.warn("회원 정보 전체 검색 {}-{}, 결과 {}개 : {}",searchOption,searchValue,memberList.size(),memberList);

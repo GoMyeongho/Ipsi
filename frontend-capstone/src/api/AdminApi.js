@@ -43,7 +43,7 @@ const AdminApi = {
 	},
 	getMemberList: (searchOption, searchValue) => {
 		console.log(`${searchOption} 전체 회원 조회 : ${searchValue}`);
-		return axios.get(baseUrl + `/admin/member/${searchOption}/${searchValue}`, {
+		return axios.get(baseUrl + `/admin/member/${searchValue}/${searchOption}`, {
 			headers: {
 				Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
 			},});

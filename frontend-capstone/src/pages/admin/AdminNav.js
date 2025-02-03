@@ -1,9 +1,11 @@
-import { useContext, useEffect } from "react";
+import {useContext, useEffect, useState} from "react";
 import { BackGround } from "../../styles/GlobalStyle";
 import styled from "styled-components";
 import { Paper } from "@mui/material";
 import { Outlet, useNavigate } from "react-router-dom";
 import { PermissionContext } from "../../context/admin/PermissionStore";
+import {useSelector} from "react-redux";
+import RejectModal from "../../component/Modal/RejectModal";
 
 // AdminNavContainer 스타일링 (MUI Paper의 스타일링 적용)
 const AdminNavContainer = styled(Paper)`
@@ -12,6 +14,7 @@ const AdminNavContainer = styled(Paper)`
     justify-content: flex-start;
     align-items: center;
     width: 300px;
+		height: 300px;
     margin: 50px 30px;
     padding: 20px;
     border-radius: 16px;
@@ -49,23 +52,16 @@ const AdminNav = () => {
 	const navList = [
 		{ name: "메인 페이지", id: "main", link: "/admin" },
 		{ name: "권한 부여 페이지", id: "auth", link: "/admin/auth" },
-		{ name: "게시글 관리 페이지", id: "board", link: "/admin/board" },
-		{ name: "회원 관리 페이지", id: "member", link: "/admin/member" },
+		{ name: "게시글 관리 페이지", id: "board", link: "/admin/board/default" },
+		{ name: "회원 관리 페이지", id: "member", link: "/admin/member/default/0" },
 	];
-	
+	const [reject, setReject] = useState({});
+	const role = useSelector(state => state.persistent.role)
 	useEffect(() => {
-		const verification = async () => {
-			const token = localStorage.getItem("token");
-			
-			if (token) {
-				// 현재 사용자의 정보 조회
-				// const rsp = await
-			} else {
-				// reject modal을 띄운 뒤 로그인 창으로 돌아가게 만들기
-			}
-		};
-		// verification(); // 미완성 이므로 주석 처리
-	}, []);
+		if(role !== "ROLE_ADMIN"){
+			setReject({value: true, label: "해당 페이지를 확인할 권한이 없습니다."})
+		}
+	}, [role]);
 	
 	const navigate = useNavigate();
 	const { page } = useContext(PermissionContext);
@@ -90,6 +86,7 @@ const AdminNav = () => {
 				</AdminNavContainer>
 				<Outlet />
 			</AdminContainer>
+			<RejectModal onClose={() => navigate("/")} open={reject.value} message={reject.label} />
 		</BackGround>
 	);
 };

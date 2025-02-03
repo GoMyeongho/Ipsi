@@ -12,9 +12,9 @@ import {useDispatch, useSelector} from "react-redux";
 import ConfirmModal from "../../../../component/Modal/ConfirmModal";
 import {setLoginModalOpen} from "../../../../context/redux/ModalReducer";
 
-const PostListMain = () => {
+const PostListMain = ({active}) => {
 	// context에서 상태 가져오기
-	const { size, page, setPage, postList, setPostList, maxPage, setMaxPage, setSearchQuery, setSearchOption } = useContext(TextContext);
+	const { size, page, setPage, postList, setPostList, maxPage, setMaxPage, setSearchQuery, setSearchOption, sortOption } = useContext(TextContext);
 	const navigator = useNavigate();
 	const { category, search, searchOption } = useParams(); // URL 파라미터에서 검색어와 검색옵션 가져오기
 	const role = useSelector(state => state.persistent.role);
@@ -37,11 +37,13 @@ const PostListMain = () => {
 			try {
 				const rsp = searchOption
 					? searchOption === "title"
-						? await TextBoardApi.getAllTextBoardPageByTitle(search, category, size)
+						? await TextBoardApi.getAllTextBoardPageByTitle(search, category, size, active)
 						: searchOption === "nickName"
-							? await TextBoardApi.getAllTextBoardPageByNickName(search, category, size)
-							: await TextBoardApi.getAllTextBoardPageByTitleOrContent(search, category, size)
-					: await TextBoardApi.getAllTextBoardPage(category, size);
+							? await TextBoardApi.getAllTextBoardPageByNickName(search, category, size, active)
+							: searchOption === "member" ?
+								await TextBoardApi.getAllTextBoardPageByMember(search, category, size, active)
+								:await TextBoardApi.getAllTextBoardPageByTitleOrContent(search, category, size, active)
+					: await TextBoardApi.getAllTextBoardPage(category, size, active);
 				setMaxPage(rsp.data);
 			} catch (error) {
 				console.error("Error fetching max page:", error);
@@ -57,11 +59,13 @@ const PostListMain = () => {
 			try {
 				const rsp = searchOption
 					? searchOption === "title"
-						? await TextBoardApi.getAllTextBoardListByTitle(search, category, page, size, "desc")
+						? await TextBoardApi.getAllTextBoardListByTitle(search, category, page, size, active, sortOption || "desc")
 						: searchOption === "nickName"
-							? await TextBoardApi.getAllTextBoardListByNickName(search, category, page, size, "desc")
-							: await TextBoardApi.getAllTextBoardListByTitleOrContent(search, category, page, size, "desc")
-					: await TextBoardApi.getAllTextBoardList(category, page, size, "desc");
+							? await TextBoardApi.getAllTextBoardListByNickName(search, category, page, size, active, sortOption || "desc")
+							: searchOption === "member" ?
+								await  TextBoardApi.getAllTextBoardListByMember(search, category, page, size, active, sortOption || "desc")
+								:await TextBoardApi.getAllTextBoardListByTitleOrContent(search, category, page, size, active, sortOption || "desc")
+					: await TextBoardApi.getAllTextBoardList(category, page, size, active, sortOption || "desc");
 				console.log(rsp);
 				setPostList(rsp.data);
 			} catch (error) {
@@ -72,7 +76,7 @@ const PostListMain = () => {
 		return(
 			setPostList(null)
 		)
-	}, [page, size, search, category, setPostList]);
+	}, [page, size, search, category, setPostList, sortOption]);
 	
 	const onClickCreate = () => {
 		if(role !== null && role !== "REST_USER") {
@@ -119,6 +123,7 @@ const styles = {
 		alignItems: "center",
 		padding: "20px",
 		position: "relative",
+		width: "100%",
 	},
 };
 

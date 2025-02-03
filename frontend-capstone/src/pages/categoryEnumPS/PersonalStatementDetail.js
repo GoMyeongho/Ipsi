@@ -607,7 +607,7 @@ const PersonalStatementDetail = () => {
                 {item.univName} {item.univDept} ({item.fileTitle})
               </DetailBoxTitle>
               <DetailBoxInfo>
-                <span onClick={onClickName} >{replaceMiddleName(item.memberName)}</span> <span>|</span>
+                <span onClick={onClickName} value={item.memberId}>{replaceMiddleName(item.memberName)}</span> <span>|</span>
                 <span>{titleDate(item.regDate)}</span> <span>|</span>
                 <span>{formattedKeywords}</span>
               </DetailBoxInfo>
@@ -667,7 +667,7 @@ const PersonalStatementDetail = () => {
               review.map((reviewItem, index) => (
               <ReviewListBox key={index}>
                 <ReviewListTop>
-                  <ReviewName>{replaceMiddleName(reviewItem.memberName)}</ReviewName>
+                  <ReviewName onClick={onClickName} value={reviewItem.memberId}>{replaceMiddleName(reviewItem.memberName)}</ReviewName>
                   <ReviewTime>{reviewDateTime(reviewItem.reviewRegDate)}</ReviewTime>
                 </ReviewListTop>
                 <ReviewListBottom>

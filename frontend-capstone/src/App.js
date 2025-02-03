@@ -32,6 +32,8 @@ import { CheckoutPage } from './paySystem/CheckOut';
 import Store from "./context/Store"
 import {Provider} from "react-redux";
 import PostCreateMain from "./pages/text/write/create/PostCreateMain";
+import MemberControlMain from "./pages/admin/member/list/MemberControlMain";
+import BoardControlMain from "./pages/admin/board/BoardControlMain";
 
 
 
@@ -69,11 +71,13 @@ function App() {
               <Route path="admin" element={<PermissionStore><AdminNav /></PermissionStore>}>
                 <Route path="auth" element={<PermissionMain />} />
                 <Route path="auth/:permissionId" element={<PermissionDetailMain />} />
+                <Route path="member/:searchOption/:searchValue" element={<MemberControlMain/>} />
+                <Route path="board/:category/:search?/:searchOption?" element={<BoardControlMain/>}/>
               </Route>
               
               {/* 게시판 (text Board) */}
               <Route path="post" element={<TextStore><PostLayout /></TextStore>}>
-                <Route path="list/:category/:search?/:searchOption?" element={<PostListMain />} />
+                <Route path="list/:category/:search?/:searchOption?" element={<PostListMain active="ACTIVE" />} />
                 <Route path="detail/:id" element={<PostItemMain />} />
                 <Route path="create/:category/:id?" element={<PostCreateMain />} />
               </Route>

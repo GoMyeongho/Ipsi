@@ -11,9 +11,16 @@ const PermissionStore = ({children}) => {
 	const [univ, setUniv] = useState({})
 	const [univList, setUnivList] = useState([]);
 	const [univNameList, setUnivNameList] = useState([]);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [searchOption, setSearchOption] = useState("");
+	const [boardCategory, setBoardCategory] = useState("default");
+	
+	
+	
 	return (
 		<PermissionContext.Provider value={{permission, permissionList, setPermission, setPermissionList
-			, permissionCategory, setPermissionCategory, page, setPage, univ, setUniv, univList, setUnivList, univNameList, setUnivNameList}}>
+			, permissionCategory, setPermissionCategory, page, setPage, univ, setUniv, univList, setUnivList, univNameList, setUnivNameList
+			, searchOption, setSearchOption, searchQuery, setSearchQuery, boardCategory, setBoardCategory}}>
 			{children}
 		</PermissionContext.Provider>
 	)

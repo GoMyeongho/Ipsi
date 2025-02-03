@@ -16,13 +16,14 @@ public enum Authority {
 		this.value = value;
 	}
 	
-	// 문자열을 받아 해당 enum 항목을 반환하는 메서드
-	public static Authority fromString(String authority) {
-		for (Authority auth : Authority.values()) {
-			if (auth.getValue().equalsIgnoreCase(authority)) {
-				return auth;
-			}
-		}
-		throw new IllegalArgumentException("Unexpected value: " + authority);
+	public static Authority fromString(String value) {
+		value = value.replace("%", "").trim(); // 와일드카드 제거
+		return switch (value.toUpperCase()) {
+			case "USER", "ROLE_USER" -> ROLE_USER;
+			case "ADMIN", "ROLE_ADMIN" -> ROLE_ADMIN;
+			case "UNIV", "ROLE_UNIV" -> ROLE_UNIV;
+			case "REST", "REST_USER" -> REST_USER;
+			default -> throw new IllegalArgumentException("Unexpected value: " + value);
+		};
 	}
 }

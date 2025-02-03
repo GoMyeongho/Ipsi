@@ -31,5 +31,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	
 	Optional<Member> findByMemberId(Long memberId);
 	List<Member> findAllByAuthority(Authority authority);
-	List<Member> findAllByUniv_UnivName(String univName);
+	List<Member> findAllByUniv_UnivNameContaining(String univName);
 }
