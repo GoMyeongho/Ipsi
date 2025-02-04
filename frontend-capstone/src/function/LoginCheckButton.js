@@ -12,10 +12,10 @@ const CheckLogin = ({ targetPage }) => {
         const res = await Commons.IsLogin();
         if (res.data === true) {
           console.log("로그인 상태 확인 완료");
-          navigate(targetPage, { replace: true });
+
         } else {
           alert("로그인 필요");
-          navigate("/login", { replace: true });
+          navigate("/", { replace: true });
         }
       } catch (e) {
         console.log(e);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import styled from "styled-components";
 import AuthApi from "../../../api/AuthApi"; // API 요청 함수
 
@@ -35,25 +35,38 @@ const InputField = styled.input`
   border-radius: 20px;
   box-sizing: border-box;
   font-size: 16px;
+    border: 1px solid #dccafc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  &:focus {
+      border-color: #a16eff;
+      outline: none;
+      box-shadow: 0 0 4px rgba(161, 110, 255, 0.5);
+    }
+`;
+const TimerText = styled.p`
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
 `;
 
 const Button = styled.button`
   width: 100%;
   padding: 12px;
-  background-color: black;
+  background-color:#5f53d3;
   color: white;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   font-size: 16px;
   margin-top: 10px;
+  
 
   &:hover {
-    background-color: #c1c1c1;
+    background-color: #dccafc;
   }
 
   &:disabled {
-    background-color: #e0e0e0;
+    background-color: #dccafc;
     cursor: not-allowed;
   }
 `;
@@ -90,89 +103,105 @@ const FindIdByPhone = ({ closeModal }) => {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [countdown, setCountdown] = useState(0); // 5분 타이머 (초 단위)
+
+  useEffect(() => {
+    let timer;
+    if (isCodeSent && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [isCodeSent, countdown]);
 
   const handleSendVerificationCode = async () => {
+    setIsSendingCode(true);
     try {
       const response = await AuthApi.sendVerificationCode(phone);
       if (response) {
         setIsCodeSent(true);
+        setCountdown(300); // 5분 (300초) 타이머 시작
         setErrorMessage("");
       } else {
         setErrorMessage("인증번호 발송에 실패했습니다.");
       }
     } catch (error) {
       setErrorMessage("서버에서 오류가 발생했습니다.");
+    } finally {
+      setIsSendingCode(false);
     }
   };
 
   const handleVerifyCode = async () => {
     try {
+      if (countdown === 0) {
+        setErrorMessage("인증번호가 만료되었습니다. 다시 시도해주세요.");
+        return;
+      }
+
       const response = await AuthApi.verifySmsToken(phone, inputCode);
-  
       if (response) {
         const rsp = await AuthApi.findPhoneByEmail(phone);
-        const fullEmail = rsp.data; // 전체 이메일 주소
-        const [localPart, domainPart] = fullEmail.split("@"); // 이메일을 @로 분리
+        const fullEmail = rsp.data;
+        const [localPart, domainPart] = fullEmail.split("@");
         const maskedEmail =
           localPart.length > 3
             ? localPart.substring(0, 3) + "*".repeat(localPart.length - 3) + "@" + domainPart
-            : localPart + "@" + domainPart; // 앞 3글자만 표시하고 나머지는 *로 대체
-        setEmail(maskedEmail); // 가공된 이메일 저장
+            : localPart + "@" + domainPart;
+        setEmail(maskedEmail);
         setErrorMessage("");
-        setShowSuccessModal(true);
+        setIsCodeSent(false);
       }
     } catch (error) {
-      console.error("이메일 찾기 실패:", error);
       setErrorMessage("입력하신 번호로 이메일을 찾을 수 없습니다.");
     }
   };
 
-  const handleModalClose = () => {
-    closeModal();
-  };
-
   const isPhoneValid = phone.length >= 11 && phone.length <= 12;
+  const formattedTime = `${Math.floor(countdown / 60)}:${String(countdown % 60).padStart(2, "0")}`;
 
   return (
-    <>
-      {showSuccessModal ? (
-        <SuccessModal onClick={closeModal}>
-          <ModalContainer onClick={(e) => e.stopPropagation()}>
-            <p>찾으신 이메일: {email}</p>
-          </ModalContainer>
-        </SuccessModal>
-      ) : (
-        <ModalOverlay onClick={handleModalClose}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
-            <h2>이메일 찾기</h2>
+    <ModalOverlay onClick={closeModal}>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
+        <h2>이메일 찾기</h2>
+        <InputField
+          type="text"
+          placeholder="휴대폰 번호 입력"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          disabled={isCodeSent}
+        />
+        <Button onClick={handleSendVerificationCode} disabled={!isPhoneValid || isSendingCode}>
+          {isSendingCode ? "인증번호 보내는 중..." : "인증번호 보내기"}
+        </Button>
+        {isSendingCode && <MessageText>인증번호 보내는 중...</MessageText>}
+        {isCodeSent && (
+          <>
             <InputField
               type="text"
-              placeholder="휴대폰 번호 입력"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              placeholder="인증번호 입력"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value)}
+              disabled={countdown === 0}
             />
-            <Button onClick={handleSendVerificationCode} disabled={!isPhoneValid}>
-              인증번호 보내기
-            </Button>
-            {isCodeSent && (
-              <>
-                <InputField
-                  type="text"
-                  placeholder="인증번호 입력"
-                  value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value)}
-                />
-                <Button onClick={handleVerifyCode}>인증하기</Button>
-              </>
+            {countdown > 0 ? (
+              <TimerText>남은 시간: {formattedTime}</TimerText>
+            ) : (
+              <MessageText error>인증번호가 만료되었습니다. 다시 요청하세요.</MessageText>
             )}
-            {errorMessage && (
-              <MessageText error={!!errorMessage}>{errorMessage}</MessageText>
+            <Button onClick={handleVerifyCode} disabled={countdown === 0}>인증하기</Button>
+            {countdown === 0 && (
+              <Button onClick={handleSendVerificationCode}>인증번호 재전송</Button>
             )}
-          </ModalContent>
-        </ModalOverlay>
-      )}
-    </>
+          </>
+        )}
+        {errorMessage && <MessageText error>{errorMessage}</MessageText>}
+      </ModalContent>
+    </ModalOverlay>
   );
 };
 

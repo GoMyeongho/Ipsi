@@ -1,205 +1,190 @@
-  import React, { useState } from "react";
-  import styled from "styled-components";
-  import AuthApi from "../../../api/AuthApi"; // API 요청 함수
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import AuthApi from "../../../api/AuthApi"; // API 요청 함수
 
-  import PasswordModal from "./PasswordModal";
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+`;
 
-  const FindPw = ({ closeModal }) => {
-    const [inputEmail, setInputEmail] = useState("");
-    const [inputCode, setInputCode] = useState("");
-    const [isCodeSent, setIsCodeSent] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    
-    const [isPasswordModal, setPasswordModal] = useState(false);
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  width: 450px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: auto;
+`;
 
-    const handleInputChange = (e, setState) => {
-      setState(e.target.value);
-    };
+const InputField = styled.input`
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border: 1px solid #dccafc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  &:focus {
+    border-color: #a16eff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(161, 110, 255, 0.5);
+  }
+`;
 
-    const closePasswrodModal = () => {
-      setPasswordModal(false);
-    };
+const TimerText = styled.p`
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+`;
 
-    // 인증번호 보내기
-    const sendVerificationCode = async () => {
-      try {
-        const rsp = await AuthApi.emailCheck(inputEmail);
-        console.log(rsp)
-        if (rsp.data) {
-          const emailResponse = await AuthApi.sendPw(inputEmail); // 인증번호 보내는 API
-          if (emailResponse) {
-            setErrorMessage("");
-            setIsCodeSent(true);
-          } else {
-            setErrorMessage("인증번호 전송에 실패했습니다.");
-          }
+const Button = styled.button`
+  width: 100%;
+  padding: 12px;
+  background-color: #5f53d3;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+
+  &:hover {
+    background-color: #dccafc;
+  }
+
+  &:disabled {
+    background-color: #dccafc;
+    cursor: not-allowed;
+  }
+`;
+
+const MessageText = styled.p`
+  color: ${(props) => (props.error ? "red" : "black")};
+  margin-top: 10px;
+`;
+
+const FindPw = ({ closeModal }) => {
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputCode, setInputCode] = useState("");
+  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [countdown, setCountdown] = useState(0); // 5분 타이머 (초 단위)
+
+  useEffect(() => {
+    let timer;
+    if (isCodeSent && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [isCodeSent, countdown]);
+
+  const handleSendVerificationCode = async () => {
+    setIsSendingCode(true);
+    try {
+      const rsp = await AuthApi.emailCheck(inputEmail);
+      if (rsp.data) {
+        const emailResponse = await AuthApi.sendPw(inputEmail); // 인증번호 보내는 API
+        if (emailResponse) {
+          setIsCodeSent(true);
+          setCountdown(300); // 5분 (300초) 타이머 시작
+          setErrorMessage("");
         } else {
-          setErrorMessage("없는 사용자입니다.");
+          setErrorMessage("인증번호 전송에 실패했습니다.");
         }
-      } catch (e) {
-        console.error("오류 발생:", e);
-        setErrorMessage("서버가 응답하지 않습니다.");
+      } else {
+        setErrorMessage("없는 사용자입니다.");
       }
-    };
-
-    // 인증번호 확인
-    const verifyEmialToken = async () => {
-    
-      try {
-        const response = await AuthApi.verifyEmialToken(inputEmail, inputCode); // 인증번호 검증 API
-        if (response===true) {
-          // 인증번호가 맞으면 이메일 전달하여 비밀번호 수정 모달 열기
-          setIsCodeSent(false);
-       
-          setPasswordModal(true);
-          }
-
-         else {
-          setErrorMessage("잘못된 인증번호입니다.");
-        }
-      } catch (e) {
-        console.error("오류 발생:", e);
-        setErrorMessage("인증번호 확인에 실패했습니다.");
-      }
-    };
-    const handleOverlayClick = (e) => {
-      if (e.target === e.currentTarget) {
-        closeModal();
-      }
-    };
-
-    return (
-      <>
-          <ModalOverlay onClick={handleOverlayClick}>
-            <ModalContainer>
-              <ModalHeader>
-                <h2>비밀번호 찾기</h2>
-              </ModalHeader>
-              <ModalBody>
-                <InputContainer>
-                  <label>이메일</label>
-                  <input
-                    type="email"
-                    value={inputEmail}
-                    onChange={(e) => handleInputChange(e, setInputEmail)}
-                    placeholder="등록된 이메일을 입력하세요"
-                  />
-                </InputContainer>
-                {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-                <Button onClick={sendVerificationCode}>인증번호 보내기</Button>
-
-                {isCodeSent && (
-                  <>
-                    <InputContainer>
-                      <label>인증번호</label>
-                      <input
-                        type="text"
-                        value={inputCode}
-                        onChange={(e) => handleInputChange(e, setInputCode)}
-                        placeholder="인증번호를 입력하세요"
-                      />
-                    </InputContainer>
-                    <Button onClick={verifyEmialToken}>인증하기</Button>
-                  </>
-                )}
-              </ModalBody>
-            </ModalContainer>
-          </ModalOverlay>
-          {isPasswordModal && <PasswordModal closeModal={closePasswrodModal} />}
-      
-      </>
-    );
+    } catch (e) {
+      console.error("오류 발생:", e);
+      setErrorMessage("서버가 응답하지 않습니다.");
+    } finally {
+      setIsSendingCode(false);
+    }
   };
 
-  // 스타일링
-  const ModalOverlay = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  `;
+  const handleVerifyCode = async () => {
+    try {
+      if (countdown === 0) {
+        setErrorMessage("인증번호가 만료되었습니다. 다시 시도해주세요.");
+        return;
+      }
 
-  const ModalContainer = styled.div`
-    background-color: white;
-    padding: 20px;
-    width: 450px;
-    flex-direction: column;
-    height: 380px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 10000;
-  `;
-
-  const SuccessModal = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10001;
-  `;
-
-  const ModalHeader = styled.div`
-    display: flex;
-    justify-content: center;  // Centering the header
-    align-items: center;
-    margin-bottom: 20px;  // Removed border-bottom
-  `;
-
-  const ModalBody = styled.div`
-    display: flex;
-    flex-direction: column;
-  `;
-
-  const InputContainer = styled.div`
-    margin-bottom: 15px;
-
-    label {
-      font-size: 14px;
-      color: #333;
-      margin-bottom: 5px;
-      display: block;
+      const response = await AuthApi.verifyEmialToken(inputEmail, inputCode); // 인증번호 검증 API
+      if (response === true) {
+        setErrorMessage("");
+        setIsCodeSent(false);
+        // 비밀번호 재설정 로직 추가
+      } else {
+        setErrorMessage("잘못된 인증번호입니다.");
+      }
+    } catch (e) {
+      console.error("오류 발생:", e);
+      setErrorMessage("인증번호 확인에 실패했습니다.");
     }
+  };
 
-    input {
-      border-radius: 20px;
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-  `;
+  const isEmailValid = inputEmail.includes("@");
+  const formattedTime = `${Math.floor(countdown / 60)}:${String(countdown % 60).padStart(2, "0")}`;
 
-  const ErrorMessage = styled.div`
-    color: red;
-    font-size: 14px;
-    margin-bottom: 10px;
-  `;
+  return (
+    <ModalOverlay onClick={closeModal}>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
+        <h2>비밀번호 찾기</h2>
+        <InputField
+          type="email"
+          placeholder="등록된 이메일을 입력하세요"
+          value={inputEmail}
+          onChange={(e) => setInputEmail(e.target.value)}
+          disabled={isCodeSent}
+        />
+        <Button onClick={handleSendVerificationCode} disabled={!isEmailValid || isSendingCode}>
+          {isSendingCode ? "인증번호 보내는 중..." : "인증번호 보내기"}
+        </Button>
+        {isSendingCode && <MessageText>인증번호 보내는 중...</MessageText>}
+        {isCodeSent && (
+          <>
+            <InputField
+              type="text"
+              placeholder="인증번호 입력"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value)}
+              disabled={countdown === 0}
+            />
+            {countdown > 0 ? (
+              <TimerText>남은 시간: {formattedTime}</TimerText>
+            ) : (
+              <MessageText error>인증번호가 만료되었습니다. 다시 요청하세요.</MessageText>
+            )}
+            <Button onClick={handleVerifyCode} disabled={countdown === 0}>
+              인증하기
+            </Button>
+            {countdown === 0 && (
+              <Button onClick={handleSendVerificationCode}>인증번호 재전송</Button>
+            )}
+          </>
+        )}
+        {errorMessage && <MessageText error>{errorMessage}</MessageText>}
+      </ModalContent>
+    </ModalOverlay>
+  );
+};
 
-  const Button = styled.button`
-    margin-top: 20px;
-    background-color: black;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #c1c1c1;
-    }
-  `;
-
-  export default FindPw;
+export default FindPw;
