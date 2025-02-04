@@ -19,4 +19,5 @@ public class PayReqDto {
     private String status;       // 결제 상태 (예: PENDING, APPROVED, FAILED)
     private String productName;  // 제품 이름
     private int productPrice;    // 제품 가격
+//    private boolean purchased; //결제상태
 }

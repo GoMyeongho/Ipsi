@@ -1,15 +1,18 @@
 import styled from "styled-components";
 import { ChatTitle } from "../ChatComponent/ChatMenuBar";
 import searchIcon from "../../images/search.svg";
-import React, { useEffect, useState } from "react";
-import AxiosApi from "../../api/AxiosApi";
+import React, { useContext, useEffect, useState } from "react";
+import ChattingApi from "../../api/ChattingApi";
 import { ChatUl, ChatRoom, ChatName } from "../ChatComponent/ChatList";
+import { ChatContext } from "../../context/ChatStore";
 
 const OpenChatBg = styled.div`
     width: 100%;
     height: 100%;
     /* background-color: pink; */
+    background: #FFF;
     padding: 0 30px;
+    position: relative;
 `
 const CreateBtn = styled.button`
     width: 25%;
@@ -17,6 +20,11 @@ const CreateBtn = styled.button`
     border-radius: 10px;
     border: 1px solid #777;
     background-color: #FFF;
+    &:hover {
+      color: #FFF;
+      background-color: #6154D4;
+      border: 1px solid #6154D4;
+    }
 `
 const SearchBox = styled.div`
     width: 100%;
@@ -37,6 +45,10 @@ const SearchInput = styled.input`
 const SearchIcon = styled.img`
     width: 15px;
     filter: grayscale(100%);
+    cursor: pointer;
+    &:hover {
+      filter: none;
+    }
 `
 const CreateInputBox = styled.div`
     width: 100%;
@@ -97,36 +109,38 @@ export const BtnBox = styled.div`
         height: 35px;
         border-radius: 10px;
         border: none;
+        background-color: #FFF;
     }
-    .cancel { background-color: #E0CEFF; }
-    .submit {
-        background-color: #6154D4;
-        color: #FFF;
-    }
+    .cancel { border: 2px solid #E0CEFF; }
+    .cancel:hover { background-color: #E0CEFF; }
+    .submit { border: 2px solid #6154D4; }
+    .submit:hover { background-color: #6154D4; color: #FFF; }
 `
 
 const OpenChatSearch = ({ setSelectedPage }) => {
     const [isOverlayOpen, setIsOverlayOpen] = useState(false); // Overlay 상태 관리
+    const [isOverMemberOpen, setIsOverMemberOpen] = useState(false);
     const [chatRooms, setChatRooms] = useState([]);
+    const {setRoomId} = useContext(ChatContext);
 
     const [filteredChatRooms, setFilteredChatRooms] = useState([]);
     const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
 
     const [personCnt, setPersonCnt] = useState([]);
     const [chatRoomTitle, setChatRoomTitle] = useState([]);
-    const email = localStorage.getItem("email");
 
     const [errorMessage, setErrorMessage] = useState("");
 
     // 서버로부터 채팅방 목록을 가져오는 API
     const fetchChatRooms = async() => {
         try {
-            const response = await AxiosApi.chatList();
-            console.log(response.data);
-            setChatRooms(response.data);
-            setFilteredChatRooms(response.data);
+            const resp = await ChattingApi.chatList();
+            if (resp.status === 200) {
+              const response = await ChattingApi.chatList();
+              setChatRooms(response.data);
+            }
         } catch (e) {
-            console.log(e); // 서버와의 통신 실패 예외 처리
+            console.log(e);
         }
     };
 
@@ -147,22 +161,32 @@ const OpenChatSearch = ({ setSelectedPage }) => {
             setErrorMessage("참여 가능 인원은 최소 2명 최대 30명입니다.");
             return;
         }
-
         try {
-            const response = await AxiosApi.chatCreate(chatRoomTitle, personCnt);
-            console.log("Response data:", response.data); // 응답 데이터 확인
-            setSelectedPage(`/chatting/${response.data}`);
+            const response = await ChattingApi.chatCreate(chatRoomTitle, personCnt);
+            setRoomId(response.data);
+            setSelectedPage("chatting");
         } catch (e) {
-            console.log(e);
             setErrorMessage(e.response.data);
         }
-        console.log("chatRoomTitle:", chatRoomTitle);
-        console.log("personCnt:", personCnt);
     };
 
     // 채팅방 이동
-    const enterChatRoom = (roomId) => {
-        setSelectedPage("chatting");
+    const enterChatRoom = async (roomId) => {
+        try {
+            const currentMembers = await ChattingApi.cntRoomMember(roomId);
+            const chatDetails = await ChattingApi.chatDetail(roomId);
+
+            const personCnt = chatDetails.personCnt;
+            if (currentMembers >= personCnt) {
+                setIsOverMemberOpen(true);
+                return; // 입장 불가
+            }
+            setRoomId(roomId);
+            setSelectedPage("chatting");
+        } catch (error) {
+            console.error("Error fetching chat room details:", error);
+            throw error;
+        }
     };
 
     const createChatRoom = () => {
@@ -170,15 +194,22 @@ const OpenChatSearch = ({ setSelectedPage }) => {
         setErrorMessage(""); // 초기화
     };
 
+    const overMember = () => {
+        setIsOverMemberOpen(false);
+    };
+
     const closeOverlay = () => {
         setIsOverlayOpen(false);
     };
 
-    // 채팅방 검색 핸들링
-    const handleSearch = (term) => {
-        setSearchTerm(term);
+    const closeOverMember = () => {
+        setIsOverMemberOpen(false);
+    }
+
+    // 채팅방 검색
+    const handleSearch = () => {
         const filteredRooms = chatRooms.filter(room =>
-            room.name.toLowerCase().includes(term.toLowerCase())
+            room.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredChatRooms(filteredRooms);
     };
@@ -192,12 +223,12 @@ const OpenChatSearch = ({ setSelectedPage }) => {
                 <SearchInput
                     placeholder="오픈 채팅방 검색"
                     value={searchTerm}
-                    onChange={(e) => handleSearch(e.target.value)}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <SearchIcon src={searchIcon} alt="Search"/>
+                <SearchIcon src={searchIcon} alt="Search" onClick={handleSearch}/>
             </SearchBox>
             <ChatUl>
-            {filteredChatRooms.map(room => (
+                {filteredChatRooms.map((room) => (
                     <ChatRoom key={room.roomId} onClick={() => enterChatRoom(room.roomId)}>
                         <ChatName>{room.name}</ChatName>
                     </ChatRoom>
@@ -229,6 +260,16 @@ const OpenChatSearch = ({ setSelectedPage }) => {
                         <BtnBox>
                             <button className="cancel" onClick={closeOverlay}>취소</button>
                             <button className="submit" onClick={handleCreateChatRoom}>확인</button>
+                        </BtnBox>
+                    </OverlayContent>
+                </OverlayContainer>
+            )}
+            {isOverMemberOpen && (
+                <OverlayContainer>
+                    <OverlayContent>
+                        <CreateTitle>최대 입장 인원을 초과하였습니다.</CreateTitle>
+                        <BtnBox>
+                            <button className="submit" onClick={closeOverMember}>확인</button>
                         </BtnBox>
                     </OverlayContent>
                 </OverlayContainer>

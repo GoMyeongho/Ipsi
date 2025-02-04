@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import styled from "styled-components";
 import AuthApi from "../../../api/AuthApi";
 import SignupModal from "../signup/SingupModal";
@@ -6,6 +6,10 @@ import FindPw from "../findPw/FIndPw";
 import FindIdByPhone from "../findId/FindIdByPhone";
 import { useNavigate } from "react-router-dom";
 import Commons from "../../../util/Common";
+import {useDispatch} from "react-redux";
+import {setAccessToken, setRefreshToken} from "../../../context/redux/PersistentReducer";
+import RejectModal from "../../../component/Modal/RejectModal";
+
 
 // 도메인 및 API URL 설정
 
@@ -26,45 +30,6 @@ const SocialButtonsContainer = styled.div`
   gap: 10px; // 버튼 간 간격
 `;
 
-// const NaverButton = styled.button`
-//   width: 100%;
-//   height: 45px;
-//   background-image: url("https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Flogo%2FbtnG_완성형.png?alt=media");
-//   background-size: cover;
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   border: none;
-//   border-radius: 20px;
-//   cursor: pointer;
-//   margin-top: 10px;
-//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); // 쉐도우 추가
-
-//   &:hover {
-//     opacity: 0.9;
-//     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Hover 시 쉐도우 강조
-//   }
-// `;
-
-// Kakao 버튼 스타일
-// const KakaoButton = styled.button`
-//   width: 100%;
-//   height: 45px;
-//   background-image: url("https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Flogo%2Fkakao_login_large_wide.png?alt=media");
-//   background-size: cover;
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   border: none;
-//   border-radius: 20px;
-//   cursor: pointer;
-//   margin-top: 10px;
-//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); // 쉐도우 추가
-
-//   &:hover {
-//     opacity: 0.9;
-//     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Hover 시 쉐도우 강조
-//   }
-// `;
-
 const NaverButton = styled.button`
   width: 100%;
   height: 45px;
@@ -82,7 +47,6 @@ const NaverButton = styled.button`
     color: #FFF;
   }
 `;
-
 
 const KakaoButton = styled.button`
   width: 100%;
@@ -120,7 +84,6 @@ const ModalContent = styled.div`
   border-radius: 8px;
   z-index: 9999;
   width: 450px;
-  
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -164,7 +127,6 @@ const Button = styled.button`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Hover 시 쉐도우 강조
   }
 `;
-
 
 // 텍스트 버튼 스타일
 const TextButtonContainer = styled.div`
@@ -221,7 +183,8 @@ const SnsLoginText = styled.div`
   margin-bottom: 10px;
 `;
 
-const LoginModal = ({ closeModal, setIsLoggedIn }) => {
+const LoginModal = ({ closeModal }) => {
+  const dispatch = useDispatch();
   const onSnsSignInButtonClickHandler = (type) => {
     window.location.href = SNS_SIGN_IN_URL(type);
   };
@@ -235,11 +198,15 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isFindIdModalOpen, setIsFindIdModalOpen] = useState(false);
   const [isFindPwModalOpen, setIsFindPwModalOpen] = useState(false);
+  const [reject, setReject] = useState({});
+
+  // 로그인시 MainPage 이동(로그인시 자료구매현황을 확인해서 구매한자료인지 아닌지 파악하기위함)
+  const navigate = useNavigate();
 
   const handleInputChange = (e, setState) => {
     setState(e.target.value);
   };
-
+ 
   const onClickLogin = async () => {
     console.log("로그인!");
     try {
@@ -247,26 +214,31 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
       if (res.data.grantType === "Bearer") {
         console.log("accessToken : " + res.data.accessToken);
         console.log("refreshToken : " + res.data.refreshToken);
-        Commons.setAccessToken(res.data.accessToken);
-        Commons.setRefreshToken(res.data.refreshToken);
-        setIsLoggedIn(true);
+        dispatch(setAccessToken(res.data.accessToken));
+        dispatch(setRefreshToken(res.data.refreshToken));
         closeModal();
       } else {
-        setErrorMessage("이메일 또는 비밀번호를 확인하세요.");
+        console.log("잘못된 아이디 또는 비밀번호 입니다.");
+        setReject({message : "ID와 PW가 다릅니다.", active: true});
       }
     } catch (err) {
       console.log("로그인 에러 : " + err);
-      setErrorMessage("이메일 또는 비밀번호를 확인하세요."); // 모든 오류에 대해 동일한 메시지 출력
+      if (err.response && err.response.status === 405) {
+        console.log("로그인 실패: 405 Unauthorized");
+        setReject({message : "로그인에 실패하였습니다.", active: true});
+      } else {
+        console.log("로그인 에러 : " + err);
+        setReject({message : "서버와의 통신에 실패했습니다.", active: true});
+      }
     }
   };
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") { 
-      
+    if (e.key === "Enter") {
+
       e.preventDefault(); // 엔터 키가 눌렸을 때
       onClickLogin();          // 로그인 버튼 클릭 함수 실행
     }
   };
-  
 
   const openSignupModal = () => {
     setIsSignupModalOpen(true);
@@ -346,6 +318,7 @@ const LoginModal = ({ closeModal, setIsLoggedIn }) => {
       {isSignupModalOpen && <SignupModal closeModal={closeSignupModal} />}
       {isFindIdModalOpen && <FindIdByPhone closeModal={closeFindIdModal} />}
       {isFindPwModalOpen && <FindPw closeModal={closeFindPwModal} />}
+      <RejectModal open={reject.active} message={reject.message} onClose={() => setReject("")}></RejectModal>
     </>
   );
 };

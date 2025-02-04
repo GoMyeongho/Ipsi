@@ -19,12 +19,21 @@ const Top = styled.div`
   padding-bottom: 2%;
   display: flex;
   justify-content: space-between;
+
+  @media (max-width:768px) {
+    width: 100%;
+  }
 `;
 
 const Title = styled.div`
-  width: 100%;
-  font-size: 1vw;
+  width: 50%;
+  font-size: clamp(1rem, 1.3vw, 2.5rem);
   font-weight: bold;
+
+  @media (max-width:768px) {
+    width: 50%;
+    padding-left: 5%;
+  }
 `;
 
 const Search = styled.div`
@@ -50,7 +59,7 @@ const Dropdown = styled.select`
   border: none;
   border-radius: 5px;
   background-color: #fff;
-  font-size: calc(5px + 0.6vw);
+  font-size: clamp(0.8rem, 1vw, 2.5rem); /* 기본 옵션 텍스트 크기 */
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -63,9 +72,55 @@ const Dropdown = styled.select`
     outline: none;
   }
 
-  option {
-    width: 100%;
+  /* 기본 옵션인 "대학명", "학과명"에 대한 폰트 크기 조정 */
+  option[value=""] {
+    font-weight: bold; /* 강조 옵션 (선택사항) */
+    font-size: clamp(0.8rem, 1vw, 2.5rem); /* 기본 옵션 텍스트 크기 */
   }
+
+  option {
+    font-size: clamp(0.8rem, 1vw, 2.5rem);
+  }
+`;
+
+const DropdownSearchButton = styled.button`
+  width: 40px;
+  aspect-ratio: 1 / 1;
+  min-width: 30px;
+  min-height: 30px;
+  background-color: black;
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  background-image: url(https://firebasestorage.googleapis.com/v0/b/photo-island-eeaa3.firebasestorage.app/o/KH_Comprehensive_Project%2Fsearh.png?alt=media&token=9eed2c07-0961-44c9-a298-c6b984bc680c);
+  background-size: 50% 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+   /* 비활성화 상태에서 hover 및 active 동작 방지 */
+   &:disabled {
+    pointer-events: none;  /* 마우스 이벤트를 막아서 hover 및 active를 비활성화 */
+    opacity: none;  /* 비활성화 상태에서 버튼의 투명도를 낮추어 구분 */
+  }
+`;
+
+const KeywordSerarchInput = styled.input`
+  width: 30%;
+  height: 30px;
+  font-size: large;
+  border: 3px solid #6154D4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const KeywordSearchButton = styled.button`
@@ -90,6 +145,12 @@ const KeywordSearchButton = styled.button`
   &:active {
     transform: scale(0.95);
   }
+
+   /* 비활성화 상태에서 hover 및 active 동작 방지 */
+   &:disabled {
+    pointer-events: none;  /* 마우스 이벤트를 막아서 hover 및 active를 비활성화 */
+    opacity: none;  /* 비활성화 상태에서 버튼의 투명도를 낮추어 구분 */
+  }
 `;
 
 const Line = styled.div`
@@ -97,6 +158,10 @@ const Line = styled.div`
   height: 2px; /* 라인의 두께 */
   background-color: black; /* 라인의 색상 */
   margin-bottom: 1%;
+
+  @media (max-width:768px) {
+    width: 100%;
+  }
 `;
 
 const Contents = styled.div`
@@ -106,6 +171,10 @@ const Contents = styled.div`
   gap: 20px;
   justify-content: flex-start;
   cursor: pointer; /* 클릭 가능하게 설정 */
+
+  @media (max-width:768px) {
+    width: 100%;
+  }
 `;
 
 const ContentsBox = styled.div`
@@ -130,19 +199,24 @@ const UnivLogo = styled.div`
   width: 100%;
   margin-top: 5%;
   img {
-    width: 50%; // 원하는 크기로 비율을 설정하거나 px 값으로 설정할 수 있습니다
-    height: auto; // 자동으로 비율에 맞게 높이를 조정
+    width: 60%; // 원하는 크기로 비율을 설정하거나 px 값으로 설정할 수 있습니다
+    object-fit: cover;
   }
 `;
 
 const UnivName = styled.div`
   width: 100%;
+  font-size: clamp(0.7rem, 0.8vw, 2.5rem);
   margin-bottom: 2%;
 `;
 
 const UnivDeptName = styled.div`
   width: 100%;
+  font-size: clamp(0.7rem, 0.8vw, 2.5rem);
   margin-bottom: 5%;
+  white-space: nowrap; /* 텍스트가 줄 바꿈되지 않도록 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 텍스트가 넘칠 경우 '...' 표시 */
 `;
 
 const ContentsBottom = styled.div`
@@ -165,13 +239,28 @@ const ContentsBottomBox = styled.div`
 
 const AuthName = styled.div`
   width: 100%;
+  font-size: clamp(0.7rem, 0.8vw, 2.5rem);
+
+  @media (max-width: 1000px) {
+    width: 50%;
+    display: flex;
+    justify-content: end;
+  }
 `;
 
 const ContentsPrice = styled.div`
   width: 100%;
+  font-size: clamp(0.8rem, 0.8vw, 2.5rem);
+  white-space: nowrap; /* 텍스트가 줄 바꿈되지 않도록 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 텍스트가 넘칠 경우 '...' 표시 */
+  @media (max-width: 1000px) {
+    display: flex;
+    justify-content: end;
+  }
 `;
 
-const BuyButton = styled.div`
+const DetailDisplay = styled.div`
   background-color: #6200ea;
   color: white;
   border: none;
@@ -183,6 +272,11 @@ const BuyButton = styled.div`
   &:hover {
     background-color: #3700b3;
   }
+
+  @media (max-width: 768px) {
+    width: 90%;
+    font-size: clamp(0.75rem, 0.8vw, 2.5rem);
+  }
 `;
 
 const PaginationContainer = styled.div`
@@ -192,8 +286,12 @@ const PaginationContainer = styled.div`
 `;
 
 const PaginationButton = styled.button`
-  background-color: #6200ea;
-  color: white;
+  background-color: ${(props) =>
+    props.isActive
+      ? "#6200ea"
+      : "transparent"}; // 활성화된 페이지일 때 보라색 배경
+  color: ${(props) =>
+    props.isActive ? "white" : "black"}; // 활성화된 페이지일 때 글자색 흰색
   border: none;
   padding: 10px;
   margin: 0 5px;
@@ -201,29 +299,12 @@ const PaginationButton = styled.button`
   border-radius: 5px;
 
   &:hover {
-    background-color: #3700b3;
-  }
-
-  &:disabled {
-    background-color: #e0e0e0;
-    cursor: not-allowed;
+    background-color: ${(props) =>
+      props.isActive ? "#3700b3" : "#f0f0f0"}; // hover 시 배경색 변화
   }
 `;
 
-// 이름 가운제 * 변경 관련련
-const replaceMiddleChar = (str) => {
-  if (!str || typeof str !== "string") {
-    // str이 falsy(null, undefined, 빈 문자열)거나 문자열이 아닌 경우 기본값 반환
-    console.warn("Invalid input for replaceMiddleChar:", str);
-    return ""; // 기본값으로 빈 문자열 반환
-  }
 
-  const len = str.length;
-  if (len === 0) return str; // 빈 문자열일 경우 원본 반환
-
-  const middleIndex = Math.floor(len / 2); // 가운데 글자 인덱스
-  return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1); // 가운데 글자를 '*'로 변경
-};
 
 const StudentRecord = () => {
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
@@ -236,6 +317,8 @@ const StudentRecord = () => {
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [dropDownError, setDropDownError] = useState(null); // DropDown 에러 상태
   const [contentsError, setContentsError] = useState(null); // 자소서 데이터 에러 상태
+  const [purchasedFileIds, setPurchasedFileIds] = useState([]); // 해당 유저가 구매한 자료 현황
+  const [keywords, setKeywords] = useState(""); // 키워드 검색 밸류
 
   // 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
@@ -317,20 +400,24 @@ const StudentRecord = () => {
         limit: itemsPerPage,
         univName: selectedUniv,
         univDept: selectedDept,
+        keywords: keywords,
       };
       // console.log(params);
       const response = await DocumentsApi.getSRContents(
         params.page,
         params.limit,
         params.univName,
-        params.univDept
+        params.univDept,
+        params.keywords,
       );
 
+      console.log(response);
       const items = response.content || response.items;
 
       // console.log(items); // 데이터 확인용
       setContentItems(items);
       setFilteredItems(items); // 필터링된 항목 업데이트
+      setPurchasedFileIds(response.purchasedFileIds);
       setTotalPages(
         response.totalPages || Math.ceil(items.length / itemsPerPage)
       ); // 전체 페이지 수 계산
@@ -366,7 +453,7 @@ const StudentRecord = () => {
   };
 
   // "검색" 버튼 클릭 핸들러
-  const handleSearch = () => {
+  const handleDropdownSearch = () => {
     fetchData();
     let filtered = contentItems;
 
@@ -385,6 +472,15 @@ const StudentRecord = () => {
     setCurrentPage(1); // 검색 시 첫 페이지로 리셋
   };
 
+    // "KeyWord 검색" 버튼 클릭 핸들러
+    const handleKeywordSearch = () => {
+      console.log(keywords);
+      if (keywords.trim()) {
+      fetchData();
+      setKeywords("");
+      }
+    }
+
   // 대학명만 고유하게 추출
   const uniqueUnivNames = Object.keys(dropDwonList);
 
@@ -401,8 +497,29 @@ const StudentRecord = () => {
   }
 
   const handleTopClick = (selectedData) => {
-    navigate("/StudentRecordDetail", { state: { item: selectedData } } );
+    navigate("/StudentRecordDetail", { state: { item: selectedData, purchasedFileIds : purchasedFileIds } } );
   };
+
+    // 입력시 Dropdown 검색 disabled
+    const handleKeywordChange = (e) => {
+      setKeywords(e.target.value);
+    };
+    
+
+  // 이름 가운제 * 변경 관련련
+const replaceMiddleChar = (str) => {
+  if (!str || typeof str !== "string") {
+    // str이 falsy(null, undefined, 빈 문자열)거나 문자열이 아닌 경우 기본값 반환
+    console.warn("Invalid input for replaceMiddleChar:", str);
+    return ""; // 기본값으로 빈 문자열 반환
+  }
+
+  const len = str.length;
+  if (len === 0) return str; // 빈 문자열일 경우 원본 반환
+
+  const middleIndex = Math.floor(len / 2); // 가운데 글자 인덱스
+  return str.slice(0, middleIndex) + "*" + str.slice(middleIndex + 1); // 가운데 글자를 '*'로 변경
+};
 
   // 자릿수만 포맷팅하는 함수
 const formatPrice = (price) => {
@@ -420,7 +537,7 @@ const formatPrice = (price) => {
         <Title>생활기록부</Title>
         <Search>
           <DropdownContainer>
-            <Dropdown onChange={handleUnivChange} value={selectedUniv}>
+            <Dropdown onChange={handleUnivChange} value={selectedUniv} disabled={!!keywords} >
               <option value="">대학명</option>
               {uniqueUnivNames.map((univName, index) => (
                 <option key={index} value={univName}>
@@ -446,7 +563,9 @@ const formatPrice = (price) => {
               )}
             </Dropdown>
           </DropdownContainer>
-          <KeywordSearchButton onClick={handleSearch} />
+          <DropdownSearchButton onClick={handleDropdownSearch} disabled={!!keywords} />
+          <KeywordSerarchInput  placeholder="키워드를 검색하세요" onChange={handleKeywordChange} disabled={!!selectedUniv}/>
+          <KeywordSearchButton onClick={handleKeywordSearch} disabled={!!selectedUniv}/>
         </Search>
       </Top>
       <Line />
@@ -466,9 +585,9 @@ const formatPrice = (price) => {
                   <AuthName>{replaceMiddleChar(item.memberName)}</AuthName>
                   <ContentsPrice>{formatPrice(item.price)}원</ContentsPrice>
                 </ContentsBottomBox>
-                <BuyButton>
-                  구매하기
-                </BuyButton>
+                <DetailDisplay>
+                  상세보기
+                </DetailDisplay>
               </ContentsBottom>
             </ContentsBox>
           ))
@@ -476,8 +595,9 @@ const formatPrice = (price) => {
           <div>조건에 맞는 데이터가 없습니다.</div>
         )}
       </Contents>
-      {/* 페이지네이션 컨트롤 */}
-      <PaginationContainer>
+      
+     {/* 페이지네이션 컨트롤 */}
+     <PaginationContainer>
         <PaginationButton
           onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
@@ -493,7 +613,7 @@ const formatPrice = (price) => {
           <PaginationButton
             key={startPage + index}
             onClick={() => handlePageChange(startPage + index)}
-            disabled={currentPage === startPage + index}
+            isActive={currentPage === startPage + index} // 현재 페이지일 때만 보라색 배경
           >
             {startPage + index}
           </PaginationButton>

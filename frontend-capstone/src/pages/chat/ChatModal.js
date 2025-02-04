@@ -32,7 +32,7 @@ export const Container = styled.div`
 const ChatIconBox = styled.div`
     position: fixed;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 990;
     bottom: 30px;
     right: 30px;
 `
@@ -61,10 +61,12 @@ export const StyledSideMenu = styled.div`
     right: 30px;
     bottom: 50px;
     width: 400px;
-    height: 700px;
+    //height: 700px;
+    aspect-ratio: 4 / 7;
+    background-color: #FFF;
     border-radius: 30px;
     box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.5);
-    z-index: ${props => props.isOpen ? "-1" : "100"};
+    z-index: ${props => props.isOpen ? "-1000" : "1000"};
     transform: ${props => props.isOpen ? "translateY(0)" : "translateY(-10%)"};
     opacity: ${props => props.isOpen ? "0" : "1"};
     transition: 0.5s ease;

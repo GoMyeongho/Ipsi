@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import styled from "styled-components";
 import Commons from "../util/Common";
 
@@ -88,9 +88,13 @@ const DateText = styled.p`
 `;
 
 const TextListComponent = ({ list, onAuthorClick }) => {
+	const {category} = useParams();
+	
 	if (!list || list.length === 0) {
 		return <div>데이터가 없습니다.</div>;
 	}
+	
+	
 	
 	return (
 		<Container>
@@ -98,16 +102,19 @@ const TextListComponent = ({ list, onAuthorClick }) => {
 			{list.map((item, index) => (
 				<BoardItem key={index}>
 					<IndexCell>{index + 1}</IndexCell>
-					<TitleContainer href={`/post/detail/${item.boardId}`}>
+					<TitleContainer to={`/post/detail/${item.boardId}`}>
 						<TitleCell>{item.title}</TitleCell>
-						<SummaryText>{item.summary}</SummaryText>
+						{category !== "faq" && <SummaryText>{item.summary}</SummaryText>}
 					</TitleContainer>
-					<BoardFooter>
-						<AuthorText onClick={() => onAuthorClick(item.nickName)}>
-							{item.nickName}
-						</AuthorText>
-						<DateText>{Commons.formatDate(item.regDate)}</DateText>
-					</BoardFooter>
+					{
+						category !== "faq" &&
+						<BoardFooter>
+							<AuthorText onClick={() => onAuthorClick(item.nickName)}>
+								{item.nickName}
+							</AuthorText>
+							<DateText>{Commons.formatDate(item.regDate)}</DateText>
+						</BoardFooter>
+					}
 				</BoardItem>
 			))}
 		</Container>

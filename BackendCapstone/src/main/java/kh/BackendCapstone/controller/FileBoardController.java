@@ -1,17 +1,30 @@
 package kh.BackendCapstone.controller;
 
 import kh.BackendCapstone.constant.FileCategory;
+import kh.BackendCapstone.dto.request.ReviewReqDto;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
-import kh.BackendCapstone.dto.response.UnivResponse;
-import kh.BackendCapstone.jwt.TokenProvider;
+import kh.BackendCapstone.dto.response.ContentsItemPageResDto;
+import kh.BackendCapstone.dto.response.FilePurchaseStatusResDto;
+import kh.BackendCapstone.dto.response.ReviewResDto;
 import kh.BackendCapstone.service.FileBoardService;
+import kh.BackendCapstone.service.PayService;
+import kh.BackendCapstone.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j // 로깅 기능 추가
@@ -22,56 +35,97 @@ import java.util.List;
 public class FileBoardController {
 	
 	private final FileBoardService fileBoardService;
-	private final TokenProvider tokenProvider;
-	
-	// 대학 정보 조회
-	@GetMapping("/psList")
-	public ResponseEntity<UnivResponse> getPersonalStatementList(
-		@RequestParam int page,
-		@RequestParam int limit,
-		@RequestParam(required = false) String univName,
-		@RequestParam(required = false) String univDept) {
-		try {
-			// 대학 정보와 페이지 수를 한 번에 가져옴
-			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "ps");
-			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "ps");
-			
-			// DTO로 응답 반환
-			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
-			log.warn("wdqdqwd{}",response);
-			return ResponseEntity.ok(response);
-		} catch (Exception e) {
-			return ResponseEntity.status(500).body(null);
-		}
-	}
+	private final PayService payService;
+	private final ReviewService reviewService;
 
-	// 대학 정보 조회
-	@GetMapping("/srList")
-	public ResponseEntity<UnivResponse> getStudentRecordList(
+	// 자기소개서 자료 목록 Item
+	@GetMapping("/psList")
+	public ResponseEntity<ContentsItemPageResDto> getPersonalStatementList(
 			@RequestParam int page,
 			@RequestParam int limit,
 			@RequestParam(required = false) String univName,
-			@RequestParam(required = false) String univDept) {
+			@RequestParam(required = false) String univDept,
+			@RequestParam(required = false) Long memberId, // 요청 파라미터로 memberId 받기
+			@RequestParam(required = false) String keywords // 추가된 파라미터 keyword
+	) {
 		try {
-			// 대학 정보와 페이지 수를 한 번에 가져옴
-			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "sr");
-			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "sr");
+			// keyword를 검색에 반영하도록 수정
+			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "ps", keywords);
+			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "ps", keywords);
 
-			// DTO로 응답 반환
-			UnivResponse response = new UnivResponse(fileBoardResDtos, totalPages);
-			log.warn("wdqdqwd{}",response);
-			log.info("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ{}",response);
+			List<FilePurchaseStatusResDto> filePurchaseStatus = new ArrayList<>();
+			if (memberId != null && memberId > 0) {
+				try {
+					filePurchaseStatus = payService.getPurchasedFileStatusesByMemberId(memberId);
+				} catch (EntityNotFoundException e) {
+//                log.warn("No purchase information found for memberId: {}", memberId);
+				}
+			}
+
+			ContentsItemPageResDto response = new ContentsItemPageResDto(fileBoardResDtos, totalPages, filePurchaseStatus);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
+			log.error("Error occurred while processing request", e);
 			return ResponseEntity.status(500).body(null);
 		}
 	}
 
+	// 생활기록부 자료 목록 Item
+	@GetMapping("/srList")
+	public ResponseEntity<ContentsItemPageResDto> getStudentRecordList(
+			@RequestParam int page,
+			@RequestParam int limit,
+			@RequestParam(required = false) String univName,
+			@RequestParam(required = false) String univDept,
+			@RequestParam(required = false) Long memberId, // 요청 파라미터로 memberId 받기
+			@RequestParam(required = false) String keywords // 추가된 파라미터 keyword
+	) {
+		try {
+			List<FileBoardResDto> fileBoardResDtos = fileBoardService.getContents(page, limit, univName, univDept, "sr",keywords);
+			int totalPages = fileBoardService.getPageSize(limit, univName, univDept, "sr",keywords);
+
+			List<FilePurchaseStatusResDto> filePurchaseStatus = new ArrayList<>();
+			if (memberId != null && memberId > 0) {
+				try {
+					filePurchaseStatus = payService.getPurchasedFileStatusesByMemberId(memberId);
+				} catch (EntityNotFoundException e) {
+//					log.warn("No purchase information found for memberId: {}", memberId);
+				}
+			}
+
+			ContentsItemPageResDto response = new ContentsItemPageResDto(fileBoardResDtos, totalPages, filePurchaseStatus);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("Error occurred while processing request", e);
+			return ResponseEntity.status(500).body(null);
+		}
+	}
+
+	// 업로드한 자소서 내역 확인
+	@GetMapping("/uploadedEnumPS")
+	public List<FileBoardResDto> getUploadedPSItems(@RequestParam Long memberId,
+											  @RequestParam("fileCategory") FileCategory fileCategory) {
+
+
+//		log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
+		return fileBoardService.getUploadedData(memberId, fileCategory);
+	}
+
+	// 업로드한 생기부 내역 확인
+	@GetMapping("/uploadedEnumSR")
+	public List<FileBoardResDto> getUploadedSRItems(      @RequestParam Long memberId,
+													@RequestParam("fileCategory") FileCategory fileCategory) {
+//		log.info("Fetching purchased items for member ID: {} with fileCategory: {}", memberId, fileCategory);
+		return fileBoardService.getUploadedData(memberId, fileCategory);
+	}
+
+	// 자료 업로드(저장)
 	@PostMapping("/save")
 	public ResponseEntity<String> saveFileBoard(
 			@RequestParam("title") String title,
 			@RequestParam("mainFile") MultipartFile mainFile,
 			@RequestParam(value = "preview", required = false) MultipartFile preview,
+			@RequestParam("folderPath") String folderPath,  // 파일 경로 받기
 			@RequestParam(value = "summary", required = false) String summary,
 			@RequestParam("univName") String univName,
 			@RequestParam("univDept") String univDept,
@@ -91,12 +145,12 @@ public class FileBoardController {
 				System.out.println("No preview file provided. Proceeding without it.");
 			} else {
 				// preview 파일이 존재하면, getOriginalFilename을 안전하게 호출할 수 있습니다.
-				String previewFileName = preview.getOriginalFilename();
-				System.out.println("Preview file: " + previewFileName);
+				String previewName = preview.getOriginalFilename();
+				System.out.println("Preview file: " + previewName);
 			}
 
 			if (summary == null || summary.trim().isEmpty()) {
-				summary = "No summary provided"; // 기본값 설정
+				summary = ""; // 기본값 설정
 			}
 
 			if (keywords == null || keywords.isEmpty()) {
@@ -108,7 +162,7 @@ public class FileBoardController {
 
 			// 서비스 호출
 			fileBoardService.saveFileBoard(
-					title, mainFile, preview, summary, univName, univDept, price, fileCategory, keywords, memberId); // memberId 추가
+					title, mainFile, preview, folderPath, summary, univName, univDept, price, fileCategory, keywords, memberId ); // memberId 추가
 			return ResponseEntity.ok("파일 저장 성공");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -116,7 +170,57 @@ public class FileBoardController {
 		}
 	}
 
+	// Main File, Preview File 다운로드
+	@GetMapping("/download")
+	public ResponseEntity<Resource> downloadFile(
+			@RequestParam("fileUrl") String fileUrl,
+			@RequestParam("fileName") String fileName) throws MalformedURLException {
 
+		// Firebase URL을 Resource로 변환
+		Resource resource = new UrlResource(fileUrl);
 
+		if (!resource.exists() || !resource.isReadable()) {
+			throw new RuntimeException("파일을 읽을 수 없거나 존재하지 않습니다: " + fileUrl);
+		}
+
+		// Firebase URL에서 실제 파일 이름만 추출 (경로와 파라미터 제거)
+		String actualFileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1); // 마지막 '/' 이후 부분만 추출
+
+		// 쿼리 파라미터 제거 (이미 쿼리 파라미터가 있는 경우)
+		int queryParamIndex = actualFileName.indexOf('?');
+		if (queryParamIndex != -1) {
+			actualFileName = actualFileName.substring(0, queryParamIndex);
+		}
+
+		// 디버깅: 실제 파일 이름 출력
+//		log.warn("Extracted actual file name from URL: {}", actualFileName);
+
+		// URL 디코딩
+		String decodedFileName = null;
+		try {
+			decodedFileName = URLDecoder.decode(actualFileName, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("파일 이름 디코딩 실패", e);
+		}
+
+		// 디버깅: 디코딩된 파일 이름 출력
+//		log.warn("Decoded file name: {}", decodedFileName);
+
+		// 실제 파일 이름만 추출 (이제 경로를 제외한 파일명만 남음)
+		String fileNameOnly = decodedFileName.substring(decodedFileName.lastIndexOf("/") + 1);
+
+		// 디버깅: 파일명만 출력
+//		log.warn("Cleaned file name: {}", fileNameOnly);
+
+		// Content-Disposition 헤더 설정 전에 로그 출력
+		String contentDisposition = "attachment; filename=\"" + fileNameOnly + "\"";
+//		log.warn("Setting Content-Disposition header with value: {}", contentDisposition);
+
+		// HTTP 응답 헤더 설정 (파일 다운로드)
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+				.body(resource);
+	}
 
 }

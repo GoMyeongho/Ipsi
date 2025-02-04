@@ -1,5 +1,4 @@
-package kh.BackendCapstone.entity;//		package kh.BackendCapstone.entity;
-
+package kh.BackendCapstone.entity;
 
 import kh.BackendCapstone.constant.Authority;
 

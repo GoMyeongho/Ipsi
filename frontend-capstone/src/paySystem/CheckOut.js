@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DocumentsApi from "../api/DocumentsApi";
 
 const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
@@ -65,7 +65,6 @@ export function CheckoutPage() {
 
   const handlePayment = async () => {
     const orderId = generateRandomString();
-    console.log(orderId);
     // 2. 결제 정보를 서버에 저장합니다.
     const formData = new FormData();
     formData.append("fileBoardId", productItem?.fileBoardId); // fileBoardId 전송
@@ -73,6 +72,8 @@ export function CheckoutPage() {
 
     // 서버에 결제 정보를 저장하는 요청
     const response = await DocumentsApi.getPaySave(formData);
+    console.log(response);
+
     try {
       // 1. 결제를 요청하기 전에 fileBoardId를 서버로 보냅니다.
       // 서버에 결제 정보를 저장하기 위한 요청
@@ -94,6 +95,12 @@ export function CheckoutPage() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const goBack = () => {
+    navigate(-1);  // 이전 페이지로 돌아가기
+  };
+
   return (
     <div className="wrapper w-100">
       <div className="max-w-540 w-100">
@@ -111,8 +118,11 @@ export function CheckoutPage() {
           >
             결제하기
           </button>
+          <button className="btn primary w-100" onClick={goBack}>뒤로가기</button>
         </div>
       </div>
     </div>
   );
 }
+export default CheckoutPage;
+

@@ -6,6 +6,7 @@ import kh.BackendCapstone.service.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -73,6 +74,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 				corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 				corsConfig.setAllowCredentials(true); // 쿠키 허용
 				corsConfig.addAllowedHeader("*");
+				corsConfig.setExposedHeaders(List.of(HttpHeaders.CONTENT_DISPOSITION));  // Content-Disposition 헤더 노출
 				return corsConfig;
 			})
 			.and()
@@ -87,7 +89,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 			.accessDeniedHandler(jwtAccessDeniedHandler)
 			.and()
 			.authorizeRequests()
-			.antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/oauth2/**", "/api/v1/auth/**", "/api/v1/payments/**", "/chat/**", "/flask/**", "/file/**", "/univ/**", "/board/**","/pay/**").permitAll()
+			.antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/oauth2/**", "/api/v1/auth/**", "/api/v1/payments/**", "/chat/**", "/flask/**", "/file/**", "/univ/**", "/board/**","/pay/**", "/write/**").permitAll()
 			.antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
 			.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.antMatchers("/favicon.ico", "/manifest.json").permitAll()

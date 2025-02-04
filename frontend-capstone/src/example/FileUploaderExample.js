@@ -57,7 +57,7 @@ const UploadPage = () => {
 			
 			{/* FileUploader 컴포넌트 사용 */}
 			<FileUploader
-				folderPath="test"  // 업로드할 폴더 경로
+				folderPath="test/test"  // 업로드할 폴더 경로
 				uploadApi={customUploadApi}    // 파일 업로드 API 함수
 				onProgress={handleProgress}    // 업로드 진행 상태를 추적하는 함수
 			/>

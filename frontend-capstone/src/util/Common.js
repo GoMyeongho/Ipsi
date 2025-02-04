@@ -3,43 +3,42 @@ import "moment/locale/ko";
 import axios from "axios";
 moment.locale("ko"); // 한국 시간 적용
 
-
 const Commons = {
-	Capstone: "http://localhost:8111",
-	Capstone_URL: "ws://localhost:8111/ws/chat",
-	timeFromNow: (timestamp) => {
-		return moment(timestamp).fromNow();
-	},
-	formatDateAndTime: (dateString) => {
-		const date = new Date(dateString);
-		const year = date.getFullYear();
-		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
-		const day = ("0" + date.getDate()).slice(-2);
-		const hour = ("0" + date.getHours()).slice(-2);
-		const minute = ("0" + date.getMinutes()).slice(-2);
-		return `${year}년 ${month}월 ${day}일 ${hour}시 ${minute}분`;
-	},
-	formatDate: (dateString) => {
-		const date = new Date(dateString);
-		const year = date.getFullYear();
-		const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
-		const day = ("0" + date.getDate()).slice(-2);
-		return `${year}-${month}-${day}` ;
-	},
-	
-	getAccessToken: () => {
-		console.log(localStorage.getItem("accessToken"))
-		return localStorage.getItem("accessToken")
-	},
-	setAccessToken: (token) => {
-		localStorage.setItem("accessToken", token)
-	},
-	getRefreshToken: () => {
-		return localStorage.getItem("refreshToken")
-	},
-	setRefreshToken: (token) => {
-		localStorage.setItem("refreshToken",token)
-	},
+  Capstone: "http://localhost:8111",
+  Capstone_URL: "ws://localhost:8111/ws/chat",
+  timeFromNow: (timestamp) => {
+    return moment(timestamp).fromNow();
+  },
+  formatDateAndTime: (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
+    const day = ("0" + date.getDate()).slice(-2);
+    const hour = ("0" + date.getHours()).slice(-2);
+    const minute = ("0" + date.getMinutes()).slice(-2);
+    return `${year}년 ${month}월 ${day}일 ${hour}시 ${minute}분`;
+  },
+  formatDate: (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = ("0" + (date.getMonth() + 1)).slice(-2); // Adds leading 0 if needed
+    const day = ("0" + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  },
+
+  getAccessToken: () => {
+    // console.log(localStorage.getItem("accessToken"));
+    return localStorage.getItem("accessToken");
+  },
+  setAccessToken: (token) => {
+    localStorage.setItem("accessToken", token);
+  },
+  getRefreshToken: () => {
+    return localStorage.getItem("refreshToken");
+  },
+  setRefreshToken: (token) => {
+    localStorage.setItem("refreshToken", token);
+  },
 
 	  // accessToken 삭제하기 (로그아웃 시 사용)
 	removeAccessToken: () => {

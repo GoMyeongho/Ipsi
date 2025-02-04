@@ -1,5 +1,6 @@
 package kh.BackendCapstone.entity;
 
+import kh.BackendCapstone.constant.Active;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +24,9 @@ public class Comment {
 	@ManyToOne
 	@JoinColumn(name = "member_id")
 	private Member member;
+	
+	@Enumerated(EnumType.STRING)
+	private Active active;
 	
 	@Column(length = 1000, name = "comment_content")
 	private String content;

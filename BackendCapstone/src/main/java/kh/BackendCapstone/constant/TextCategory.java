@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum TextCategory {
-	DEFAULT("default"), FAQ("faq"), WEB_REVIEW("webReview");
+	DEFAULT("default"), FAQ("faq"), REVIEW("review");
 	
 	// 해당 enum 항목의 문자열 값을 가져오는 메서드
 	private final String value;

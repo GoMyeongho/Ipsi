@@ -1,71 +1,8 @@
 import axios from "axios";
 import Commons from "../util/Common";
-
-
 const Capstone = "http://localhost:8111";
 axios.defaults.withCredentials = true; // 쿠키를 요청에 포함
 const AuthApi = {
-
-
-	// checkLoginStatus: async () => {
-	// 	const accessToken = Commons.getAccessToken();
-	  
-	// 	if (!accessToken) {
-	// 	  // 토큰이 없으면 로그인 페이지로 이동
-	// 	  alert("로그인 해주세요");
-	// 	  window.location.href = "/";
-	// 	  return false; // 로그인 상태가 아님
-	// 	}
-	  
-	// 	try {
-	// 	  const res = await axios.get(`${Capstone}/member/isLogin/${accessToken}`, {
-	// 		headers: {
-	// 		  "Content-Type": "application/json",
-	// 		  Authorization: `Bearer ${accessToken}`,
-	// 		},
-	// 	  });
-	  
-	// 	  if (res.data === true) {
-	// 		console.log("로그인 상태 확인 완료");
-	// 		return true; // 로그인 상태
-	// 	  } else {
-	// 		alert("로그인 필요");
-	// 		window.location.href = "/";
-	// 		return false; // 로그인 상태 아님
-	// 	  }
-	// 	} catch (e) {
-	// 	  console.log(e);
-	// 	  if (e.response && e.response.status === 401) {
-	// 		// 401 오류 발생 시 토큰 만료 처리
-	// 		console.log("로그인 만료, 토큰 재발급 시도 중...");
-	// 		try {
-	// 		  const res = await Commons.handleUnauthorized();
-	// 		  if (res === false) {
-	// 			alert("로그인 해주세요");
-	// 			window.location.href = "/";
-	// 			return false; // 로그인 상태 아님
-	// 		  }
-	// 		  const newToken = Commons.getAccessToken();
-	// 		  if (newToken !== accessToken) {
-	// 			const token = await AuthApi.checkLoginStatus(); // 재확인
-	// 			if (token) {
-	// 			  console.log("로그인 상태 확인 완료");
-	// 			}
-	// 		  }
-	// 		} catch (e) {
-	// 		  console.log(e);
-	// 		  alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-	// 		  window.location.href = "/";
-	// 		  return false;
-	// 		}
-	// 	  } else {
-	// 		// 다른 오류 처리
-	// 		console.log("예기치 않은 오류 발생");
-	// 		window.location.href = "/";
-	// 		return false; // 예기치 않은 오류
-	// 	  }
-	// 	}
-	//   },
 
 	sendPw: async (email) => {
 		return await axios.post(`${Capstone}/auth/sendPw`, { email: email }); // email을 객체로 감싸서 전달
@@ -148,7 +85,7 @@ const AuthApi = {
 			return await axios.post(
 				`${Capstone}/member/changeNickName`,
 				{
-					
+
 					nickname: inputNickName
 				},
 				{
@@ -225,10 +162,10 @@ const AuthApi = {
 			  Authorization: `Bearer ${token}`, // Bearer 형식으로 토큰 적용
 			},
 		  });
-	  
+
 		  const memberData = response.data;
 		  return memberData
-		
+
 		} catch (error) {
 		  console.error("회원 정보 요청 실패:", error.message || error);
 		}
@@ -245,7 +182,7 @@ const AuthApi = {
 		  throw error;
 		}
 	},
-	
+
 	 getRevenue: async (token) => {
 		try {
 		  const response = await axios.get(`${Capstone}/member/revenue`, {
@@ -272,8 +209,8 @@ const AuthApi = {
 		  throw error;
 		}
 	  },
-	  
-	  
+
+
 	  changeBankInfo : async (memberId,bankName,bankAccount) => {
 		try {
 			const response = await axios.post(`${Capstone}/auth/changeBankInfo`,{
@@ -286,9 +223,9 @@ const AuthApi = {
 			console.log(error)
 		}
 	  },
-	  
 
-	
+
+
 
 		IsLogin : async()=>{
 			const accessToken = Commons.getAccessToken();
@@ -306,7 +243,7 @@ const AuthApi = {
 			  return await axios.post (`${Capstone}/auth/savePermission`,
 				{
 					permissionUrl :permissionUrl
-				},	
+				},
 				{
 					headers: {
 						Authorization: `Bearer ${token}` // 헤더에 토큰 추가
@@ -342,19 +279,15 @@ const AuthApi = {
 				}
 			);
 				console.log(response.data)
-				
+
 				// 서버 응답에서 성공 여부만 반환
 				return response.data; // response.data가 true/false인 경우 이를 그대로 반환
-		
+
 			} catch (error) {
 				console.error("에러 발생", error);
 				throw error; // 에러가 발생하면 다시 throw하여 상위에서 처리
 			}
 
-}
-
-
-}
 
 
 export default AuthApi

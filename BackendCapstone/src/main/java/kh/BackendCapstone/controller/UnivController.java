@@ -28,7 +28,7 @@ public class UnivController {
         try {
             List<Map<String, Object>> dropdownList = univService.getDropDownList();
             // 컨트롤러에서 데이터를 추가로 로그에 남기고 싶다면 여기에 추가
-            log.info("Dropdown Response Data: {}", dropdownList);
+//            log.info("Dropdown Response Data: {}", dropdownList);
             return ResponseEntity.ok(dropdownList);
         } catch (Exception e) {
             log.error("드롭다운 조회 실패: {}", e.getMessage());
@@ -42,7 +42,7 @@ public class UnivController {
     public ResponseEntity<List<Map<String, Object>>> getUnivList() {
         try {
             List<Map<String, Object>> univList = univService.getUnivList();
-            log.info("Univ List Response Data: {}", univList);
+//            log.info("Univ List Response Data: {}", univList);
             return ResponseEntity.ok(univList);
         } catch (Exception e) {
             log.error("대학 목록 조회 실패: {}", e.getMessage());
@@ -55,7 +55,7 @@ public class UnivController {
     public ResponseEntity<List<Map<String, Object>>> getDeptList(@RequestParam String univName) {
         try {
             List<Map<String, Object>> deptList = univService.getDeptList(univName);
-            log.info("Dept List for University {}: {}", univName, deptList);
+//            log.info("Dept List for University {}: {}", univName, deptList);
             return ResponseEntity.ok(deptList);
         } catch (Exception e) {
             log.error("학과 목록 조회 실패: {}", e.getMessage());

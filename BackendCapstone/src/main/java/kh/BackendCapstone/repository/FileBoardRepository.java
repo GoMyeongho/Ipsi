@@ -12,9 +12,18 @@ import java.util.List;
 
 @Repository
 public interface FileBoardRepository extends JpaRepository<FileBoard, Long> {
+
+    Page<FileBoard> findAllByKeywordsContainingAndFileCategory(String keywords, FileCategory fileCategory, Pageable pageable);
+
     Page<FileBoard> findAllByFileCategory(FileCategory fileCategory, Pageable pageable);
 
     Page<FileBoard> findAllByUnivInAndFileCategory(List<Univ> univList, FileCategory fileCategory, Pageable pageable);
 
     Page<FileBoard> findAllByUniv_UnivNameAndFileCategory(String univName, FileCategory fileCategory, Pageable pageable);
+
+    // 회원 ID와 파일 카테고리로 필터링된 파일 목록을 조회하는 메서드
+    List<FileBoard> findByMember_MemberIdAndFileCategory(Long memberId, FileCategory fileCategory);
+
+    List<FileBoard> findAllByFileCategory(FileCategory fileCategory);
+
 }

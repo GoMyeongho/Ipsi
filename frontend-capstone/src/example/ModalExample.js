@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import RejectModal from "../component/RejectModal";
-import ConfirmModal from "../component/ConfirmModal";
+import RejectModal from "../component/Modal/RejectModal";
+import ConfirmModal from "../component/Modal/ConfirmModal";
 import { Button } from "@mui/material";
 
 const ModalExample = () => {

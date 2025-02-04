@@ -41,7 +41,33 @@ public class MemberController {
 		log.info("memberResDto : {}", memberResDto);
 		return ResponseEntity.ok(memberResDto);
 	}
+	@GetMapping("/nickName")
+	public ResponseEntity<String> getEmailFromToken(@RequestHeader("Authorization") String token) {
+		try {
+			String nickName = memberService.convertTokenToEntity(token).getNickName();
+			return ResponseEntity.ok(nickName);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+		}
+	}
 
+
+	@PostMapping("/updateUser")
+	public ResponseEntity<Boolean> updateMember(@RequestBody MemberReqDto memberReqDto) {
+		boolean isSuccess = memberService.updateMember(memberReqDto);
+		log.info("수정 성공 여부 : {}", isSuccess);
+		return ResponseEntity.ok(isSuccess);
+	}
+
+	@GetMapping("/memberId")
+	public ResponseEntity<Long> getMemberIdFromToken(@RequestHeader("Authorization") String token) {
+		try {
+			Long memberId = memberService.convertTokenToEntity(token).getMemberId();
+			return ResponseEntity.ok(memberId);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Long.valueOf("Invalid token"));
+		}
+	}
 
 	@PostMapping("/deleteUser/{email}")
 	public ResponseEntity<Boolean> deleteMember(@PathVariable String email) {
@@ -49,12 +75,12 @@ public class MemberController {
 		log.info("삭제 성공 여부 : {}", isSuccess);
 		return ResponseEntity.ok(isSuccess);
 	}
-
 	// 받는거
-	@GetMapping("/isRole/{role}")
-	public ResponseEntity<Boolean> isRole(@PathVariable String role, @RequestHeader("Authorization") String token) {
-		boolean isSuccess = memberService.isRole(role, token);
-		return ResponseEntity.ok(isSuccess);
+	@GetMapping("/role")
+	public ResponseEntity<String> isRole(@RequestHeader("Authorization") String token) {
+		log.warn("확인");
+		String role = memberService.getRole(token);
+		return ResponseEntity.ok(role);
 	}
 
 	@GetMapping("/revenue")
