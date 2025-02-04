@@ -3,8 +3,12 @@
 	import kh.BackendCapstone.dto.AccessTokenDto;
 	import kh.BackendCapstone.dto.TokenDto;
 	import kh.BackendCapstone.dto.request.MemberReqDto;
+	import kh.BackendCapstone.dto.request.PermissionReqDto;
 	import kh.BackendCapstone.dto.response.MemberResDto;
+	import kh.BackendCapstone.entity.Bank;
 	import kh.BackendCapstone.entity.Member;
+	import kh.BackendCapstone.entity.Permission;
+	import kh.BackendCapstone.jwt.TokenProvider;
 	import kh.BackendCapstone.security.SecurityUtil;
 	import kh.BackendCapstone.service.AuthService;
 	import kh.BackendCapstone.service.EmailService;
@@ -13,15 +17,17 @@
 
 	import lombok.RequiredArgsConstructor;
 	import lombok.extern.slf4j.Slf4j;
-	import org.springframework.beans.factory.annotation.Autowired;
+
 	import org.springframework.http.HttpStatus;
 	import org.springframework.http.ResponseEntity;
+
 	import org.springframework.security.crypto.password.PasswordEncoder;
 	import org.springframework.web.bind.annotation.*;
 
-	import javax.servlet.http.HttpSession;
-	import java.util.HashMap;
-	import java.util.Map;
+
+
+	import java.util.List;
+
 
 	@Slf4j
 	@CrossOrigin(origins = "http://localhost:3000")
@@ -34,7 +40,7 @@
 		private final EmailService emailService;
 		private final MemberService memberService;
 		private final PasswordEncoder passwordEncoder;
-
+		private  final TokenProvider tokenProvider;
 
 
 		@GetMapping("/getMemberId")
@@ -55,9 +61,9 @@
 		}
 
 		// 닉네임 중복 확인
-		@GetMapping("/nickname/{nickName}")
-		public ResponseEntity<Boolean> existNickName(@PathVariable String nickName) {
-			boolean existNickName = authService.existNickName(nickName);
+		@GetMapping("/nickname/{nickname}")
+		public ResponseEntity<Boolean> existNickName(@PathVariable String nickname) {
+			boolean existNickName = authService.existNickName(nickname);
 			log.info("existNickName : {}", existNickName);
 			return ResponseEntity.ok(existNickName);
 		}
@@ -195,6 +201,47 @@
 				return ResponseEntity.ok(false); // 실패했음을 false로 반환
 			}
 		}
+
+		@GetMapping("/isLogin/{token}")
+		public ResponseEntity<Boolean> isLogin(@PathVariable String token) {
+			log.warn("token: {}", token);
+			boolean isTrue = tokenProvider.validateToken(token);
+			return ResponseEntity.ok(isTrue);
+		}
+
+		@PostMapping("/savePermission")
+		public ResponseEntity<Boolean> savePermission(
+				@RequestHeader("Authorization") String token, // 헤더에서 token 받기
+				@RequestBody PermissionReqDto permissionReqDto) { // RequestBody에서 permissionUrl 받기
+
+			try {
+				boolean result = authService.savePermission(token, permissionReqDto.getPermissionUrl());
+				if (result) {
+					return ResponseEntity.ok(true); // 성공적으로 저장되었으면 true 반환
+				} else {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false); // 실패 시 false 반환
+				}
+			} catch (RuntimeException e) {
+				// 예외 처리: 실패 시 상태 코드 400 반환
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
+			}
+		}
+
+
+		@GetMapping("banklist")
+		public ResponseEntity<?> getAllBanks() {
+			try {
+				List<Bank> bankList = authService.getAllBanks();
+				return ResponseEntity.ok(bankList);
+			} catch (RuntimeException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
+			}
+		}
+
+
+
+
+
 
 
 	}

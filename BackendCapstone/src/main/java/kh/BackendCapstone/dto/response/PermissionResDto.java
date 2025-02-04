@@ -23,4 +23,11 @@ public class PermissionResDto {
 	private String permissionUrl;
 	private LocalDateTime regDate;
 	private LocalDateTime activeDate;
-}
+
+	// 필요한 필드만 받는 생성자 추가
+	public PermissionResDto(Long memberId, String univName, String univDept) {
+		this.memberId = memberId;
+		this.univName = univName;
+		this.univDept = univDept;
+	}
+	}

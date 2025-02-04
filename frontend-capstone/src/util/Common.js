@@ -42,9 +42,9 @@ const Commons = {
 	},
 
 	  // accessToken 삭제하기 (로그아웃 시 사용)
-	  removeAccessToken: () => {
+	removeAccessToken: () => {
 		localStorage.removeItem("accessToken");
-	  },
+	},
 	
 	  // refreshToken 삭제하기 (로그아웃 시 사용)
 	  removeRefreshToken: () => {
@@ -98,18 +98,18 @@ const Commons = {
 			}
 		}
 	},
-// 	IsLogin: async () => {
-// 		const accessToken = Commons.getAccessToken();
-// 		return await axiosApi.get(
-// 		  Commons.Capstone + `/auth/isLogin/${accessToken}`,
-// 		  {
-// 			headers: {
-// 			  "Content-Type": "application/json",
-// 			  Authorization: "Bearer " + accessToken,
-// 			},
-// 		  }
-// 		);
-// 	  },
+	IsLogin: async () => {
+		const accessToken = Commons.getAccessToken();
+		return await axios.get(
+		  Commons.Capstone + `/auth/isLogin/${accessToken}`,
+		  {
+			headers: {
+			  "Content-Type": "application/json",
+			  Authorization: "Bearer " + accessToken,
+			},
+		  }
+		);
+	  },
 };
 
 

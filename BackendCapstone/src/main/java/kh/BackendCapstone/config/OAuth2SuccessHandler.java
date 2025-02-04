@@ -35,6 +35,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         long expirationTime = tokenDto.getAccessTokenExpiresIn() / 1000; // 밀리초를 초로 변환
 
         // 프론트엔드로 리다이렉트하면서 토큰과 만료 시간을 전달
-        response.sendRedirect("http://localhost:3000/auth/oauth-response/" + token + "/" + expirationTime);
+        response.sendRedirect("http://uniguide.shop/auth/oauth-response/" + token + "/" + expirationTime);
     }
 }

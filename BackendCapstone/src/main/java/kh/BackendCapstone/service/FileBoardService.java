@@ -4,9 +4,11 @@ import kh.BackendCapstone.constant.FileCategory;
 import kh.BackendCapstone.dto.response.FileBoardResDto;
 import kh.BackendCapstone.entity.FileBoard;
 import kh.BackendCapstone.entity.Member;
+import kh.BackendCapstone.entity.Permission;
 import kh.BackendCapstone.entity.Univ;
 import kh.BackendCapstone.repository.FileBoardRepository;
 import kh.BackendCapstone.repository.MemberRepository;
+import kh.BackendCapstone.repository.PermissionRepository;
 import kh.BackendCapstone.repository.UnivRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ public class FileBoardService {
 	private final FileStorageService fileStorageService;
 	private final UnivRepository univRepository;
 	private final MemberRepository memberRepository;
+	private final PermissionRepository permissionRepository;
 	
 	public int getPageSize(int limit, String univName, String univDept, String category) {
 		Pageable pageable = PageRequest.of(0, limit);
@@ -115,6 +118,8 @@ public class FileBoardService {
 		// DB 저장
 		fileBoardRepository.save(fileBoard);
 	}
+
+
 
 
 	private List<FileBoardResDto> convertEntityToDto(List<FileBoard> fileBoardList) {

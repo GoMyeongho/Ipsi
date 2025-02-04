@@ -39,7 +39,6 @@ public class UnivService {
 		}
 	}
 
-
 	// 모든 대학 목록 조회
 	public List<Map<String, Object>> getUnivList() {
 		try {
@@ -89,6 +88,12 @@ public class UnivService {
 			log.error("학과 목록 조회 실패: 대학명 = {}, 에러 = {}", univName, e.getMessage(), e);
 			throw new RuntimeException("학과 목록을 조회하는 중 문제가 발생했습니다.", e);
 		}
+	}
+
+
+	public Univ getUnivById(Long univId) {
+		return univRepository.findById(univId)
+				.orElseThrow(() -> new IllegalArgumentException("대학교 정보를 찾을 수 없습니다."));
 	}
 	
 	public boolean saveUniv(Univ univ) {

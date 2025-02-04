@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import { useNavigate,useParams } from "react-router-dom"
-import {useCookies} from'react-cookie'
+
 
 export default function OAuth({onLogin}) {
   const{token,expirationTime} = useParams();
-  const[cookie,setCookie] = useCookies();
+
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 상태 선언
 

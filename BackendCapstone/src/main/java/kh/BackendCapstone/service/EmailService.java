@@ -98,18 +98,17 @@ public class EmailService {
     @Transactional
 
     public void changePassword(String newPassword, PasswordEncoder passwordEncoder) {
-        String email = (String) request.getSession().getAttribute("email"); // 수정된 세션 접근 방식
+        Long memberId = (Long) request.getSession().getAttribute("memberId"); // 수정된 세션 접근 방식
         System.out.println("세션 ID: " + request.getSession().getId());
-        if (email == null) {
+        if (memberId == null) {
             throw new RuntimeException("정보가 만료 되었습니다. 인증을 다시 진행해주세요.");
         }
-
-        Optional<Member> memberOptional = memberRepository.findByEmail(email);
+        Optional<Member> memberOptional = memberRepository.findById(memberId);
         Member member = memberOptional.orElseThrow(() -> new RuntimeException("이메일에 해당하는 회원이 존재하지 않습니다."));
 
         String encodedPassword = passwordEncoder.encode(newPassword);
         member.setPwd(encodedPassword);
         memberRepository.save(member);
-        request.getSession().removeAttribute("email"); // 세션에서 이메일 제거
+        request.getSession().removeAttribute("memberId"); // 세션에서 이메일 제거
     }
 }

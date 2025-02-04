@@ -27,6 +27,9 @@ import FileUploaderExample from "./example/FileUploaderExample";
 import OAuth from './pages/auth/login/OAuth';
 import {useState} from "react";
 import PermissionDetailMain from "./pages/admin/auth/item/PermissionDetailMain";
+import MemberEdit from './pages/member/update/MemberEdit';
+import Permission from './pages/member/info/Permission';
+import Withdrawal from './pages/member/info/Withdrawal';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -53,7 +56,11 @@ function App() {
               <Route path="coverLetterRegister" element={<CoverLetterRegister />} />
               <Route path="purchasedEnumPS" element={<PurchasedEnumPS />} />
               <Route path="purchasedEnumSR" element={<PurchasedEnumSR />} />
+              <Route path="memberEdit" element={<MemberEdit />} />
+              <Route path="permission" element={<Permission />} />
+              <Route path="withdrawal" element={<Withdrawal/>}/>
             </Route>
+            
 
             {/* 테스트 페이지 */}
             <Route path="test/modal" element={<ModalExample />} />

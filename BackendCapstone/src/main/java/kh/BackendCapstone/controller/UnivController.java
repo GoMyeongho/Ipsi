@@ -2,6 +2,7 @@ package kh.BackendCapstone.controller;
 
 
 
+import kh.BackendCapstone.entity.Univ;
 import kh.BackendCapstone.service.UnivService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class UnivController {
         }
     }
 
+
     // 대학 목록 조회 (추가된 메서드)
     @GetMapping("/univList")
     public ResponseEntity<List<Map<String, Object>>> getUnivList() {
@@ -58,6 +60,16 @@ public class UnivController {
         } catch (Exception e) {
             log.error("학과 목록 조회 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{univId}")
+    public ResponseEntity<?> getUnivDetails(@PathVariable Long univId) {
+        try {
+            Univ univ = univService.getUnivById(univId);
+            return ResponseEntity.ok(univ);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body("{\"message\": \"대학교 정보를 찾을 수 없습니다.\"}");
         }
     }
 

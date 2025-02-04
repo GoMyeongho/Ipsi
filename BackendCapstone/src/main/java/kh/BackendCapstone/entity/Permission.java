@@ -14,9 +14,9 @@ public class Permission {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long permissionId;
-	
-	@ManyToOne
-	@JoinColumn(name = "univ_id")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "univ_id")  // univ_id 컬럼 이름 변경
 	private Univ univ;
 	
 	@ManyToOne
@@ -24,8 +24,9 @@ public class Permission {
 	private Member member;
 	
 	private String permissionUrl;
+
 	@Enumerated(EnumType.STRING)
-	private Active active;
+	private Active active = Active.INACTIVE;
 	
 	@Column(name = "permission_reg_date")
 	private LocalDateTime regDate;

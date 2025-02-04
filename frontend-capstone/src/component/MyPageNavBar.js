@@ -1,7 +1,8 @@
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import CheckLogin from "../function/LoginCheckButton";
+
+import CheckLogin from "../function/LoginCheckButton"; // LoginCheckButton 임포트
 const Background = styled.div`
   width: 100%;
   height: 100%;
@@ -105,6 +106,8 @@ const Right = styled.div`
 const MyPageNavBar = () => {
   const navigate = useNavigate(); // 페이지 전환 훅
 
+  
+
   return (
     <>
       <Background>
@@ -115,11 +118,9 @@ const MyPageNavBar = () => {
 
             <SubTitle1>
               나의 계정정보
-              {/* CheckLogin을 사용하여 인증 후 정보수정 페이지로 바로 이동 */}
-              <CheckLogin targetPage="MemberEdit">
-                <p>회원정보수정</p>
-              </CheckLogin>
-              <p onClick={() => navigate("")}>업로드 권한 확인</p>
+              <p onClick={() => navigate("memberEdit")}>회원정보수정</p> 
+              <p onClick={() => navigate("permission")}>업로드 권한 확인</p>
+              <p onClick={() => navigate("withdrawal")}>수익금 정산</p>
             </SubTitle1>
 
             <SubTitle2>

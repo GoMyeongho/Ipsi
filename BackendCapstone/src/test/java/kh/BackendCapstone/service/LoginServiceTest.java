@@ -37,11 +37,11 @@ class LoginServiceTest {
     @Test
     @DisplayName("로그인 테스트")
     void loginServiceTest() {
-        // Given
-        // 이미 가입된 회원이 있다고 가정
+        // Given: 이미 가입된 회원이 있다고 가정
         Member member = memberRepository.findByEmail("test@example.com")
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
+        // 비밀번호가 인코딩되어 저장된 경우
         MemberReqDto loginRequest = MemberReqDto.builder()
                 .email("test@example.com")
                 .pwd("password123")
