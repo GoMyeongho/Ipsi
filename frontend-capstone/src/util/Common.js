@@ -27,46 +27,31 @@ const Commons = {
   },
 
   getAccessToken: () => {
-    // console.log(localStorage.getItem("accessToken"));
     return localStorage.getItem("accessToken");
   },
   setAccessToken: (token) => {
-    localStorage.setItem("accessToken", token);
+		localStorage.setItem("accessToken", token)
   },
   getRefreshToken: () => {
     return localStorage.getItem("refreshToken");
   },
   setRefreshToken: (token) => {
-    localStorage.setItem("refreshToken", token);
+    localStorage.setItem("refreshToken", token)
   },
-
-	  // accessToken 삭제하기 (로그아웃 시 사용)
-	removeAccessToken: () => {
-		localStorage.removeItem("accessToken");
-	},
-	
-	  // refreshToken 삭제하기 (로그아웃 시 사용)
-	  removeRefreshToken: () => {
-		localStorage.removeItem("refreshToken");
-	  },
 	
 	// 401 에러 처리 함수
 	handleUnauthorized: async () => {
-		console.log("handleUnauthorized!!!")
-		const accessToken = Commons.getAccessToken()
 		const refreshToken = Commons.getRefreshToken()
-		const config = {
-			headers: {
-				Authorization: `Bearer ${accessToken}`
-			},
-		};
 		try {
-			const rsp = await axios.post(
-				`${Commons.Capstone}/auth/refresh`,
-				refreshToken, config
+			const rsp = await axios.get(
+				`${Commons.Capstone}/auth/refresh`, {params: {refreshToken}}
 			);
-			console.log(rsp.data)
-			Commons.setAccessToken(rsp.data)
+			console.log(rsp)
+			if(rsp.data.accessToken){
+				Commons.setAccessToken(rsp.data.accessToken);
+				return rsp.data.accessToken;
+			}
+			return false;
 		} catch (e) {
 			console.log(e)
 			return false;
@@ -97,18 +82,6 @@ const Commons = {
 			}
 		}
 	},
-	IsLogin: async () => {
-		const accessToken = Commons.getAccessToken();
-		return await axios.get(
-		  Commons.Capstone + `/auth/isLogin/${accessToken}`,
-		  {
-			headers: {
-			  "Content-Type": "application/json",
-			  Authorization: "Bearer " + accessToken,
-			},
-		  }
-		);
-	  },
 };
 
 
